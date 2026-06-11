@@ -4,26 +4,19 @@
                                                                                                          
 
 ```text
- __    __           _ _   _       ___       _            _   ___                           
-/ / /\ \ \___  __ _| | |_| |__   / _ \_ __ | |_  /\   /\/ | / _ \                          
-\ \/  \/ / _ \/ _` | | __| '_ \ / /_\/ '_ \| __| \ \ / /| || | | |                         
- \  /\  /  __/ (_| | | |_| | | / /_\\| |_) | |_   \ V / | || |_| |                         
-  \/  \/ \___|\__,_|_|\__|_| |_\____/| .__/ \__|   \_/  |_(_)___/                          
-                                     |_|                                                   
-   ___                _            _ _   _                   _   _        __  
-  / (_)_ ___ _____ __| |_  __ __ _(_) |_| |_    __ __ _ _  _| |_(_)___ _ _\ \ 
- | || | ' \ V / -_|_-<  _| \ V  V / |  _| ' \  / _/ _` | || |  _| / _ \ ' \| |
- | ||_|_||_\_/\___/__/\__|  \_/\_/|_|\__|_||_| \__\__,_|\_,_|\__|_\___/_||_| |
-  \_\                                                                     /_/
-                                                                   
-                                                                   
+ __        __         _ _   _      ____ ____ _____
+ \ \      / /__  __ _| | |_| |__  / ___|  _ \_   _|
+  \ \ /\ / / _ \/ _` | | __| '_ \| |  _| |_) || |
+   \ V  V /  __/ (_| | | |_| | | | |_| |  __/ | |
+    \_/\_/ \___|\__,_|_|\__|_| |_|\____|_|    |_|
+
+              AI-assisted allocation research
+                    Invest with caution
 ```
 
 # WealthGPT
 
 An AI-assisted portfolio allocation research model for the S&P/TSX 60.
-
-I set out to beat the all-cap weighted TSX 60 ETF (XIU.TO):
 
 WealthGPT combines Modern Portfolio Theory, Black-Litterman expected returns,
 live market data, and structured equity research generated through the OpenAI
@@ -60,7 +53,8 @@ holdings in each portfolio.
 |-- requirements.txt      # Runtime Python dependencies
 |-- .env.example          # Environment-variable template
 |-- .gitignore
-`-- README.md
+|-- README.md
+`-- examples/             # Sanitized transcripts, walkthrough, and sample report
 ```
 
 Generated JSON, CSV, PDF, and chart files are intentionally excluded from Git.
@@ -152,6 +146,11 @@ The PDF report includes:
 - concentration and effective-holdings measures;
 - rationale for the eight largest holdings in each portfolio; and
 - a detailed allocation appendix.
+
+## Example Run
+
+A public-safe walkthrough, sanitized terminal transcripts, and a sample PDF are
+available in [`examples/`](examples/).
 
 ## Important Limitations
 
