@@ -220,7 +220,9 @@ Public-safe transcripts and a sample report are available in
 | UK                 |      20 |
 | Europe             |      28 |
 | **Total Holdings** | **251** |
+
 _Note. Two duplicates are present (249)_
+
 | Sector Group                                            | Count |   % |
 | ------------------------------------------------------- | ----: | --: |
 | Technology / Software                                   |    28 | 11% |
