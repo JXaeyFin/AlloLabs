@@ -1,22 +1,5 @@
 ```text
-                       AAAAAAAAu yAAAAAAAAc                             
-                   AAAAA                AAAAAAAAAAAAAAAA                
-                 TAAA             AAAAAAA              AAAAA            
-           AAAAAAAAA        AAAAAAA                        AAAA         
-       AAAAA     AAA      AAA            AAAAAAAAA          AAAA        
-     AAAA        AAA      CAA      AAAAA         AAAAAAA     AAA        
-    ZAAA         AAA      CAAAAAAA     AAAA            nAAAAAAAA        
-    AAAA         AAA      CAA              AAAAAA            AAAA       
-     AAAA        AAAAA     AA              AA     AAAAA        AAAA     
-       AAAA           gAAAAAA              AAA      AAA         AAAA    
-        NAAAAAAA             AAAA     AAAAAAAA      AAA         AAA0    
-        AAA     AAAAAAA         AAAAA      AAA      AAA        AAAA     
-        AAAA          AAAAAAAAA            AAA      AAA     AAAAA       
-         AAAA                        AAAAAAA        AAAAAAAAA           
-            AAAAA              AAAAAAA             AAAA                 
-                AAAAAAAAAAAAAAAA                AAAAA                   
-                             WAAAAAAAo   1AAAAAAA                       
-                                                                                                                                                                      
+<img width="611" height="611" alt="image" src="https://github.com/user-attachments/assets/b98896bc-1fbf-4f83-9b06-dd44b96f183a" />                                                                                                                               
  __    __           _ _   _       ___       _            _   ___                           
 / / /\ \ \___  __ _| | |_| |__   / _ \_ __ | |_  /\   /\/ | / _ \                          
 \ \/  \/ / _ \/ _` | | __| '_ \ / /_\/ '_ \| __| \ \ / /| || | | |                         
