@@ -1,4 +1,6 @@
-<img width="747" height="747" alt="Untitled design (3)" src="https://github.com/user-attachments/assets/a3b22038-3cbb-4c31-9825-594a137d7168" />
+<p align="center">
+  <img width="560" height="560" alt="Untitled design (3)" src="https://github.com/user-attachments/assets/a3b22038-3cbb-4c31-9825-594a137d7168" />
+</p>
                                                                                                          
 
 ```text
