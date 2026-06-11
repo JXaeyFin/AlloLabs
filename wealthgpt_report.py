@@ -1,4 +1,4 @@
-"""PDF reporting for the TSX portfolio optimization model."""
+"""PDF reporting and sector classification for WealthGPT."""
 
 from __future__ import annotations
 
@@ -87,6 +87,144 @@ SECTOR_MAP = {
     "WSP.TO": "Industrials",
 }
 
+YAHOO_SECTOR_MAP = {
+    "Basic Materials": "Materials",
+    "Communication Services": "Communication Services",
+    "Consumer Cyclical": "Consumer Discretionary",
+    "Consumer Defensive": "Consumer Staples",
+    "Energy": "Energy",
+    "Financial Services": "Financials",
+    "Healthcare": "Health Care",
+    "Industrials": "Industrials",
+    "Real Estate": "Real Estate",
+    "Technology": "Information Technology",
+    "Utilities": "Utilities",
+}
+
+INDUSTRY_KEYWORDS = {
+    "Communication Services": (
+        "advertising", "broadcast", "entertainment", "gaming", "media",
+        "publishing", "telecom", "wireless",
+    ),
+    "Consumer Discretionary": (
+        "apparel", "auto", "casino", "consumer electronics", "hotel",
+        "internet retail", "leisure", "lodging", "luxury", "restaurant",
+        "retail", "travel",
+    ),
+    "Consumer Staples": (
+        "beverage", "confection", "discount store", "food", "grocery",
+        "household", "packaged", "personal care", "tobacco",
+    ),
+    "Energy": (
+        "coal", "drilling", "energy", "exploration", "oil", "petroleum",
+        "pipeline", "refining",
+    ),
+    "Financials": (
+        "asset management", "bank", "capital market", "credit", "exchange",
+        "financial", "insurance", "mortgage", "payments",
+    ),
+    "Health Care": (
+        "biotech", "diagnostic", "drug", "health", "life science", "medical",
+        "pharma",
+    ),
+    "Industrials": (
+        "aerospace", "air freight", "airline", "business services",
+        "construction", "defense", "engineering", "industrial", "logistics",
+        "machinery", "rail", "transport", "waste",
+    ),
+    "Information Technology": (
+        "application software", "cloud", "computer", "cyber", "data processing",
+        "electronic", "information technology", "semiconductor", "software",
+        "technology hardware",
+    ),
+    "Materials": (
+        "aluminum", "chemical", "copper", "forest", "gold", "materials",
+        "metal", "mining", "paper", "steel",
+    ),
+    "Real Estate": ("real estate", "reit"),
+    "Utilities": (
+        "electric", "gas utility", "independent power", "regulated", "utility",
+        "utilities", "water",
+    ),
+}
+
+LAST_SECTORS: dict[str, str] = {}
+
+
+def _infer_sector(industry):
+    normalized = str(industry or "").strip().lower()
+    for sector, keywords in INDUSTRY_KEYWORDS.items():
+        if any(keyword in normalized for keyword in keywords):
+            return sector
+    return None
+
+
+def _load_sector_cache(path):
+    try:
+        payload = json.loads(Path(path).read_text(encoding="utf-8"))
+        return {
+            str(ticker): str(sector)
+            for ticker, sector in payload.items()
+            if isinstance(ticker, str) and isinstance(sector, str)
+        }
+    except (FileNotFoundError, json.JSONDecodeError, OSError):
+        return {}
+
+
+def resolve_sectors(tickers, max_weights, min_weights, analysis, cache_path):
+    """Resolve sectors from known mappings, research, cache, then Yahoo."""
+    cache_path = Path(cache_path)
+    resolved = dict(SECTOR_MAP)
+    resolved.update(_load_sector_cache(cache_path))
+    active = {
+        ticker
+        for ticker, max_weight, min_weight in zip(tickers, max_weights, min_weights)
+        if max(float(max_weight), float(min_weight)) > 1e-7
+    }
+
+    for ticker in tickers:
+        item = analysis.get(ticker, {})
+        sector = YAHOO_SECTOR_MAP.get(str(item.get("sector", "")))
+        sector = sector or _infer_sector(item.get("industry"))
+        if sector:
+            resolved[ticker] = sector
+
+    unresolved = sorted(
+        ticker
+        for ticker in active
+        if resolved.get(ticker) in {None, "Other", "Unclassified"}
+    )
+    if unresolved:
+        try:
+            import yfinance as yf
+
+            for ticker in unresolved:
+                try:
+                    info = yf.Ticker(ticker).get_info() or {}
+                    sector = YAHOO_SECTOR_MAP.get(str(info.get("sector", "")))
+                    sector = sector or _infer_sector(info.get("industry"))
+                    resolved[ticker] = sector or "Unclassified"
+                except Exception:
+                    resolved[ticker] = "Unclassified"
+        except ImportError:
+            for ticker in unresolved:
+                resolved[ticker] = "Unclassified"
+
+    for ticker in tickers:
+        resolved.setdefault(ticker, "Unclassified")
+
+    current = {ticker: resolved[ticker] for ticker in tickers}
+    temporary_path = cache_path.with_suffix(cache_path.suffix + ".tmp")
+    temporary_path.write_text(
+        json.dumps({ticker: current[ticker] for ticker in sorted(current)}, indent=2),
+        encoding="utf-8",
+    )
+    temporary_path.replace(cache_path)
+    LAST_SECTORS.clear()
+    LAST_SECTORS.update(current)
+    SECTOR_MAP.update(current)
+    return current
+
 
 def _rounded_box(fig, x, y, width, height, facecolor=WHITE, edgecolor=GRID, radius=0.012):
     box = FancyBboxPatch(
@@ -138,6 +276,17 @@ def _metric_card(fig, x, y, width, height, label, value, detail, accent):
     fig.text(x + 0.025, y + 0.014, detail, color=MUTED, fontsize=7.5)
 
 
+def _format_optional_percent(value, decimals=1):
+    """Format an optional decimal return or confidence value for display."""
+    try:
+        numeric_value = float(value)
+    except (TypeError, ValueError):
+        return "N/A"
+    if not np.isfinite(numeric_value):
+        return "N/A"
+    return f"{numeric_value:.{decimals}%}"
+
+
 def _portfolio_frame(tickers, weights, analysis):
     records = []
     for ticker, weight in zip(tickers, weights):
@@ -146,7 +295,7 @@ def _portfolio_frame(tickers, weights, analysis):
             {
                 "ticker": ticker,
                 "weight": float(weight),
-                "sector": SECTOR_MAP.get(ticker, "Other"),
+                "sector": SECTOR_MAP.get(ticker, "Unclassified"),
                 "industry": item.get("industry") or "Not classified",
                 "posterior_return": item.get("posterior_return"),
                 "expected_return": item.get("expected_return"),
@@ -243,7 +392,7 @@ def _overview_page(
     _page_header(
         fig,
         "Portfolio Summary",
-        f"TSX 60 allocation model  |  Training: {training_start} to {training_end}",
+        f"Global allocation model  |  Training: {training_start} to {training_end}",
         1,
     )
 
@@ -349,8 +498,8 @@ def _portfolio_breakdown_page(pdf, frame, metrics, name, color, page_number):
         fig.text(columns[2], y, row["sector"], color=INK, fontsize=7.8)
         posterior = row["posterior_return"]
         confidence = row["confidence"]
-        fig.text(columns[3], y, f"{posterior:.1%}" if posterior is not None else "N/A", color=INK, fontsize=8.2)
-        fig.text(columns[4], y, f"{confidence:.0%}" if confidence is not None else "N/A", color=INK, fontsize=8.2)
+        fig.text(columns[3], y, _format_optional_percent(posterior, 1), color=INK, fontsize=8.2)
+        fig.text(columns[4], y, _format_optional_percent(confidence, 0), color=INK, fontsize=8.2)
         fig.text(columns[5], y, f"#{rank + 1}", color=color, fontsize=8.2, weight="bold")
         y -= 0.024
 
@@ -379,7 +528,10 @@ def _rationale_pages(pdf, frame, name, color, starting_page):
             fig.text(
                 0.275,
                 position + 0.113,
-                f"{row['weight']:.2%} weight  |  {row['sector']}  |  Posterior {row['posterior_return']:.1%}",
+                (
+                    f"{row['weight']:.2%} weight  |  {row['sector']}  |  "
+                    f"Posterior {_format_optional_percent(row['posterior_return'], 1)}"
+                ),
                 color=MUTED,
                 fontsize=8.2,
             )
@@ -436,8 +588,18 @@ def create_portfolio_pdf(
     """Create a polished multi-page PDF portfolio summary."""
     output_path = Path(output_path)
     analysis_path = Path(analysis_path)
-    with analysis_path.open("r", encoding="utf-8") as fp:
-        analysis = json.load(fp)
+    try:
+        analysis = json.loads(analysis_path.read_text(encoding="utf-8"))
+    except (FileNotFoundError, json.JSONDecodeError, OSError):
+        analysis = {}
+
+    sectors = resolve_sectors(
+        tickers,
+        max_weights,
+        min_weights,
+        analysis,
+        output_path.with_name("sector_cache.json"),
+    )
 
     max_frame = _portfolio_frame(tickers, max_weights, analysis)
     min_frame = _portfolio_frame(tickers, min_weights, analysis)
@@ -445,7 +607,7 @@ def create_portfolio_pdf(
     allocation_export = pd.DataFrame(
         {
             "ticker": tickers,
-            "sector": [SECTOR_MAP.get(ticker, "Other") for ticker in tickers],
+            "sector": [sectors[ticker] for ticker in tickers],
             "max_sharpe_weight": max_weights,
             "min_volatility_weight": min_weights,
         }
@@ -455,8 +617,8 @@ def create_portfolio_pdf(
     metadata = {
         "Title": "WealthGPT Portfolio Summary",
         "Author": "Jeffrey Xia",
-        "Subject": "TSX 60 portfolio allocation model summary",
-        "Keywords": "portfolio optimization, Black-Litterman, TSX 60, MPT",
+        "Subject": "Global portfolio allocation model summary",
+        "Keywords": "portfolio optimization, Black-Litterman, MPT, global equities",
     }
     with PdfPages(output_path, metadata=metadata) as pdf:
         _overview_page(

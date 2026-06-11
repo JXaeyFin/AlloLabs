@@ -9,11 +9,17 @@ have been removed or replaced with clearly marked placeholders.
 ```text
 examples/
 |-- README.md
+|-- default-run.json
+|-- default-portfolio-report.pdf
+|-- default-performance.png
 |-- terminal-first-run.txt
 |-- terminal-cached-run.txt
 `-- wealthgpt-sample-report.pdf
 ```
 
+- `default-run.json` powers the dashboard before the first local run.
+- `default-portfolio-report.pdf` and `default-performance.png` accompany that
+  bundled snapshot.
 - `terminal-first-run.txt` demonstrates initial research generation.
 - `terminal-cached-run.txt` demonstrates reuse of validated cached views.
 - `wealthgpt-sample-report.pdf` shows the resulting portfolio report.
@@ -45,22 +51,15 @@ valid local research cache.
 
 ## 2. Configure
 
-The main settings are near the top of `wealthgpt.py`:
+Use the dashboard controls or environment variables:
 
-```python
-training_years = 1
-oos_years = 0
-
-risk_free_rate = 0.0268
-gpt_model = "gpt-5.4"
-gpt_black_litterman = True
-black_litterman_ticker_subset = None
+```powershell
+$env:WEALTHGPT_TRAINING_YEARS="1"
+$env:WEALTHGPT_OOS_YEARS="0"
+$env:WEALTHGPT_MAX_POSITION_WEIGHT="0.20"
+$env:WEALTHGPT_GPT_VIEWS="true"
+$env:WEALTHGPT_RESEARCH_TICKERS='["AAPL","MSFT","RY.TO"]'
 ```
-
-- `training_years` controls the historical estimation window.
-- `oos_years` enables or disables out-of-sample testing.
-- `gpt_black_litterman` enables AI-assisted expected returns.
-- `black_litterman_ticker_subset` can limit API use during testing.
 
 ## 3. Run
 
@@ -73,7 +72,7 @@ download status.
 
 ## 4. Market Data
 
-WealthGPT downloads adjusted TSX 60 prices and builds:
+WealthGPT downloads adjusted global equity prices and builds:
 
 - annualized historical returns;
 - an annualized covariance matrix; and
@@ -121,10 +120,9 @@ Weights are validated and normalized to sum to 100%.
 
 ## 8. Optional Out-of-Sample Test
 
-When `oos_years` is greater than zero, WealthGPT compares the portfolios with:
-
-- the TSX 60 ETF (`XIU.TO`); and
-- the S&P/TSX Composite (`^GSPTSE`).
+When OOS testing is enabled, WealthGPT compares the portfolios with available
+broad-market trackers including `XIU.TO`, `SPY`, `QQQ`, `ISF.L`, and
+`^STOXX50E`.
 
 It reports realized return and annualized volatility, plots cumulative returns,
 and performs Jobson-Korkie Sharpe-ratio comparisons.

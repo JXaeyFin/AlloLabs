@@ -1,8 +1,3 @@
-<p align="center">
-  <img width="280" height="280" alt="Untitled design (3)" src="https://github.com/user-attachments/assets/a3b22038-3cbb-4c31-9825-594a137d7168" />
-</p>
-                                                                                                         
-
 ```text
  __        __         _ _   _      ____ ____ _____
  \ \      / /__  __ _| | |_| |__  / ___|  _ \_   _|
@@ -15,168 +10,202 @@
 ```
 
 # WealthGPT
-<img width="1919" height="940" alt="image" src="https://github.com/user-attachments/assets/756b68aa-7354-489f-9152-869307a149f4" />
 
+WealthGPT is an AI-assisted global equity allocation research project. It
+combines live Yahoo Finance data, Modern Portfolio Theory, Black-Litterman
+expected returns, structured OpenAI research views, and a local
+Bloomberg-inspired dashboard.
 
-An AI-assisted portfolio allocation research model for the S&P/TSX 60.
-<img width="1919" height="940" alt="image" src="https://github.com/user-attachments/assets/10dddec1-f747-443d-960b-7679cae152d8" />
-
-WealthGPT combines Modern Portfolio Theory, Black-Litterman expected returns,
-live market data, and structured equity research generated through the OpenAI
-Responses API. It constructs and compares:
+It constructs and compares:
 
 - a maximum Sharpe ratio portfolio; and
 - a global minimum-volatility portfolio.
 
-The model also produces a polished PDF report covering allocations, sector
-exposure, portfolio metrics, and research rationales for the eight largest
-holdings in each portfolio.
-<img width="1919" height="944" alt="image" src="https://github.com/user-attachments/assets/0d533e09-01f4-455e-8957-7ef2dcf896a4" />
+> **Research software only.** WealthGPT is not financial advice or an automated
+> trading system. Review all data, assumptions, generated research, and
+> allocations independently.
 
+## Features
 
-> **Research software only.** This project is not financial advice and should
-> not be used as an automated trading system without independent validation.
+- Global U.S., Canadian, U.K., and European equity universe
+- Adjusted price and company metadata from `yfinance`
+- Long-only SLSQP portfolio optimization with a configurable position cap
+- Optional GPT-assisted Black-Litterman expected returns
+- Validated and reusable research, sector, and listing caches
+- Optional out-of-sample testing against broad market benchmarks
+- Jobson-Korkie Sharpe-ratio comparisons
+- Eight-page PDF portfolio report and CSV allocation export
+- Local web dashboard with run controls, live terminal relay, report viewer,
+  performance chart, market flags, and listing metadata
+- Bundled example portfolios and AI sentiments visible before the first run
 
-## Highlights
-
-- Live adjusted price data and company context from `yfinance`
-- Long-only SLSQP portfolio optimization
-- Black-Litterman posterior expected returns
-- Strict JSON-schema equity views through the OpenAI Responses API
-- Validated, reusable research cache
-- Maximum Sharpe and minimum-volatility portfolios
-- Optional out-of-sample benchmark testing
-- Jobson-Korkie Sharpe-ratio significance testing
-- Automatic PDF portfolio report generation
-
-## Project Structure
+## Repository
 
 ```text
 .
-|-- wealthgpt.py          # Main data, research, optimization, and evaluation pipeline
-|-- wealthgpt_report.py   # PDF reporting and sector-exposure visualizations
-|-- requirements.txt      # Runtime Python dependencies
-|-- .env.example          # Environment-variable template
-|-- .gitignore
-|-- README.md
-`-- examples/             # Sanitized transcripts, walkthrough, and sample report
+|-- wealthgpt.py                 # Main research and optimization pipeline
+|-- wealthgpt_report.py          # PDF reporting and sector classification
+|-- dashboard/
+|   |-- server.py                # Constrained local HTTP runner
+|   |-- runner.py                # Model configuration and result adapter
+|   |-- index.html               # Dashboard interface
+|   |-- app.js
+|   |-- styles.css
+|   `-- terminal-theme.css
+|-- scripts/
+|   `-- start-dashboard.ps1
+|-- tests/
+|   `-- test_release.py
+|-- examples/                    # Sanitized transcripts and sample PDF
+|-- start-dashboard.bat
+|-- requirements.txt
+|-- .env.example
+`-- .github/workflows/ci.yml
 ```
 
-Generated JSON, CSV, PDF, and chart files are intentionally excluded from Git.
+Generated research, caches, allocations, charts, and reports are intentionally
+excluded from Git. Sanitized default examples under `examples/` are included.
 
-## Methodology
+## Installation
 
-1. Download adjusted TSX 60 prices from Yahoo Finance.
-2. Calculate annualized historical returns and the covariance matrix.
-3. Collect fundamentals and recent company news.
-4. Generate structured 12-month equity views using GPT.
-5. Blend those views with equilibrium returns using Black-Litterman.
-6. Optimize long-only maximum-Sharpe and minimum-volatility portfolios.
-7. Optionally evaluate both portfolios against TSX benchmarks out of sample.
-8. Export research data, allocations, charts, and an eight-page PDF report.
-
-## Requirements
+Requirements:
 
 - Python 3.11 or newer
-- An OpenAI API key when generating missing or refreshed equity views
+- An OpenAI API key only when generating new GPT research views
 
-Install the Python dependencies:
+```bash
+# From your cloned or downloaded repository:
+cd wealthgpt
+python -m venv .venv
+```
+
+Activate the environment and install dependencies:
 
 ```bash
 python -m pip install -r requirements.txt
 ```
 
-## Configuration
-
-Set the OpenAI API key as an environment variable.
-
-PowerShell:
+Set the API key in the process environment when GPT views are enabled:
 
 ```powershell
 $env:OPENAI_API_KEY="your_api_key"
 ```
 
-macOS or Linux:
+Never commit a real API key or `.env` file.
 
-```bash
-export OPENAI_API_KEY="your_api_key"
-```
+## Run The Model
 
-Never place a real key in the source code or commit a `.env` file.
-
-The main settings are near the top of `wealthgpt.py`:
-
-```python
-training_years = 1
-oos_years = 0
-
-risk_free_rate = 0.0268
-gpt_model = "gpt-5.4"
-gpt_black_litterman = True
-black_litterman_ticker_subset = None
-```
-
-Set `oos_years` above zero to enable out-of-sample analysis. To limit API use
-during development, set `black_litterman_ticker_subset` to a list of tickers.
-
-## Usage
-
-Run the complete model:
+The standard command-line run uses the defaults defined in `wealthgpt.py`:
 
 ```bash
 python wealthgpt.py
 ```
 
-The first complete run may make multiple OpenAI API requests and incur usage
-charges. Valid equity views are cached, so later runs reuse them unless the
-cache is deleted or cache refreshing is enabled.
+Runtime settings can be supplied without editing source:
 
-## Generated Outputs
+```powershell
+$env:WEALTHGPT_TRAINING_YEARS="2"
+$env:WEALTHGPT_OOS_YEARS="0.5"
+$env:WEALTHGPT_MAX_POSITION_WEIGHT="0.15"
+$env:WEALTHGPT_GPT_VIEWS="true"
+$env:WEALTHGPT_RESEARCH_TICKERS='["AAPL","MSFT","RY.TO"]'
+python wealthgpt.py
+```
 
-The script can create:
+See [.env.example](.env.example) for every supported override.
+
+## Run The Dashboard
+
+On Windows, double-click `start-dashboard.bat`, or run:
+
+```powershell
+.\scripts\start-dashboard.ps1
+```
+
+If an older dashboard process is still using port `8765`, run:
+
+```powershell
+.\restart-dashboard.bat
+```
+
+The legacy `start-wealthgpt-dashboard.bat` and
+`restart-wealthgpt-dashboard.bat` names remain as compatibility aliases.
+
+On any platform:
+
+```bash
+python dashboard/server.py
+```
+
+Open [http://127.0.0.1:8765](http://127.0.0.1:8765). The dashboard validates
+settings, launches the model in a background process, relays terminal output,
+and refreshes the overview and report tabs after completion.
+
+For access beyond localhost, set `WEALTHGPT_REMOTE_TOKEN`, bind explicitly, and
+place the service behind HTTPS and a firewall:
+
+```bash
+python dashboard/server.py --host 0.0.0.0
+```
+
+The server does not expose a general-purpose shell endpoint. Browser requests
+are restricted to the dashboard origin, with local `file://` use supported.
+
+## Outputs
+
+A completed run may create:
 
 ```text
 black_litterman_stock_analysis.json
 gpt_views.csv
+latest_run.json
+listing_metadata_cache.json
 portfolio_allocations.csv
-wealthgpt_portfolio_report.pdf
 portfolio_vs_markets_oos.png
+sector_cache.json
+wealthgpt_portfolio_report.pdf
 ```
 
-The PDF report includes:
+The PDF includes portfolio metrics, top holdings, sector exposure,
+concentration, effective holdings, rationales for the eight largest positions,
+and a detailed allocation appendix.
 
-- headline return, volatility, and Sharpe estimates;
-- largest portfolio positions;
-- sector exposure comparisons;
-- concentration and effective-holdings measures;
-- rationale for the eight largest holdings in each portfolio; and
-- a detailed allocation appendix.
+## Validation
 
-## Example Run
+Run the release checks locally:
 
-A public-safe walkthrough, sanitized terminal transcripts, and a sample PDF are
-available in [`examples/`](examples/).
+```bash
+python -m unittest discover -s tests -v
+python -m py_compile wealthgpt.py wealthgpt_report.py dashboard/server.py dashboard/runner.py
+node --check dashboard/app.js
+```
 
-## Important Limitations
+GitHub Actions runs the same checks on pushes and pull requests.
 
-- Expected returns are estimates, not forecasts with guaranteed accuracy.
-- Model-generated equity views can be incomplete, stale, or incorrect.
-- Yahoo Finance data may contain delays, omissions, or classification errors.
-- Covariance estimates are sensitive to the selected training window.
-- The equal-weight proxy used for equilibrium returns is not a true
-  capitalization-weighted market portfolio.
-- Long-only optimization can produce concentrated allocations.
-- In-sample Sharpe ratios should not be interpreted as expected realized
-  performance.
-- The Jobson-Korkie test relies on assumptions that may not hold for all return
-  series.
+## Methodology
 
-## Responsible Use
+1. Download and align adjusted equity prices.
+2. Estimate annualized historical returns and covariance.
+3. Collect company context and optional structured GPT views.
+4. Blend views with equilibrium returns using Black-Litterman.
+5. Solve maximum-Sharpe and minimum-volatility portfolios with SLSQP.
+6. Optionally evaluate both portfolios out of sample.
+7. Export dashboard data, allocations, charts, and the PDF report.
 
-Review all generated research and allocations before relying on them. Production
-use would require stronger data provenance, point-in-time constituent history,
-transaction costs, liquidity constraints, turnover controls, robust covariance
-estimation, and independent model validation.
+## Limitations
+
+- Expected returns are estimates, not guaranteed forecasts.
+- Generated equity research may be stale, incomplete, or incorrect.
+- Yahoo Finance data may contain delays, omissions, and classification errors.
+- The universe is current rather than point-in-time and may introduce
+  survivorship bias.
+- Covariance estimates are sensitive to the training window.
+- The equilibrium proxy is not a true capitalization-weighted market portfolio.
+- Transaction costs, taxes, liquidity, turnover, and market impact are omitted.
+- Statistical tests rely on assumptions that may not hold in realized markets.
+
+Public-safe transcripts and a sample report are available in
+[`examples/`](examples/).
 
 ## Author
 

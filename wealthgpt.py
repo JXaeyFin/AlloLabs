@@ -3,14 +3,13 @@
 MPT Data-Driven Asset Allocation Model
 ================================================================================
 Author:      Jeffrey Xia
-Description: Implements Modern Portfolio Theory (MPT) on TSX 60 constituents
-             using SLSQP optimization to construct two portfolios:
+Description: Implements Modern Portfolio Theory (MPT) on a global large-cap
+             equity universe using SLSQP optimization to construct:
                1. Maximum Sharpe Ratio (Tangency Portfolio)
                2. Minimum Volatility (Global Minimum Variance Portfolio)
 
-             Both portfolios are evaluated out-of-sample against the TSX 60
-             Index (XIU.TO) and TSX Composite (^GSPTSE) benchmarks using
-             YTD 2026 live market data.
+             Both portfolios can be evaluated out of sample against broad
+             Canadian, U.S., U.K., and European market benchmarks.
 
              A Jobson-Korkie significance test is applied to assess whether
              out-of-sample Sharpe ratio outperformance is statistically
@@ -45,6 +44,57 @@ from wealthgpt_report import create_portfolio_pdf
 
 SCRIPT_DIR = Path(__file__).resolve().parent
 
+
+def env_float(
+    name: str,
+    default: float,
+    *,
+    minimum: float | None = None,
+    maximum: float | None = None,
+) -> float:
+    """Read and validate a numeric runtime setting."""
+    raw_value = os.getenv(name)
+    try:
+        value = default if raw_value in (None, "") else float(raw_value)
+    except ValueError as exc:
+        raise ValueError(f"{name} must be numeric, received {raw_value!r}.") from exc
+    if not np.isfinite(value):
+        raise ValueError(f"{name} must be finite.")
+    if minimum is not None and value < minimum:
+        raise ValueError(f"{name} must be at least {minimum}.")
+    if maximum is not None and value > maximum:
+        raise ValueError(f"{name} must be at most {maximum}.")
+    return value
+
+
+def env_bool(name: str, default: bool) -> bool:
+    """Read a strict boolean runtime setting."""
+    raw_value = os.getenv(name)
+    if raw_value in (None, ""):
+        return default
+    normalized = raw_value.strip().lower()
+    if normalized in {"1", "true", "yes", "on"}:
+        return True
+    if normalized in {"0", "false", "no", "off"}:
+        return False
+    raise ValueError(f"{name} must be true or false, received {raw_value!r}.")
+
+
+def env_ticker_subset(name: str) -> list[str] | None:
+    """Read a JSON ticker list, or return None for the full universe."""
+    raw_value = os.getenv(name)
+    if raw_value in (None, "", "null"):
+        return None
+    try:
+        payload = json.loads(raw_value)
+    except json.JSONDecodeError as exc:
+        raise ValueError(f"{name} must contain a JSON list of ticker symbols.") from exc
+    if not isinstance(payload, list) or not all(
+        isinstance(ticker, str) and ticker.strip() for ticker in payload
+    ):
+        raise ValueError(f"{name} must contain a JSON list of non-empty ticker symbols.")
+    return list(dict.fromkeys(ticker.strip().upper() for ticker in payload))
+
 TERMINAL_BANNER = r"""
  __        __         _ _   _      ____ ____ _____
  \ \      / /__  __ _| | |_| |__  / ___|  _ \_   _|
@@ -59,31 +109,109 @@ TERMINAL_BANNER = r"""
 # =============================================================================
 # BLOCK 0: UNIVERSE DEFINITION
 # =============================================================================
-# TSX 60 constituents as of 2026 (yfinance format)
-# The benchmark XIU.TO is excluded from the optimisable universe.
-TSX60_TICKERS = [
-    "AEM.TO", "ATD.TO", "BAM.TO", "BN.TO", "BIP-UN.TO",
-    "BMO.TO", "BNS.TO", "ABX.TO", "BCE.TO", "CAE.TO",
-    "CCO.TO", "CM.TO", "CNR.TO", "CNQ.TO", "CP.TO",
-    "CTC-A.TO", "CCL-B.TO", "CLS.TO", "CVE.TO", "GIB-A.TO",
-    "CSU.TO", "DOL.TO", "EMA.TO", "ENB.TO", "FFH.TO",
-    "FM.TO", "FSV.TO", "FTS.TO", "FNV.TO", "WN.TO",
-    "GIL.TO", "H.TO", "IMO.TO", "IFC.TO", "K.TO",
-    "L.TO", "MG.TO", "MFC.TO", "MRU.TO", "NA.TO",
-    "NTR.TO", "OTEX.TO", "PPL.TO", "POW.TO", "QSR.TO",
-    "RCI-B.TO", "RY.TO", "SAP.TO", "SHOP.TO", "SLF.TO",
-    "SU.TO", "TRP.TO", "TECK-B.TO", "T.TO", "TRI.TO",
-    "TD.TO", "TOU.TO", "WCN.TO", "WPM.TO", "WSP.TO"
+# Global large-cap research universe in Yahoo Finance ticker format.
+# Benchmarks are maintained separately from the optimizable universe.
+
+ASSET_UNIVERSE = [
+    
+    # ==========================================================
+    # 🇺🇸 US CORE (S&P 100 MEGA CAPS)
+    # ==========================================================
+    "AAPL","ABBV","ABT","ACN","ADBE","AIG","AMD","AMGN","AMT","AMZN",
+    "AVGO","AXP","BA","BAC","BK","BKNG","BLK","BMY","BRK-B","C",
+    "CAT","CL","CMCSA","COF","COP","COST","CRM","CSCO","CVS","CVX",
+    "DHR","DIS","DOW","GE","GILD","GM","GOOG","GOOGL","GS","HD",
+    "HON","IBM","INTC","JNJ","JPM","KHC","KO","LIN","LLY","LOW",
+    "MA","MCD","META","MET","MMM","MRK","MS","MSFT","NEE","NFLX",
+    "NKE","NVDA","ORCL","PEP","PFE","PG","PM","QCOM","RTX","SBUX",
+    "SCHW","SO","SPG","T","TGT","TMO","TMUS","TSLA","TXN","UNH",
+    "UNP","UPS","USB","V","VZ","WFC","WMT","XOM",
+
+    # ==========================================================
+    # 🇺🇸 US GROWTH / NASDAQ EXTENSIONS
+    # ==========================================================
+    "ABNB","ADI","ADP","ARM","CDW","CRWD","DDOG","FTNT","KLAC","LRCX",
+    "MAR","MDB","MELI","MCHP","MDLZ","MPWR","MRVL","MU","NXPI","PANW",
+    "PAYX","PDD","PLTR","REGN","ROP","SHOP","SNPS","VRTX","WDAY","ZS",
+    "APP","CTSH","GFS","ON","STX","TEAM","AKAM","ANSS",
+
+    # ==========================================================
+    # 🇺🇸 US HEALTHCARE / BIOTECH EXTENSION
+    # ==========================================================
+    "ALNY","BIIB","DXCM","IDXX","INSM","ISRG",
+
+    # ==========================================================
+    # 🇺🇸 US CONSUMER / DIGITAL
+    # ==========================================================
+    "DASH","EBAY","KDP","MNST","ORLY","ROST",
+
+    # ==========================================================
+    # 🇺🇸 US INDUSTRIALS / LOGISTICS
+    # ==========================================================
+    "CPRT","CSX","CTAS","FAST","ODFL","PCAR","VRSK",
+
+    # ==========================================================
+    # 🇺🇸 US MEDIA / GAMING
+    # ==========================================================
+    "CHTR","EA","TTWO","WBD",
+
+    # ==========================================================
+    # 🇺🇸 US ENERGY / UTILITIES
+    # ==========================================================
+    "AEP","BKR","EXC","FANG","XEL",
+
+    # ==========================================================
+    # 🇨🇦 CANADA CORE (FINANCIALS / ENERGY / DEFENSIVE)
+    # ==========================================================
+    "RY.TO","TD.TO","BMO.TO","BNS.TO","NA.TO","CM.TO",
+    "ENB.TO","TRP.TO","SU.TO","CNQ.TO","CVE.TO","TOU.TO",
+    "POW.TO","SLF.TO","MFC.TO","FFH.TO",
+    "BAM.TO","BN.TO","BIP-UN.TO",
+    "FTS.TO","EMA.TO","PPL.TO",
+    "TRI.TO","OTEX.TO","CSU.TO",
+    "WCN.TO","WSP.TO","CNR.TO","CP.TO",
+    "ATD.TO","DOL.TO","QSR.TO","MRU.TO",
+    "SHOP.TO","GIB-A.TO","WN.TO",
+    "WPM.TO","FNV.TO","AEM.TO","ABX.TO",
+    "TECK-B.TO","NTR.TO","FM.TO",
+    "CCO.TO","BCE.TO","T.TO","RCI-B.TO",
+
+    # ==========================================================
+    # 🇬🇧 LONDON STOCK EXCHANGE (FTSE 100 — GLOBAL DRIVERS ONLY)
+    # NOTE: no global duplicates (avoid adding Shell/HSBC overlap issues)
+    # ==========================================================
+    "AZN.L","ULVR.L","SHEL.L","BP.L","HSBA.L",
+    "GSK.L","RIO.L","BATS.L","DGE.L","GLEN.L",
+    "AAL.L","LSEG.L","NG.L","VOD.L","REL.L",
+    "CPG.L","SMIN.L","IMB.L","CRH.L","SN.L",
+
+    # ==========================================================
+    # 🇪🇺 EURONEXT 100 (EUROPEAN LARGE CAP EXPOSURE)
+    # NOTE: filtered to avoid duplication with US listings where possible
+    # ==========================================================
+    "ASML.AS","SAP.DE","SIE.DE","AIR.PA","OR.PA",
+    "MC.PA","SAN.PA","BNP.PA","ENGI.PA","AI.PA",
+    "RMS.PA","KER.PA","DG.PA","ENEL.MI","ISP.MI",
+    "ENI.MI","STLA.MI","ABI.BR","DSY.PA","HO.PA",
+    "PHIA.AS","AD.AS","ZURN.SW","NESN.SW","NOVN.SW",
+    "ROG.SW","UBSG.SW","CS.PA"
 ]
-BENCHMARK_TICKERS = ["XIU.TO", "^GSPTSE"]
+# Benchmarks & tracker funds: keep the TSX ETF, add broad-market trackers
+# including S&P 500, Nasdaq-100, an LSE FTSE tracker, and the Euro Stoxx index.
+# Note: users can customise this list to specific ETF tickers if desired.
+BENCHMARK_TICKERS = ["XIU.TO", "SPY", "QQQ", "ISF.L", "^STOXX50E"]
 
 # =============================================================================
 # BLOCK 1: DATE WINDOW CONFIGURATION
 # =============================================================================
 # USER-FACING KNOBS
-training_years = 1  # Training lookback in years (e.g. 0.5, 1, 2, 5)
-oos_years      = 0  # Out-of-sample window in years, counting back from today.
-                       # Set to 0 to skip OOS entirely (no chart, no JK test).
+training_years = env_float(
+    "WEALTHGPT_TRAINING_YEARS", 1.0, minimum=0.25, maximum=10.0
+)
+oos_years = env_float(
+    "WEALTHGPT_OOS_YEARS", 0.5, minimum=0.0, maximum=5.0
+)
+# Set OOS to 0 to skip the chart and Jobson-Korkie test.
 # ─────────────────────────────────────────────────────────────────────────────
 
 today = pd.Timestamp.today().normalize()
@@ -118,19 +246,22 @@ else:
 print("\nDownloading training prices from yfinance...")
 
 raw_train = yf.download(
-    TSX60_TICKERS,
+    ASSET_UNIVERSE,
     start=training_start,
     end=training_end + pd.Timedelta(days=1),   # yfinance end is exclusive
     progress=False,
     auto_adjust=True,
 )["Close"]
 
-# Replace any isolated missing prices with the most recent available quote.
-# This preserves assets with minor data gaps without throwing away the entire universe.
+# Replace isolated missing prices with the most recent available quote.
 raw_train = raw_train.sort_index().ffill()
 
-# Drop any ticker whose entire training series is missing or all-NaN
-raw_train = raw_train.dropna(axis=1, how="any")
+# Retain assets with sufficient coverage, then align all return observations.
+minimum_price_observations = max(21, int(len(raw_train) * 0.80))
+raw_train = raw_train.dropna(axis=1, how="all")
+raw_train = raw_train.loc[
+    :, raw_train.notna().sum(axis=0) >= minimum_price_observations
+]
 
 # Compute daily returns; drop rows with no valid returns on any day
 train_returns = raw_train.pct_change(fill_method=None).dropna(how="any")
@@ -175,15 +306,17 @@ gpt_model = "gpt-5.4"
 gpt_batch_size = 12
 gpt_max_output_tokens = 7000
 gpt_request_attempts = 3
-gpt_refresh_cache = False
+gpt_refresh_cache = env_bool("WEALTHGPT_REFRESH_CACHE", False)
 
 # When set to True, the script will query GPT-5.4 for each stock and use those views
 # to compute posterior returns via Black-Litterman. This may be slow and requires a valid key.
-gpt_black_litterman = True
+gpt_black_litterman = env_bool("WEALTHGPT_GPT_VIEWS", False)
 
 # If you want the model to generate research on a subset rather than all tickers,
 # set this to a list of tickers like ["AEM.TO", "BCE.TO"]. Otherwise leave as None.
-black_litterman_ticker_subset = None
+black_litterman_ticker_subset = env_ticker_subset(
+    "WEALTHGPT_RESEARCH_TICKERS"
+)
 
 BL_CACHE_PATH = SCRIPT_DIR / "black_litterman_stock_analysis.json"
 GPT_VIEWS_CSV_PATH = SCRIPT_DIR / "gpt_views.csv"
@@ -816,13 +949,21 @@ def validated_optimizer_weights(result, label: str) -> np.ndarray:
     weights = np.asarray(result.x, dtype=float)
     if not np.all(np.isfinite(weights)):
         raise RuntimeError(f"{label} optimization returned non-finite weights.")
-    weights = np.clip(weights, 0.0, 1.0)
+    weights[np.abs(weights) < 1e-12] = 0.0
+    if np.any(weights < -1e-8):
+        raise RuntimeError(f"{label} optimization returned a negative weight.")
     total = float(weights.sum())
     if total <= 0:
         raise RuntimeError(f"{label} optimization returned zero total weight.")
     weights /= total
     if not np.isclose(weights.sum(), 1.0, atol=1e-8):
         raise RuntimeError(f"{label} optimization weights do not sum to one.")
+    if np.any(weights > max_position_weight + 1e-7):
+        largest = float(weights.max())
+        raise RuntimeError(
+            f"{label} optimization exceeded the {max_position_weight:.1%} "
+            f"position limit with a {largest:.1%} holding."
+        )
     return weights
 
 
@@ -831,7 +972,15 @@ def validated_optimizer_weights(result, label: str) -> np.ndarray:
 # =============================================================================
 initial_guess = np.ones(num_assets) / num_assets
 constraints   = {"type": "eq", "fun": lambda x: np.sum(x) - 1}
-bounds        = tuple((0.0, 1.0) for _ in range(num_assets))
+max_position_weight = env_float(
+    "WEALTHGPT_MAX_POSITION_WEIGHT", 1.0, minimum=0.01, maximum=1.0
+)
+if max_position_weight * num_assets < 1.0 - 1e-12:
+    raise ValueError(
+        f"Maximum position {max_position_weight:.1%} is infeasible for "
+        f"{num_assets} usable assets; choose at least {1 / num_assets:.1%}."
+    )
+bounds = tuple((0.0, max_position_weight) for _ in range(num_assets))
 
 # =============================================================================
 # BLOCK 6: SLSQP OPTIMISATION
@@ -869,19 +1018,30 @@ opt_ret_V, opt_risk_V, opt_sr_V = portfolio_performance(w_vol, mu_values, Sigma_
 # =============================================================================
 # BLOCK 7: IN-SAMPLE ALLOCATION TABLE
 # =============================================================================
-print("\n" + "=" * 62)
-print(f"{'IN-SAMPLE ASSET ALLOCATIONS  (>0.01%)':^62}")
-print("=" * 62)
-print(f"{'Ticker':<12} | {'Max Sharpe Wgt':>14} | {'Min Vol Wgt':>11}")
-print("-" * 62)
+print("\n" + "=" * 78)
+# Display configuration: show very small weights with more decimal places
+# `WEIGHT_DISPLAY_DECIMALS` controls how many decimals are shown for percent
+# `WEIGHT_DISPLAY_THRESHOLD_PCT` is the minimum percent (not fraction) to display
+WEIGHT_DISPLAY_DECIMALS = 6
+WEIGHT_DISPLAY_THRESHOLD_PCT = 0.0001  # show weights > 0.0001% (very small)
+
+title = f"IN-SAMPLE ASSET ALLOCATIONS  (>{WEIGHT_DISPLAY_THRESHOLD_PCT:.6f}%)"
+print(f"{title:^78}")
+print("=" * 78)
+col_ms_width = 22
+col_mv_width = 22
+print(f"{'Ticker':<12} | {'Max Sharpe Wgt':>{col_ms_width}} | {'Min Vol Wgt':>{col_mv_width}}")
+print("-" * 78)
 
 for i, ticker in enumerate(tickers):
     ws = w_sharpe[i] * 100
     wv = w_vol[i]    * 100
-    if ws > 0.01 or wv > 0.01:
-        print(f"{ticker:<12} | {ws:>13.2f}%  | {wv:>10.2f}%")
+    if ws > WEIGHT_DISPLAY_THRESHOLD_PCT or wv > WEIGHT_DISPLAY_THRESHOLD_PCT:
+        ms_str = format(ws, f">{col_ms_width}.{WEIGHT_DISPLAY_DECIMALS}f") + "%"
+        mv_str = format(wv, f">{col_mv_width}.{WEIGHT_DISPLAY_DECIMALS}f") + "%"
+        print(f"{ticker:<12} | {ms_str} | {mv_str}")
 
-print("-" * 62)
+print("-" * 78)
 print(f"\nIn-sample Max Sharpe  ->  ret {opt_ret_S*100:.2f}%  "
       f"vol {opt_risk_S*100:.2f}%  Sharpe {opt_sr_S:.3f}")
 print(f"In-sample Min Vol     ->  ret {opt_ret_V*100:.2f}%  "
@@ -908,7 +1068,7 @@ else:
         auto_adjust=True,
     )["Close"]
 
-    print("Fetching benchmarks (XIU.TO, ^GSPTSE)...")
+    print(f"Fetching benchmarks ({', '.join(BENCHMARK_TICKERS)})...")
     bench_raw = yf.download(
         BENCHMARK_TICKERS,
         start=oos_start,
@@ -925,51 +1085,75 @@ else:
     # Survivorship: keep only tickers that exist in the OOS download
     surviving     = [t for t in tickers if t in oos_returns.columns]
     surv_idx      = [tickers.index(t) for t in surviving]
+    if not surviving:
+        raise RuntimeError("No portfolio tickers have usable out-of-sample data.")
 
     surv_w_sharpe = w_sharpe[surv_idx]
     surv_w_vol    = w_vol[surv_idx]
 
-    if surv_w_sharpe.sum() > 0:
-        surv_w_sharpe /= surv_w_sharpe.sum()
-    if surv_w_vol.sum() > 0:
-        surv_w_vol    /= surv_w_vol.sum()
+    if surv_w_sharpe.sum() <= 0 or surv_w_vol.sum() <= 0:
+        raise RuntimeError("Surviving out-of-sample assets have zero portfolio weight.")
+    surv_w_sharpe /= surv_w_sharpe.sum()
+    surv_w_vol /= surv_w_vol.sum()
 
     oos_ret_mat     = oos_returns[surviving]
     port_ret_sharpe = oos_ret_mat.dot(surv_w_sharpe)
     port_ret_vol    = oos_ret_mat.dot(surv_w_vol)
 
-    master = pd.DataFrame({
-        "Max_Sharpe"    : port_ret_sharpe,
-        "Min_Vol"       : port_ret_vol,
-        "TSX_60"        : bench_returns["XIU.TO"],
-        "TSX_Composite" : bench_returns["^GSPTSE"],
-    }).dropna()
+    # Map downloaded benchmark tickers to friendly column labels
+    BENCHMARK_LABELS = {
+        "XIU.TO": "TSX_60",
+        "SPY": "S&P_500",
+        "QQQ": "Nasdaq_100",
+        "ISF.L": "FTSE_100_ETF",
+        "^STOXX50E": "STOXX50E",
+    }
+
+    master_payload = {
+        "Max_Sharpe": port_ret_sharpe,
+        "Min_Vol": port_ret_vol,
+    }
+    # Add only benchmarks that were actually downloaded
+    for tkr, label in BENCHMARK_LABELS.items():
+        if tkr in bench_returns.columns:
+            master_payload[label] = bench_returns[tkr]
+
+    master = pd.DataFrame(master_payload).dropna()
     if master.empty:
         raise RuntimeError("No aligned out-of-sample portfolio and benchmark returns.")
 
     cum_ret = (1 + master).cumprod() - 1
 
     # --- Summary metrics ---
+    # Compute portfolio summary metrics
     oos_ret_sharpe = master["Max_Sharpe"].add(1).prod() - 1
     oos_ret_vol    = master["Min_Vol"].add(1).prod() - 1
-    oos_ret_60     = master["TSX_60"].add(1).prod() - 1
-    oos_ret_comp   = master["TSX_Composite"].add(1).prod() - 1
 
     oos_vol_sharpe = master["Max_Sharpe"].std() * np.sqrt(252)
     oos_vol_vol    = master["Min_Vol"].std()    * np.sqrt(252)
-    oos_vol_60     = master["TSX_60"].std()     * np.sqrt(252)
-    oos_vol_comp   = master["TSX_Composite"].std() * np.sqrt(252)
+
+    # Compute per-benchmark total return and annualised vol
+    benchmark_oos_rets = {}
+    benchmark_oos_vols = {}
+    for col in master.columns:
+        if col in ("Max_Sharpe", "Min_Vol"):
+            continue
+        benchmark_oos_rets[col] = master[col].add(1).prod() - 1
+        benchmark_oos_vols[col] = master[col].std() * np.sqrt(252)
 
     print("-" * 62)
     print(f"Test period: {master.index[0].date()} -> {master.index[-1].date()}")
     print(f"Surviving tickers in OOS: {len(surviving)} / {num_assets}")
     print("-" * 62)
-    print(f"{'Portfolio / Index':<25} | {'OOS Return':>10} | {'Ann. Vol':>9}")
+    print(f"{'Portfolio / Index':<30} | {'OOS Return':>10} | {'Ann. Vol':>9}")
     print("-" * 62)
-    print(f"{'Max Sharpe Portfolio':<25} | {oos_ret_sharpe*100:>9.2f}%  | {oos_vol_sharpe*100:>8.2f}%")
-    print(f"{'Min Vol Portfolio':<25} | {oos_ret_vol*100:>9.2f}%  | {oos_vol_vol*100:>8.2f}%")
-    print(f"{'TSX 60  (XIU.TO)':<25} | {oos_ret_60*100:>9.2f}%  | {oos_vol_60*100:>8.2f}%")
-    print(f"{'TSX Composite':<25} | {oos_ret_comp*100:>9.2f}%  | {oos_vol_comp*100:>8.2f}%")
+    print(f"{'Max Sharpe Portfolio':<30} | {oos_ret_sharpe*100:>9.2f}%  | {oos_vol_sharpe*100:>8.2f}%")
+    print(f"{'Min Vol Portfolio':<30} | {oos_ret_vol*100:>9.2f}%  | {oos_vol_vol*100:>8.2f}%")
+    # Print benchmark rows
+    for label, ret in benchmark_oos_rets.items():
+        vol = benchmark_oos_vols.get(label, float('nan'))
+        print(f"{label:<30} | {ret*100:>9.2f}%  | {vol*100:>8.2f}%")
+    print("-" * 62)
     print("-" * 62)
 
 # =============================================================================
@@ -1011,12 +1195,12 @@ if master is not None:
     print("STATISTICAL SIGNIFICANCE  (Jobson-Korkie 1981)")
     print("=" * 62)
 
-    comparisons = [
-        ("Max Sharpe vs TSX 60",        master["Max_Sharpe"], master["TSX_60"]),
-        ("Max Sharpe vs TSX Composite", master["Max_Sharpe"], master["TSX_Composite"]),
-        ("Min Vol vs TSX 60",           master["Min_Vol"],    master["TSX_60"]),
-        ("Min Vol vs TSX Composite",    master["Min_Vol"],    master["TSX_Composite"]),
-    ]
+    # Build comparisons dynamically vs all available benchmarks
+    comparisons = []
+    benchmark_cols = [c for c in master.columns if c not in ("Max_Sharpe", "Min_Vol")]
+    for col in benchmark_cols:
+        comparisons.append((f"Max Sharpe vs {col}", master["Max_Sharpe"], master[col]))
+        comparisons.append((f"Min Vol vs {col}", master["Min_Vol"], master[col]))
 
     for label, ra, rb in comparisons:
         z, p, sra, srb = jobson_korkie_test(ra, rb, risk_free_rate)
@@ -1065,40 +1249,47 @@ if cum_ret is None:
 else:
     print("\nGenerating equity curve chart...")
 
-    fig, ax = plt.subplots(figsize=(14, 8))
+    # Larger figure to accommodate many benchmark lines and improve readability
+    fig, ax = plt.subplots(figsize=(20, 10))
 
-    dates        = cum_ret.index
-    ret_sharpe   = cum_ret["Max_Sharpe"]  * 100
-    ret_vol      = cum_ret["Min_Vol"]     * 100
-    ret_tsx60    = cum_ret["TSX_60"]      * 100
-    ret_comp     = cum_ret["TSX_Composite"] * 100
+    dates = cum_ret.index
+    ret_sharpe = cum_ret["Max_Sharpe"] * 100
+    ret_vol = cum_ret["Min_Vol"] * 100
 
     color_sharpe = "#1f77b4"
-    color_vol    = "#d62728"
-    color_tsx60  = "#8c8c8c"
-    color_comp   = "#bfbfbf"
+    color_vol = "#d62728"
 
-    ax.plot(dates, ret_sharpe, label="Max Sharpe Portfolio",    color=color_sharpe,
-            linestyle="-",  linewidth=3, marker="o", markersize=4, markevery=5)
-    ax.plot(dates, ret_vol,    label="Min Volatility Portfolio", color=color_vol,
-            linestyle="-",  linewidth=3, marker="D", markersize=4, markevery=5)
-    ax.plot(dates, ret_tsx60,  label="TSX 60 (XIU.TO)",         color=color_tsx60,
-            linestyle=":",  linewidth=1.5)
-    ax.plot(dates, ret_comp,   label="TSX Composite (^GSPTSE)", color=color_comp,
-            linestyle=":",  linewidth=1.5)
+    # Reduce marker density dynamically to avoid clutter on long series
+    marker_interval = max(1, len(dates) // 24)
+    ax.plot(dates, ret_sharpe, label="Max Sharpe Portfolio", color=color_sharpe,
+            linestyle="-", linewidth=3, marker="o", markersize=5, markevery=marker_interval)
+    ax.plot(dates, ret_vol, label="Min Volatility Portfolio", color=color_vol,
+            linestyle="-", linewidth=3, marker="D", markersize=5, markevery=marker_interval)
 
-    annotate_extremes(
-        {"Max Sharpe": ret_sharpe, "Min Vol": ret_vol, "TSX 60": ret_tsx60, "TSX Comp": ret_comp},
-        {"Max Sharpe": color_sharpe, "Min Vol": color_vol, "TSX 60": color_tsx60, "TSX Comp": color_comp},
-    )
+    # Plot all available benchmarks (thin, dotted lines)
+    benchmark_cols = [c for c in cum_ret.columns if c not in ("Max_Sharpe", "Min_Vol")]
+    cmap = plt.get_cmap("tab10")
+    bench_colors = {col: cmap(i % 10) for i, col in enumerate(benchmark_cols)}
+    for col in benchmark_cols:
+        series = cum_ret[col] * 100
+        ax.plot(dates, series, label=col, linestyle=":", linewidth=1.5, color=bench_colors[col])
 
-    # Endpoint labels with vertical collision avoidance
+    # Prepare series and color maps for annotation
+    series_map = {"Max Sharpe": ret_sharpe, "Min Vol": ret_vol}
+    color_map = {"Max Sharpe": color_sharpe, "Min Vol": color_vol}
+    for col in benchmark_cols:
+        series_map[col] = cum_ret[col] * 100
+        color_map[col] = bench_colors[col]
+
+    annotate_extremes(series_map, color_map)
+
+    # Endpoint labels with vertical collision avoidance (portfolios + benchmarks)
     ep_labels = [
-        ("Max Sharpe Portfolio",    ret_sharpe.iloc[-1], color_sharpe),
-        ("Min Volatility Portfolio",ret_vol.iloc[-1],    color_vol),
-        ("TSX 60 (XIU.TO)",        ret_tsx60.iloc[-1],  color_tsx60),
-        ("TSX Composite (^GSPTSE)",ret_comp.iloc[-1],   color_comp),
+        ("Max Sharpe Portfolio", ret_sharpe.iloc[-1], color_sharpe),
+        ("Min Volatility Portfolio", ret_vol.iloc[-1], color_vol),
     ]
+    for col in benchmark_cols:
+        ep_labels.append((col, (cum_ret[col] * 100).iloc[-1], bench_colors[col]))
     placed_y: list = []
     v_gap = 0.8
 
@@ -1114,15 +1305,16 @@ else:
                 va="bottom" if ty >= val else "top", fontsize=9,
                 fontweight="bold", color=col)
 
-    # Volatility summary box
-    vol_box = (
-        "Out-of-Sample Volatility (Annualised)\n"
-        "-------------------------------------\n"
-        f"Max Sharpe:     {oos_vol_sharpe*100:>6.2f}%\n"
-        f"Min Volatility: {oos_vol_vol*100:>6.2f}%\n"
-        f"TSX 60:         {oos_vol_60*100:>6.2f}%\n"
-        f"TSX Composite:  {oos_vol_comp*100:>6.2f}%"
-    )
+    # Volatility summary box: include all benchmarks
+    vol_lines = [
+        "Out-of-Sample Volatility (Annualised)",
+        "-------------------------------------",
+        f"Max Sharpe:     {oos_vol_sharpe*100:>6.2f}%",
+        f"Min Volatility: {oos_vol_vol*100:>6.2f}%",
+    ]
+    for label, vol in benchmark_oos_vols.items():
+        vol_lines.append(f"{label + ':':<17} {vol*100:>6.2f}%")
+    vol_box = "\n".join(vol_lines)
     ax.text(0.98, 0.04, vol_box, transform=ax.transAxes, fontsize=10, family="monospace",
             ha="right", va="bottom",
             bbox=dict(boxstyle="round,pad=0.5", facecolor="#f8f9fa", alpha=0.9, edgecolor="#ced4da"))
@@ -1135,12 +1327,14 @@ else:
     ax.set_ylabel("Cumulative Return (%)", fontsize=11)
     ax.set_xlabel("Date", fontsize=11)
     ax.grid(True, linestyle="--", alpha=0.5)
-    ax.legend(loc="upper left", fontsize=10)
+    # Place legend to the right to free up plotting area
+    ax.legend(loc="upper left", bbox_to_anchor=(1.02, 1), borderaxespad=0, fontsize=10)
 
     ax.xaxis.set_major_locator(mdates.MonthLocator())
     ax.xaxis.set_major_formatter(mdates.DateFormatter("%b %Y"))
     fig.autofmt_xdate()
-    plt.tight_layout()
+    # Leave space on the right for the external legend and volatility box
+    fig.tight_layout(rect=[0, 0, 0.85, 1])
 
     out_path = SCRIPT_DIR / "portfolio_vs_markets_oos.png"
     plt.savefig(out_path, dpi=300, bbox_inches="tight")

@@ -1,0 +1,455 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="WealthGPT AI-assisted portfolio research dashboard">
+  <title>WealthGPT Dashboard</title>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="terminal-theme.css">
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar">
+      <a class="brand" href="#overview" aria-label="WealthGPT home">
+        <span class="brand-mark">WG</span>
+        <span>
+          <strong>WEALTHGPT</strong>
+          <small>PORTFOLIO TERMINAL</small>
+        </span>
+      </a>
+
+      <nav class="nav-list" aria-label="Dashboard sections">
+        <button class="nav-item active" data-view="overview">
+          <span class="nav-icon">01</span> Overview
+        </button>
+        <button class="nav-item" data-view="portfolios">
+          <span class="nav-icon">02</span> Portfolios
+        </button>
+        <button class="nav-item" data-view="research">
+          <span class="nav-icon">03</span> AI Research
+        </button>
+        <button class="nav-item" data-view="settings">
+          <span class="nav-icon">04</span> Run Settings
+        </button>
+        <button class="nav-item" data-view="console">
+          <span class="nav-icon">05</span> Run Console
+        </button>
+        <button class="nav-item" data-view="report">
+          <span class="nav-icon">06</span> Report
+        </button>
+      </nav>
+
+      <div class="sidebar-note">
+        <span class="status-dot"></span>
+        <div>
+          <strong>Research mode</strong>
+          <small>Not investment advice</small>
+        </div>
+      </div>
+    </aside>
+
+    <main class="main">
+      <header class="topbar">
+        <div>
+          <p class="eyebrow">WG / PORTFOLIO ANALYTICS</p>
+          <h1 id="page-title">Overview</h1>
+        </div>
+        <div class="topbar-actions">
+          <span class="data-date" id="data-date">Loading bundled example</span>
+          <button class="button button-secondary" id="open-report-button">View report</button>
+          <button class="button button-primary" id="configure-button">Configure analysis</button>
+        </div>
+      </header>
+
+      <div class="market-tape" aria-label="Terminal status">
+        <span class="tape-brand" id="data-mode">WEALTHGPT SNAPSHOT</span>
+        <span><b>MODE</b> RESEARCH</span>
+        <span><b>ENGINE</b> MPT + BL</span>
+        <span><b>DATA</b> YFINANCE</span>
+        <span><b>BASE</b> CAD</span>
+        <span class="tape-positive"><b>STATUS</b> SYSTEM READY</span>
+        <span class="tape-clock" id="terminal-clock">--:--:-- ET</span>
+      </div>
+
+      <section class="view active" id="overview-view">
+        <div class="hero-card">
+          <div>
+            <p class="eyebrow light" id="run-label">Bundled example</p>
+            <h2>Two portfolios. One clearer decision.</h2>
+            <p>Compare return-seeking and risk-controlled allocations built from the same global asset universe.</p>
+          </div>
+          <div class="hero-meta">
+            <div><span>Training window</span><strong id="hero-training">Loading</strong></div>
+            <div><span>OOS window</span><strong id="hero-oos">Loading</strong></div>
+            <div><span>Max position</span><strong id="hero-cap">Loading</strong></div>
+          </div>
+        </div>
+
+        <div class="metric-grid">
+          <article class="metric-card blue">
+            <span>Max Sharpe return</span>
+            <strong id="overview-max-return">--</strong>
+            <small>Expected annual return</small>
+          </article>
+          <article class="metric-card blue">
+            <span>Max Sharpe risk</span>
+            <strong id="overview-max-risk">--</strong>
+            <small>Sharpe ratio <span id="overview-max-sharpe">--</span></small>
+          </article>
+          <article class="metric-card teal">
+            <span>Min Vol return</span>
+            <strong id="overview-min-return">--</strong>
+            <small>Expected annual return</small>
+          </article>
+          <article class="metric-card teal">
+            <span>Min Vol risk</span>
+            <strong id="overview-min-risk">--</strong>
+            <small>Sharpe ratio <span id="overview-min-sharpe">--</span></small>
+          </article>
+        </div>
+
+        <div class="dashboard-grid">
+          <article class="panel performance-panel">
+            <div class="panel-heading">
+              <div>
+                <p class="eyebrow">Out-of-sample</p>
+                <h3>Portfolio performance</h3>
+              </div>
+              <div class="legend">
+                <span><i class="legend-line blue-line"></i>Max Sharpe</span>
+                <span><i class="legend-line teal-line"></i>Min Vol</span>
+                <span><i class="legend-line gray-line"></i>Benchmark</span>
+              </div>
+            </div>
+            <div class="chart-wrap">
+              <svg class="line-chart" viewBox="0 0 760 290" role="img" aria-label="Illustrative portfolio performance line chart">
+                <g class="grid-lines">
+                  <line x1="48" y1="35" x2="730" y2="35"></line>
+                  <line x1="48" y1="95" x2="730" y2="95"></line>
+                  <line x1="48" y1="155" x2="730" y2="155"></line>
+                  <line x1="48" y1="215" x2="730" y2="215"></line>
+                </g>
+                <path class="area" d="M48 215 C105 202 130 170 188 179 S270 137 330 143 S420 91 480 111 S580 55 630 72 S695 42 730 35 L730 250 L48 250 Z"></path>
+                <path class="chart-path benchmark" id="chart-benchmark" d=""></path>
+                <path class="chart-path min-vol" id="chart-min" d=""></path>
+                <path class="chart-path max-sharpe" id="chart-max" d=""></path>
+                <g class="axis-labels" id="chart-axis-labels">
+                  <text x="390" y="150" text-anchor="middle">Run an analysis to populate performance</text>
+                </g>
+              </svg>
+            </div>
+          </article>
+
+          <article class="panel snapshot-panel">
+            <div class="panel-heading">
+              <div>
+                <p class="eyebrow">At a glance</p>
+                <h3>Portfolio character</h3>
+              </div>
+            </div>
+            <div class="character-list">
+              <div>
+                <span class="character-icon blue-bg">M</span>
+                <div><strong>Max Sharpe</strong><small>Concentrated return-seeking allocation</small></div>
+              </div>
+              <div>
+                <span class="character-icon teal-bg">V</span>
+                <div><strong>Minimum Volatility</strong><small>Broader defensive allocation</small></div>
+              </div>
+              <div>
+                <span class="character-icon gold-bg">AI</span>
+                <div><strong>Research overlay</strong><small>Black-Litterman views with confidence</small></div>
+              </div>
+            </div>
+            <button class="text-button" data-go="portfolios">Compare allocations <span>&rarr;</span></button>
+          </article>
+        </div>
+      </section>
+
+      <section class="view" id="portfolios-view">
+        <div class="section-intro">
+          <div>
+            <p class="eyebrow">Allocation detail</p>
+            <h2>Portfolio breakdown</h2>
+            <p>Switch between strategies to inspect concentration, holdings, and sector exposure.</p>
+          </div>
+          <div class="segmented-control" role="group" aria-label="Select portfolio">
+            <button class="active" data-portfolio="max">Max Sharpe</button>
+            <button data-portfolio="min">Min Volatility</button>
+          </div>
+        </div>
+
+        <div class="metric-grid compact">
+          <article class="metric-card"><span>Expected return</span><strong id="portfolio-return">--</strong></article>
+          <article class="metric-card"><span>Annualized risk</span><strong id="portfolio-risk">--</strong></article>
+          <article class="metric-card"><span>Sharpe ratio</span><strong id="portfolio-sharpe">--</strong></article>
+          <article class="metric-card"><span>Top five weight</span><strong id="portfolio-concentration">--</strong></article>
+        </div>
+
+        <div class="portfolio-grid">
+          <article class="panel">
+            <div class="panel-heading">
+              <div><p class="eyebrow">Allocation</p><h3>Largest holdings</h3></div>
+              <span class="panel-badge" id="holding-count">12 shown</span>
+            </div>
+            <div class="holdings-bars" id="holdings-bars"></div>
+          </article>
+
+          <article class="panel">
+            <div class="panel-heading">
+              <div><p class="eyebrow">Exposure</p><h3>Sector mix</h3></div>
+            </div>
+            <div class="donut-layout">
+              <div class="donut" id="sector-donut">
+                <div><strong id="donut-total">100%</strong><span>allocated</span></div>
+              </div>
+              <div class="sector-legend" id="sector-legend"></div>
+            </div>
+            <div class="insight-box">
+              <span>Model note</span>
+              <p id="portfolio-note">The return-seeking portfolio is concentrated in financials and selected cross-market opportunities.</p>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <section class="view" id="research-view">
+        <div class="section-intro">
+          <div>
+            <p class="eyebrow">Black-Litterman overlay</p>
+            <h2>AI research views</h2>
+            <p>Review thesis, signed posterior return, listing venue, and index/ETF references. ETFs shown are trackers, not listing venues.</p>
+          </div>
+          <label class="search-box">
+            <span>Search</span>
+            <input id="research-search" type="search" placeholder="Ticker or company thesis">
+          </label>
+        </div>
+        <div class="research-list" id="research-list"></div>
+      </section>
+
+      <section class="view" id="settings-view">
+        <div class="section-intro">
+          <div>
+            <p class="eyebrow">Analysis controls</p>
+            <h2>Configure a model run</h2>
+            <p>Configure the next local model run. Completed results automatically replace the bundled example snapshot.</p>
+          </div>
+          <span class="status-pill">Local run controls</span>
+        </div>
+
+        <div class="settings-grid">
+          <article class="panel settings-card">
+            <h3>Time windows</h3>
+            <label>
+              <span>Training lookback <strong id="training-value">1 year</strong></span>
+              <input id="training-range" type="range" min="0.25" max="10" step="0.25" value="1">
+            </label>
+            <label>
+              <span>Out-of-sample period <strong id="oos-value">6 months</strong></span>
+              <input id="oos-range" type="range" min="0" max="60" step="1" value="6">
+            </label>
+          </article>
+
+          <article class="panel settings-card">
+            <h3>Research overlay</h3>
+            <label class="switch-row">
+              <span><strong>GPT-assisted views</strong><small>Apply research views through Black-Litterman</small></span>
+              <input id="gpt-toggle" type="checkbox">
+              <i class="switch"></i>
+            </label>
+            <label>
+              <span>Research universe</span>
+              <select id="universe-select">
+                <option>Curated token-efficient list</option>
+                <option>Full investable universe</option>
+                <option>Canada core only</option>
+              </select>
+            </label>
+          </article>
+
+          <article class="panel settings-card">
+            <h3>Portfolio constraints</h3>
+            <label>
+              <span>Maximum position <strong id="position-value">25%</strong></span>
+              <input id="position-range" type="range" min="1" max="100" step="1" value="25">
+            </label>
+            <label class="switch-row">
+              <span><strong>Long-only weights</strong><small>Prevent short positions</small></span>
+              <input type="checkbox" checked disabled>
+              <i class="switch"></i>
+            </label>
+          </article>
+
+          <article class="panel run-card">
+            <p class="eyebrow light">Production path</p>
+            <h3>Ready for a thin backend</h3>
+            <p>Extract the analysis blocks into a callable engine, write a JSON result file, and let this dashboard launch runs and stream progress.</p>
+            <button class="button button-light" id="save-settings">Save local settings</button>
+            <span id="settings-message" aria-live="polite"></span>
+          </article>
+        </div>
+      </section>
+
+      <section class="view" id="console-view">
+        <div class="section-intro">
+          <div>
+            <p class="eyebrow">Remote execution</p>
+            <h2>Run console</h2>
+            <p>Connect to the constrained WealthGPT runner, launch an analysis, and follow its terminal output live.</p>
+          </div>
+          <div class="runner-state disconnected" id="runner-state">
+            <span></span>
+            <strong>Disconnected</strong>
+          </div>
+        </div>
+
+        <div class="console-layout">
+          <div class="console-controls">
+            <article class="panel connection-card">
+              <div class="panel-heading">
+                <div><p class="eyebrow">Runner service</p><h3>Connection</h3></div>
+                <button class="button button-secondary button-small" id="runner-connect">Connect</button>
+              </div>
+              <label class="field">
+                <span>Service URL</span>
+                <input id="runner-url" type="url" value="http://127.0.0.1:8765" spellcheck="false">
+              </label>
+              <label class="field">
+                <span>Access token <small>Optional on localhost</small></span>
+                <input id="runner-token" type="password" placeholder="Stored for this browser session only" autocomplete="off">
+              </label>
+              <p class="field-help">The service URL may point to another trusted machine. Public exposure requires HTTPS, authentication, and firewall restrictions.</p>
+            </article>
+
+            <article class="panel remote-config-card">
+              <div class="panel-heading">
+                <div><p class="eyebrow">Validated inputs</p><h3>Run configuration</h3></div>
+                <span class="panel-badge">No shell access</span>
+              </div>
+              <div class="remote-fields">
+                <label class="field">
+                  <span>Training lookback <small>0.25-10 years</small></span>
+                  <input id="remote-training" type="number" min="0.25" max="10" step="0.25" value="1">
+                </label>
+                <label class="field">
+                  <span>OOS test window <small>0-60 months</small></span>
+                  <input id="remote-oos" type="number" min="0" max="60" step="1" value="6">
+                </label>
+                <label class="field">
+                  <span>Maximum position <small>1-100%</small></span>
+                  <input id="remote-position" type="number" min="1" max="100" step="1" value="25">
+                </label>
+                <label class="field">
+                  <span>Research universe</span>
+                  <select id="remote-universe">
+                    <option value="curated" selected>Curated token-efficient list</option>
+                    <option value="canada">Canada core</option>
+                    <option value="full">Full asset universe</option>
+                  </select>
+                </label>
+              </div>
+              <label class="switch-row console-switch">
+                <span><strong>GPT-assisted Black-Litterman</strong><small>Uses the server's OPENAI_API_KEY when enabled</small></span>
+                <input id="remote-gpt" type="checkbox">
+                <i class="switch"></i>
+              </label>
+              <label class="switch-row console-switch">
+                <span><strong>Refresh research cache</strong><small>Regenerate rather than reuse cached views</small></span>
+                <input id="remote-refresh" type="checkbox">
+                <i class="switch"></i>
+              </label>
+              <div class="run-actions">
+                <button class="button button-primary" id="runner-start" disabled>Run WealthGPT</button>
+                <button class="button button-danger" id="runner-stop" disabled>Stop run</button>
+              </div>
+            </article>
+          </div>
+
+          <article class="terminal-card">
+            <div class="terminal-toolbar">
+              <div class="terminal-title">
+                <span class="terminal-lights"><i></i><i></i><i></i></span>
+                <strong>wealthgpt relay</strong>
+              </div>
+              <div class="terminal-actions">
+                <label><input id="terminal-autoscroll" type="checkbox" checked> Auto-scroll</label>
+                <button id="terminal-copy">Copy</button>
+                <button id="terminal-clear">Clear</button>
+              </div>
+            </div>
+            <pre id="terminal-output" tabindex="0" aria-live="polite"><span class="terminal-muted">Connect to a runner service to begin.</span></pre>
+            <div class="terminal-footer">
+              <span id="terminal-run-id">No active run</span>
+              <span id="terminal-line-count">0 lines</span>
+            </div>
+          </article>
+        </div>
+
+        <div class="security-note">
+          <strong>Remote safety boundary</strong>
+          <span>The included service executes only the configured WealthGPT script with allowlisted values. It does not provide an interactive shell or accept command text.</span>
+        </div>
+      </section>
+
+      <section class="view" id="report-view">
+        <div class="section-intro">
+          <div>
+            <p class="eyebrow">Generated artifacts</p>
+            <h2>Portfolio report</h2>
+            <p>The latest PDF summary and out-of-sample chart are served directly by the WealthGPT runner.</p>
+          </div>
+          <div class="report-actions">
+            <span class="runner-state disconnected" id="report-state"><span></span><strong>Awaiting report</strong></span>
+            <button class="button button-secondary" id="refresh-report">Refresh</button>
+            <button class="button button-primary" id="download-report" disabled>Open PDF</button>
+          </div>
+        </div>
+
+        <div class="report-grid">
+          <article class="panel pdf-panel">
+            <div class="panel-heading">
+              <div><p class="eyebrow">PDF output</p><h3>WealthGPT portfolio summary</h3></div>
+              <span class="panel-badge" id="pdf-status">Not loaded</span>
+            </div>
+            <div class="pdf-viewer-shell">
+              <iframe id="pdf-viewer" title="WealthGPT portfolio summary PDF"></iframe>
+              <div class="artifact-placeholder" id="pdf-placeholder">
+                <strong>No PDF loaded</strong>
+                <span>Connect to the runner or complete an analysis.</span>
+              </div>
+            </div>
+          </article>
+
+          <article class="panel chart-panel">
+            <div class="panel-heading">
+              <div><p class="eyebrow">Performance output</p><h3>Out-of-sample chart</h3></div>
+              <span class="panel-badge" id="chart-status">Not loaded</span>
+            </div>
+            <div class="chart-artifact-shell">
+              <img id="report-chart" alt="Latest WealthGPT out-of-sample performance chart">
+              <div class="artifact-placeholder" id="chart-placeholder">
+                <strong>No chart loaded</strong>
+                <span>The chart is generated when OOS testing is enabled.</span>
+              </div>
+            </div>
+          </article>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <div class="function-bar" aria-label="Keyboard navigation shortcuts">
+    <button data-shortcut-view="overview"><kbd>F1</kbd> OVERVIEW</button>
+    <button data-shortcut-view="portfolios"><kbd>F2</kbd> PORTFOLIOS</button>
+    <button data-shortcut-view="research"><kbd>F3</kbd> RESEARCH</button>
+    <button data-shortcut-view="settings"><kbd>F4</kbd> SETTINGS</button>
+    <button data-shortcut-view="console"><kbd>F5</kbd> CONSOLE</button>
+    <button data-shortcut-view="report"><kbd>F6</kbd> REPORT</button>
+    <span>WEALTHGPT // RESEARCH USE ONLY</span>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>

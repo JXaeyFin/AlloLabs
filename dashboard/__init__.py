@@ -1,0 +1,1 @@
+"""WealthGPT local dashboard package."""
