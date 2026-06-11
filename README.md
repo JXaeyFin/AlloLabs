@@ -15,8 +15,10 @@
 ```
 
 # WealthGPT
+<img width="1919" height="940" alt="image" src="https://github.com/user-attachments/assets/756b68aa-7354-489f-9152-869307a149f4" />
 
 An AI-assisted portfolio allocation research model for the S&P/TSX 60.
+<img width="1919" height="940" alt="image" src="https://github.com/user-attachments/assets/10dddec1-f747-443d-960b-7679cae152d8" />
 
 WealthGPT combines Modern Portfolio Theory, Black-Litterman expected returns,
 live market data, and structured equity research generated through the OpenAI
@@ -28,6 +30,8 @@ Responses API. It constructs and compares:
 The model also produces a polished PDF report covering allocations, sector
 exposure, portfolio metrics, and research rationales for the eight largest
 holdings in each portfolio.
+<img width="1919" height="944" alt="image" src="https://github.com/user-attachments/assets/0d533e09-01f4-455e-8957-7ef2dcf896a4" />
+
 
 > **Research software only.** This project is not financial advice and should
 > not be used as an automated trading system without independent validation.
