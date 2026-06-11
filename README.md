@@ -240,7 +240,7 @@ _Note. Two duplicates are present (249)_
 | Data / Information Services                             |     6 |  2% |
 | Other Specialized                                       |   0–2 | <1% |
 
-US Main
+US Core
 | Ticker | Country | Listed Index / Exchange | Sector                          |
 | ------ | ------- | ----------------------- | ------------------------------- |
 | AAPL   | USA     | Nasdaq-100 / NASDAQ     | Technology                      |
