@@ -210,6 +210,100 @@ GitHub Actions runs the same checks on pushes and pull requests.
 Public-safe transcripts and a sample report are available in
 [`examples/`](examples/).
 
+## Full Universe
+
+| Ticker | Country | Listed Index / Exchange | Sector                          |
+| ------ | ------- | ----------------------- | ------------------------------- |
+| AAPL   | USA     | Nasdaq-100 / NASDAQ     | Technology                      |
+| ABBV   | USA     | S&P 500 / NYSE          | Healthcare                      |
+| ABT    | USA     | S&P 500 / NYSE          | Healthcare                      |
+| ACN    | USA     | S&P 500 / NYSE          | Information Technology Services |
+| ADBE   | USA     | Nasdaq-100 / NASDAQ     | Software                        |
+| AIG    | USA     | S&P 500 / NYSE          | Insurance                       |
+| AMD    | USA     | Nasdaq-100 / NASDAQ     | Semiconductors                  |
+| AMGN   | USA     | Nasdaq-100 / NASDAQ     | Biotechnology                   |
+| AMT    | USA     | S&P 500 / NYSE          | REIT (Telecom Infrastructure)   |
+| AMZN   | USA     | Nasdaq-100 / NASDAQ     | Consumer Discretionary          |
+| AVGO   | USA     | Nasdaq-100 / NASDAQ     | Semiconductors                  |
+| AXP    | USA     | S&P 500 / NYSE          | Financial Services              |
+| BA     | USA     | Dow Jones / NYSE        | Aerospace & Defense             |
+| BAC    | USA     | S&P 500 / NYSE          | Banking                         |
+| BK     | USA     | S&P 500 / NYSE          | Custody Banking                 |
+| BKNG   | USA     | Nasdaq-100 / NASDAQ     | Travel Services                 |
+| BLK    | USA     | S&P 500 / NYSE          | Asset Management                |
+| BMY    | USA     | S&P 500 / NYSE          | Pharmaceuticals                 |
+| BRK-B  | USA     | S&P 500 / NYSE          | Diversified Financials          |
+| C      | USA     | S&P 500 / NYSE          | Banking                         |
+| CAT    | USA     | Dow Jones / NYSE        | Industrial Machinery            |
+| CL     | USA     | S&P 500 / NYSE          | Consumer Staples                |
+| CMCSA  | USA     | Nasdaq-100 / NASDAQ     | Telecommunications & Media      |
+| COF    | USA     | S&P 500 / NYSE          | Consumer Finance                |
+| COP    | USA     | S&P 500 / NYSE          | Energy                          |
+| COST   | USA     | S&P 500 / NASDAQ        | Consumer Staples                |
+| CRM    | USA     | S&P 500 / NYSE          | Software                        |
+| CSCO   | USA     | Dow Jones / NASDAQ      | Networking Equipment            |
+| CVS    | USA     | S&P 500 / NYSE          | Healthcare Services             |
+| CVX    | USA     | Dow Jones / NYSE        | Energy                          |
+| DHR    | USA     | S&P 500 / NYSE          | Life Sciences Tools             |
+| DIS    | USA     | Dow Jones / NYSE        | Entertainment                   |
+| DOW    | USA     | S&P 500 / NYSE          | Chemicals                       |
+| GE     | USA     | S&P 500 / NYSE          | Aerospace                       |
+| GILD   | USA     | Nasdaq-100 / NASDAQ     | Biotechnology                   |
+| GM     | USA     | S&P 500 / NYSE          | Automobiles                     |
+| GOOG   | USA     | Nasdaq-100 / NASDAQ     | Internet Services               |
+| GOOGL  | USA     | Nasdaq-100 / NASDAQ     | Internet Services               |
+| GS     | USA     | Dow Jones / NYSE        | Investment Banking              |
+| HD     | USA     | Dow Jones / NYSE        | Home Improvement Retail         |
+| HON    | USA     | S&P 500 / NASDAQ        | Industrials                     |
+| IBM    | USA     | Dow Jones / NYSE        | Technology                      |
+| INTC   | USA     | Nasdaq-100 / NASDAQ     | Semiconductors                  |
+| JNJ    | USA     | Dow Jones / NYSE        | Healthcare                      |
+| JPM    | USA     | Dow Jones / NYSE        | Banking                         |
+| KHC    | USA     | Nasdaq-100 / NASDAQ     | Consumer Staples                |
+| KO     | USA     | Dow Jones / NYSE        | Beverages                       |
+| LIN    | USA     | S&P 500 / NASDAQ        | Industrial Gases                |
+| LLY    | USA     | S&P 500 / NYSE          | Pharmaceuticals                 |
+| LOW    | USA     | S&P 500 / NYSE          | Home Improvement Retail         |
+| MA     | USA     | S&P 500 / NYSE          | Payment Networks                |
+| MCD    | USA     | Dow Jones / NYSE        | Restaurants                     |
+| META   | USA     | Nasdaq-100 / NASDAQ     | Internet Platforms              |
+| MET    | USA     | S&P 500 / NYSE          | Insurance                       |
+| MMM    | USA     | Dow Jones / NYSE        | Industrials                     |
+| MRK    | USA     | Dow Jones / NYSE        | Pharmaceuticals                 |
+| MS     | USA     | S&P 500 / NYSE          | Investment Banking              |
+| MSFT   | USA     | Nasdaq-100 / NASDAQ     | Software                        |
+| NEE    | USA     | S&P 500 / NYSE          | Utilities                       |
+| NFLX   | USA     | Nasdaq-100 / NASDAQ     | Streaming Media                 |
+| NKE    | USA     | Dow Jones / NYSE        | Consumer Discretionary          |
+| NVDA   | USA     | Nasdaq-100 / NASDAQ     | Semiconductors                  |
+| ORCL   | USA     | S&P 500 / NYSE          | Software                        |
+| PEP    | USA     | Nasdaq-100 / NASDAQ     | Beverages                       |
+| PFE    | USA     | S&P 500 / NYSE          | Pharmaceuticals                 |
+| PG     | USA     | Dow Jones / NYSE        | Consumer Staples                |
+| PM     | USA     | S&P 500 / NYSE          | Tobacco                         |
+| QCOM   | USA     | Nasdaq-100 / NASDAQ     | Semiconductors                  |
+| RTX    | USA     | S&P 500 / NYSE          | Aerospace & Defense             |
+| SBUX   | USA     | Nasdaq-100 / NASDAQ     | Restaurants                     |
+| SCHW   | USA     | S&P 500 / NYSE          | Brokerage                       |
+| SO     | USA     | S&P 500 / NYSE          | Utilities                       |
+| SPG    | USA     | S&P 500 / NYSE          | REIT (Retail)                   |
+| T      | USA     | S&P 500 / NYSE          | Telecommunications              |
+| TGT    | USA     | S&P 500 / NYSE          | Retail                          |
+| TMO    | USA     | S&P 500 / NYSE          | Life Sciences Tools             |
+| TMUS   | USA     | Nasdaq-100 / NASDAQ     | Telecommunications              |
+| TSLA   | USA     | Nasdaq-100 / NASDAQ     | Automobiles                     |
+| TXN    | USA     | Nasdaq-100 / NASDAQ     | Semiconductors                  |
+| UNH    | USA     | Dow Jones / NYSE        | Healthcare Insurance            |
+| UNP    | USA     | S&P 500 / NYSE          | Railroads                       |
+| UPS    | USA     | S&P 500 / NYSE          | Logistics                       |
+| USB    | USA     | S&P 500 / NYSE          | Banking                         |
+| V      | USA     | Dow Jones / NYSE        | Payment Networks                |
+| VZ     | USA     | Dow Jones / NYSE        | Telecommunications              |
+| WFC    | USA     | S&P 500 / NYSE          | Banking                         |
+| WMT    | USA     | Dow Jones / NYSE        | Consumer Staples                |
+| XOM    | USA     | Dow Jones / NYSE        | Energy                          |
+
+
 ## Author
 
 Jeffrey Xia
