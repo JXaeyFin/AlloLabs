@@ -13,6 +13,8 @@
 
 An AI-assisted portfolio allocation research model for the S&P/TSX 60.
 
+I set out to beat the all-cap weighted TSX 60 ETF (XIU.TO):
+
 WealthGPT combines Modern Portfolio Theory, Black-Litterman expected returns,
 live market data, and structured equity research generated through the OpenAI
 Responses API. It constructs and compares:
