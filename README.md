@@ -2,7 +2,7 @@
   <img width="280" height="280" alt="Untitled design (3)" src="https://github.com/user-attachments/assets/a3b22038-3cbb-4c31-9825-594a137d7168" />
 </p>
                                                                                                          
-<p align="center">
+
 ```text
  __        __         _ _   _      ____ ____ _____
  \ \      / /__  __ _| | |_| |__  / ___|  _ \_   _|
@@ -12,7 +12,7 @@
 
               AI-assisted allocation research
                     Invest with caution
-```</p>
+```
 
 # WealthGPT
 
