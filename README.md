@@ -17,6 +17,7 @@
 # WealthGPT
 <img width="1919" height="940" alt="image" src="https://github.com/user-attachments/assets/756b68aa-7354-489f-9152-869307a149f4" />
 
+
 An AI-assisted portfolio allocation research model for the S&P/TSX 60.
 <img width="1919" height="940" alt="image" src="https://github.com/user-attachments/assets/10dddec1-f747-443d-960b-7679cae152d8" />
 
