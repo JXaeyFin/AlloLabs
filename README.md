@@ -1,5 +1,5 @@
-<img width="1254" height="1254" alt="Untitled design (3)" src="https://github.com/user-attachments/assets/b384774b-a90a-4303-b153-1fd1ab1027ae" />
-                                                                                                                        
+<img width="747" height="747" alt="Untitled design (3)" src="https://github.com/user-attachments/assets/a3b22038-3cbb-4c31-9825-594a137d7168" />
+                                                                                                         
 
 ```text
  __    __           _ _   _       ___       _            _   ___                           
