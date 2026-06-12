@@ -1,5 +1,5 @@
 <p align="center">
-  <img width="220" height="220" alt="Untitled design (3)" src="https://github.com/user-attachments/assets/e7033cf5-0856-4f12-a04b-2e556afb1e03" />
+  <img width="225" height="225" alt="Untitled - June 12, 2026 at 01 50 12" src="https://github.com/user-attachments/assets/eb6fc7b3-3e0c-45d7-8e08-63e943fa1e1c" />
 </p>
 
 ```text
