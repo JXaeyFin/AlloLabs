@@ -12,8 +12,9 @@
               AI-assisted allocation research
                     Invest with caution
 ```
-
-For Individual Users, Visit the Website Here! [WealthGPT Website](https://wealthgpt.carrd.co/)
+<p align="center">
+Individual or First-Time User? Visit the Website Here! [WealthGPT Website](https://wealthgpt.carrd.co/)
+</p>
 
 # WealthGPT
 
