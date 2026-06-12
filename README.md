@@ -13,7 +13,7 @@
                     Invest with caution
 ```
 <p align="center">
-Individual or First-Time User? Visit the Website Here! [WealthGPT Website](https://wealthgpt.carrd.co/)
+Individual or First-Time User? Visit the Website Here! https://wealthgpt.carrd.co/
 </p>
 
 # WealthGPT
