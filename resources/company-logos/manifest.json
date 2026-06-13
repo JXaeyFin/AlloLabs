@@ -1,0 +1,1722 @@
+{
+  "generatedAt": "2026-06-13T01:06:44.077419+00:00",
+  "source": "Logo.dev ticker endpoint",
+  "universeFile": "wealthgpt.py",
+  "tickerCount": 285,
+  "counts": {
+    "company": 284,
+    "monogram": 1
+  },
+  "logos": [
+    {
+      "ticker": "AAL.L",
+      "file": "AAL.L.png",
+      "status": "company",
+      "bytes": 37476
+    },
+    {
+      "ticker": "AAPL",
+      "file": "AAPL.png",
+      "status": "company",
+      "bytes": 7543
+    },
+    {
+      "ticker": "ABBV",
+      "file": "ABBV.png",
+      "status": "company",
+      "bytes": 14005
+    },
+    {
+      "ticker": "ABI.BR",
+      "file": "ABI.BR.png",
+      "status": "company",
+      "bytes": 33093
+    },
+    {
+      "ticker": "ABNB",
+      "file": "ABNB.png",
+      "status": "company",
+      "bytes": 8441
+    },
+    {
+      "ticker": "ABT",
+      "file": "ABT.png",
+      "status": "company",
+      "bytes": 15788
+    },
+    {
+      "ticker": "ABX.TO",
+      "file": "ABX.TO.png",
+      "status": "company",
+      "bytes": 18614
+    },
+    {
+      "ticker": "ACN",
+      "file": "ACN.png",
+      "status": "company",
+      "bytes": 19950
+    },
+    {
+      "ticker": "AD.AS",
+      "file": "AD.AS.png",
+      "status": "company",
+      "bytes": 70785
+    },
+    {
+      "ticker": "ADBE",
+      "file": "ADBE.png",
+      "status": "company",
+      "bytes": 8942
+    },
+    {
+      "ticker": "ADI",
+      "file": "ADI.png",
+      "status": "company",
+      "bytes": 14354
+    },
+    {
+      "ticker": "ADP",
+      "file": "ADP.png",
+      "status": "company",
+      "bytes": 15894
+    },
+    {
+      "ticker": "AEM.TO",
+      "file": "AEM.TO.png",
+      "status": "company",
+      "bytes": 19883
+    },
+    {
+      "ticker": "AEP",
+      "file": "AEP.png",
+      "status": "company",
+      "bytes": 22550
+    },
+    {
+      "ticker": "AI.PA",
+      "file": "AI.PA.png",
+      "status": "company",
+      "bytes": 15215
+    },
+    {
+      "ticker": "AIG",
+      "file": "AIG.png",
+      "status": "company",
+      "bytes": 9591
+    },
+    {
+      "ticker": "AIR.PA",
+      "file": "AIR.PA.png",
+      "status": "company",
+      "bytes": 4174
+    },
+    {
+      "ticker": "AKAM",
+      "file": "AKAM.png",
+      "status": "company",
+      "bytes": 22532
+    },
+    {
+      "ticker": "ALNY",
+      "file": "ALNY.png",
+      "status": "company",
+      "bytes": 20435
+    },
+    {
+      "ticker": "ALV.DE",
+      "file": "ALV.DE.png",
+      "status": "company",
+      "bytes": 24675
+    },
+    {
+      "ticker": "AMAT",
+      "file": "AMAT.png",
+      "status": "company",
+      "bytes": 32935
+    },
+    {
+      "ticker": "AMD",
+      "file": "AMD.png",
+      "status": "company",
+      "bytes": 7043
+    },
+    {
+      "ticker": "AMGN",
+      "file": "AMGN.png",
+      "status": "company",
+      "bytes": 18955
+    },
+    {
+      "ticker": "AMT",
+      "file": "AMT.png",
+      "status": "company",
+      "bytes": 8758
+    },
+    {
+      "ticker": "AMZN",
+      "file": "AMZN.png",
+      "status": "company",
+      "bytes": 9631
+    },
+    {
+      "ticker": "APP",
+      "file": "APP.png",
+      "status": "company",
+      "bytes": 10363
+    },
+    {
+      "ticker": "ARM",
+      "file": "ARM.png",
+      "status": "company",
+      "bytes": 9209
+    },
+    {
+      "ticker": "ASML.AS",
+      "file": "ASML.AS.png",
+      "status": "company",
+      "bytes": 11615
+    },
+    {
+      "ticker": "ATD.TO",
+      "file": "ATD.TO.png",
+      "status": "company",
+      "bytes": 47246
+    },
+    {
+      "ticker": "AVGO",
+      "file": "AVGO.png",
+      "status": "company",
+      "bytes": 16663
+    },
+    {
+      "ticker": "AXP",
+      "file": "AXP.png",
+      "status": "company",
+      "bytes": 22520
+    },
+    {
+      "ticker": "AZN.L",
+      "file": "AZN.L.png",
+      "status": "company",
+      "bytes": 54735
+    },
+    {
+      "ticker": "BA",
+      "file": "BA.png",
+      "status": "company",
+      "bytes": 22838
+    },
+    {
+      "ticker": "BAC",
+      "file": "BAC.png",
+      "status": "company",
+      "bytes": 21156
+    },
+    {
+      "ticker": "BAE.L",
+      "file": "BAE.L.png",
+      "status": "monogram",
+      "bytes": 2756
+    },
+    {
+      "ticker": "BAM.TO",
+      "file": "BAM.TO.png",
+      "status": "company",
+      "bytes": 11679
+    },
+    {
+      "ticker": "BATS.L",
+      "file": "BATS.L.png",
+      "status": "company",
+      "bytes": 10220
+    },
+    {
+      "ticker": "BCE.TO",
+      "file": "BCE.TO.png",
+      "status": "company",
+      "bytes": 4471
+    },
+    {
+      "ticker": "BHP",
+      "file": "BHP.png",
+      "status": "company",
+      "bytes": 21812
+    },
+    {
+      "ticker": "BIIB",
+      "file": "BIIB.png",
+      "status": "company",
+      "bytes": 16737
+    },
+    {
+      "ticker": "BIP-UN.TO",
+      "file": "BIP-UN.TO.png",
+      "status": "company",
+      "bytes": 11679
+    },
+    {
+      "ticker": "BKNG",
+      "file": "BKNG.png",
+      "status": "company",
+      "bytes": 32646
+    },
+    {
+      "ticker": "BKR",
+      "file": "BKR.png",
+      "status": "company",
+      "bytes": 7699
+    },
+    {
+      "ticker": "BLK",
+      "file": "BLK.png",
+      "status": "company",
+      "bytes": 6667
+    },
+    {
+      "ticker": "BMO.TO",
+      "file": "BMO.TO.png",
+      "status": "company",
+      "bytes": 16450
+    },
+    {
+      "ticker": "BMY",
+      "file": "BMY.png",
+      "status": "company",
+      "bytes": 9514
+    },
+    {
+      "ticker": "BN.TO",
+      "file": "BN.TO.png",
+      "status": "company",
+      "bytes": 11679
+    },
+    {
+      "ticker": "BNP.PA",
+      "file": "BNP.PA.png",
+      "status": "company",
+      "bytes": 13524
+    },
+    {
+      "ticker": "BNS.TO",
+      "file": "BNS.TO.png",
+      "status": "company",
+      "bytes": 8352
+    },
+    {
+      "ticker": "BNY",
+      "file": "BNY.png",
+      "status": "company",
+      "bytes": 6667
+    },
+    {
+      "ticker": "BP.L",
+      "file": "BP.L.png",
+      "status": "company",
+      "bytes": 40338
+    },
+    {
+      "ticker": "BRK-B",
+      "file": "BRK-B.png",
+      "status": "company",
+      "bytes": 9209
+    },
+    {
+      "ticker": "C",
+      "file": "C.png",
+      "status": "company",
+      "bytes": 12609
+    },
+    {
+      "ticker": "CAT",
+      "file": "CAT.png",
+      "status": "company",
+      "bytes": 12083
+    },
+    {
+      "ticker": "CCO.TO",
+      "file": "CCO.TO.png",
+      "status": "company",
+      "bytes": 23223
+    },
+    {
+      "ticker": "CDNS",
+      "file": "CDNS.png",
+      "status": "company",
+      "bytes": 9594
+    },
+    {
+      "ticker": "CDW",
+      "file": "CDW.png",
+      "status": "company",
+      "bytes": 10163
+    },
+    {
+      "ticker": "CHTR",
+      "file": "CHTR.png",
+      "status": "company",
+      "bytes": 17615
+    },
+    {
+      "ticker": "CL",
+      "file": "CL.png",
+      "status": "company",
+      "bytes": 13051
+    },
+    {
+      "ticker": "CLS.TO",
+      "file": "CLS.TO.png",
+      "status": "company",
+      "bytes": 39027
+    },
+    {
+      "ticker": "CM.TO",
+      "file": "CM.TO.png",
+      "status": "company",
+      "bytes": 16938
+    },
+    {
+      "ticker": "CMCSA",
+      "file": "CMCSA.png",
+      "status": "company",
+      "bytes": 44159
+    },
+    {
+      "ticker": "CNQ.TO",
+      "file": "CNQ.TO.png",
+      "status": "company",
+      "bytes": 19741
+    },
+    {
+      "ticker": "CNR.TO",
+      "file": "CNR.TO.png",
+      "status": "company",
+      "bytes": 3730
+    },
+    {
+      "ticker": "COF",
+      "file": "COF.png",
+      "status": "company",
+      "bytes": 20846
+    },
+    {
+      "ticker": "COP",
+      "file": "COP.png",
+      "status": "company",
+      "bytes": 9061
+    },
+    {
+      "ticker": "COST",
+      "file": "COST.png",
+      "status": "company",
+      "bytes": 18645
+    },
+    {
+      "ticker": "CP.TO",
+      "file": "CP.TO.png",
+      "status": "company",
+      "bytes": 38284
+    },
+    {
+      "ticker": "CPG.L",
+      "file": "CPG.L.png",
+      "status": "company",
+      "bytes": 11494
+    },
+    {
+      "ticker": "CPRT",
+      "file": "CPRT.png",
+      "status": "company",
+      "bytes": 29757
+    },
+    {
+      "ticker": "CRH.L",
+      "file": "CRH.L.png",
+      "status": "company",
+      "bytes": 16277
+    },
+    {
+      "ticker": "CRM",
+      "file": "CRM.png",
+      "status": "company",
+      "bytes": 10493
+    },
+    {
+      "ticker": "CRWD",
+      "file": "CRWD.png",
+      "status": "company",
+      "bytes": 24489
+    },
+    {
+      "ticker": "CS.PA",
+      "file": "CS.PA.png",
+      "status": "company",
+      "bytes": 14289
+    },
+    {
+      "ticker": "CSCO",
+      "file": "CSCO.png",
+      "status": "company",
+      "bytes": 19515
+    },
+    {
+      "ticker": "CSU.TO",
+      "file": "CSU.TO.png",
+      "status": "company",
+      "bytes": 7067
+    },
+    {
+      "ticker": "CSX",
+      "file": "CSX.png",
+      "status": "company",
+      "bytes": 26890
+    },
+    {
+      "ticker": "CTAS",
+      "file": "CTAS.png",
+      "status": "company",
+      "bytes": 25675
+    },
+    {
+      "ticker": "CTSH",
+      "file": "CTSH.png",
+      "status": "company",
+      "bytes": 18045
+    },
+    {
+      "ticker": "CVE.TO",
+      "file": "CVE.TO.png",
+      "status": "company",
+      "bytes": 18907
+    },
+    {
+      "ticker": "CVS",
+      "file": "CVS.png",
+      "status": "company",
+      "bytes": 19996
+    },
+    {
+      "ticker": "CVX",
+      "file": "CVX.png",
+      "status": "company",
+      "bytes": 27767
+    },
+    {
+      "ticker": "DASH",
+      "file": "DASH.png",
+      "status": "company",
+      "bytes": 10732
+    },
+    {
+      "ticker": "DDOG",
+      "file": "DDOG.png",
+      "status": "company",
+      "bytes": 29913
+    },
+    {
+      "ticker": "DE",
+      "file": "DE.png",
+      "status": "company",
+      "bytes": 35301
+    },
+    {
+      "ticker": "DG.PA",
+      "file": "DG.PA.png",
+      "status": "company",
+      "bytes": 5434
+    },
+    {
+      "ticker": "DGE.L",
+      "file": "DGE.L.png",
+      "status": "company",
+      "bytes": 6554
+    },
+    {
+      "ticker": "DHR",
+      "file": "DHR.png",
+      "status": "company",
+      "bytes": 10729
+    },
+    {
+      "ticker": "DIS",
+      "file": "DIS.png",
+      "status": "company",
+      "bytes": 11082
+    },
+    {
+      "ticker": "DOL.TO",
+      "file": "DOL.TO.png",
+      "status": "company",
+      "bytes": 43019
+    },
+    {
+      "ticker": "DOW",
+      "file": "DOW.png",
+      "status": "company",
+      "bytes": 19673
+    },
+    {
+      "ticker": "DSY.PA",
+      "file": "DSY.PA.png",
+      "status": "company",
+      "bytes": 30032
+    },
+    {
+      "ticker": "DTE.DE",
+      "file": "DTE.DE.png",
+      "status": "company",
+      "bytes": 6251
+    },
+    {
+      "ticker": "DUK",
+      "file": "DUK.png",
+      "status": "company",
+      "bytes": 63992
+    },
+    {
+      "ticker": "DXCM",
+      "file": "DXCM.png",
+      "status": "company",
+      "bytes": 9282
+    },
+    {
+      "ticker": "EA",
+      "file": "EA.png",
+      "status": "company",
+      "bytes": 39766
+    },
+    {
+      "ticker": "EBAY",
+      "file": "EBAY.png",
+      "status": "company",
+      "bytes": 15840
+    },
+    {
+      "ticker": "EL.PA",
+      "file": "EL.PA.png",
+      "status": "company",
+      "bytes": 6168
+    },
+    {
+      "ticker": "EMA.TO",
+      "file": "EMA.TO.png",
+      "status": "company",
+      "bytes": 9985
+    },
+    {
+      "ticker": "EMR",
+      "file": "EMR.png",
+      "status": "company",
+      "bytes": 10039
+    },
+    {
+      "ticker": "ENB.TO",
+      "file": "ENB.TO.png",
+      "status": "company",
+      "bytes": 20496
+    },
+    {
+      "ticker": "ENEL.MI",
+      "file": "ENEL.MI.png",
+      "status": "company",
+      "bytes": 10447
+    },
+    {
+      "ticker": "ENGI.PA",
+      "file": "ENGI.PA.png",
+      "status": "company",
+      "bytes": 6415
+    },
+    {
+      "ticker": "ENI.MI",
+      "file": "ENI.MI.png",
+      "status": "company",
+      "bytes": 35227
+    },
+    {
+      "ticker": "EXC",
+      "file": "EXC.png",
+      "status": "company",
+      "bytes": 34563
+    },
+    {
+      "ticker": "FANG",
+      "file": "FANG.png",
+      "status": "company",
+      "bytes": 27803
+    },
+    {
+      "ticker": "FAST",
+      "file": "FAST.png",
+      "status": "company",
+      "bytes": 25365
+    },
+    {
+      "ticker": "FDX",
+      "file": "FDX.png",
+      "status": "company",
+      "bytes": 5447
+    },
+    {
+      "ticker": "FFH.TO",
+      "file": "FFH.TO.png",
+      "status": "company",
+      "bytes": 13391
+    },
+    {
+      "ticker": "FM.TO",
+      "file": "FM.TO.png",
+      "status": "company",
+      "bytes": 20966
+    },
+    {
+      "ticker": "FNV.TO",
+      "file": "FNV.TO.png",
+      "status": "company",
+      "bytes": 25235
+    },
+    {
+      "ticker": "FTNT",
+      "file": "FTNT.png",
+      "status": "company",
+      "bytes": 3070
+    },
+    {
+      "ticker": "FTS.TO",
+      "file": "FTS.TO.png",
+      "status": "company",
+      "bytes": 20353
+    },
+    {
+      "ticker": "GD",
+      "file": "GD.png",
+      "status": "company",
+      "bytes": 7767
+    },
+    {
+      "ticker": "GE",
+      "file": "GE.png",
+      "status": "company",
+      "bytes": 26127
+    },
+    {
+      "ticker": "GEV",
+      "file": "GEV.png",
+      "status": "company",
+      "bytes": 79369
+    },
+    {
+      "ticker": "GFS",
+      "file": "GFS.png",
+      "status": "company",
+      "bytes": 14984
+    },
+    {
+      "ticker": "GIB-A.TO",
+      "file": "GIB-A.TO.png",
+      "status": "company",
+      "bytes": 28837
+    },
+    {
+      "ticker": "GILD",
+      "file": "GILD.png",
+      "status": "company",
+      "bytes": 11640
+    },
+    {
+      "ticker": "GLEN.L",
+      "file": "GLEN.L.png",
+      "status": "company",
+      "bytes": 17337
+    },
+    {
+      "ticker": "GM",
+      "file": "GM.png",
+      "status": "company",
+      "bytes": 5040
+    },
+    {
+      "ticker": "GOOG",
+      "file": "GOOG.png",
+      "status": "company",
+      "bytes": 17274
+    },
+    {
+      "ticker": "GOOGL",
+      "file": "GOOGL.png",
+      "status": "company",
+      "bytes": 17274
+    },
+    {
+      "ticker": "GS",
+      "file": "GS.png",
+      "status": "company",
+      "bytes": 16952
+    },
+    {
+      "ticker": "GSK.L",
+      "file": "GSK.L.png",
+      "status": "company",
+      "bytes": 15443
+    },
+    {
+      "ticker": "GWO.TO",
+      "file": "GWO.TO.png",
+      "status": "company",
+      "bytes": 25177
+    },
+    {
+      "ticker": "HD",
+      "file": "HD.png",
+      "status": "company",
+      "bytes": 37983
+    },
+    {
+      "ticker": "HO.PA",
+      "file": "HO.PA.png",
+      "status": "company",
+      "bytes": 28823
+    },
+    {
+      "ticker": "HON",
+      "file": "HON.png",
+      "status": "company",
+      "bytes": 16359
+    },
+    {
+      "ticker": "HSBA.L",
+      "file": "HSBA.L.png",
+      "status": "company",
+      "bytes": 12467
+    },
+    {
+      "ticker": "IBE.MC",
+      "file": "IBE.MC.png",
+      "status": "company",
+      "bytes": 82631
+    },
+    {
+      "ticker": "IBM",
+      "file": "IBM.png",
+      "status": "company",
+      "bytes": 3094
+    },
+    {
+      "ticker": "IDXX",
+      "file": "IDXX.png",
+      "status": "company",
+      "bytes": 6174
+    },
+    {
+      "ticker": "IFC.TO",
+      "file": "IFC.TO.png",
+      "status": "company",
+      "bytes": 17791
+    },
+    {
+      "ticker": "IMB.L",
+      "file": "IMB.L.png",
+      "status": "company",
+      "bytes": 39214
+    },
+    {
+      "ticker": "IMO.TO",
+      "file": "IMO.TO.png",
+      "status": "company",
+      "bytes": 18025
+    },
+    {
+      "ticker": "INSM",
+      "file": "INSM.png",
+      "status": "company",
+      "bytes": 16626
+    },
+    {
+      "ticker": "INTC",
+      "file": "INTC.png",
+      "status": "company",
+      "bytes": 8620
+    },
+    {
+      "ticker": "INTU",
+      "file": "INTU.png",
+      "status": "company",
+      "bytes": 9999
+    },
+    {
+      "ticker": "ISP.MI",
+      "file": "ISP.MI.png",
+      "status": "company",
+      "bytes": 18323
+    },
+    {
+      "ticker": "ISRG",
+      "file": "ISRG.png",
+      "status": "company",
+      "bytes": 21062
+    },
+    {
+      "ticker": "ITX.MC",
+      "file": "ITX.MC.png",
+      "status": "company",
+      "bytes": 5467
+    },
+    {
+      "ticker": "JNJ",
+      "file": "JNJ.png",
+      "status": "company",
+      "bytes": 16503
+    },
+    {
+      "ticker": "JPM",
+      "file": "JPM.png",
+      "status": "company",
+      "bytes": 24045
+    },
+    {
+      "ticker": "KDP",
+      "file": "KDP.png",
+      "status": "company",
+      "bytes": 93696
+    },
+    {
+      "ticker": "KER.PA",
+      "file": "KER.PA.png",
+      "status": "company",
+      "bytes": 7648
+    },
+    {
+      "ticker": "KHC",
+      "file": "KHC.png",
+      "status": "company",
+      "bytes": 20651
+    },
+    {
+      "ticker": "KLAC",
+      "file": "KLAC.png",
+      "status": "company",
+      "bytes": 2606
+    },
+    {
+      "ticker": "KO",
+      "file": "KO.png",
+      "status": "company",
+      "bytes": 17553
+    },
+    {
+      "ticker": "LIN",
+      "file": "LIN.png",
+      "status": "company",
+      "bytes": 15025
+    },
+    {
+      "ticker": "LLOY.L",
+      "file": "LLOY.L.png",
+      "status": "company",
+      "bytes": 21827
+    },
+    {
+      "ticker": "LLY",
+      "file": "LLY.png",
+      "status": "company",
+      "bytes": 9667
+    },
+    {
+      "ticker": "LMT",
+      "file": "LMT.png",
+      "status": "company",
+      "bytes": 31687
+    },
+    {
+      "ticker": "LOW",
+      "file": "LOW.png",
+      "status": "company",
+      "bytes": 12338
+    },
+    {
+      "ticker": "LRCX",
+      "file": "LRCX.png",
+      "status": "company",
+      "bytes": 19428
+    },
+    {
+      "ticker": "LSEG.L",
+      "file": "LSEG.L.png",
+      "status": "company",
+      "bytes": 21492
+    },
+    {
+      "ticker": "MA",
+      "file": "MA.png",
+      "status": "company",
+      "bytes": 7341
+    },
+    {
+      "ticker": "MAR",
+      "file": "MAR.png",
+      "status": "company",
+      "bytes": 8649
+    },
+    {
+      "ticker": "MC.PA",
+      "file": "MC.PA.png",
+      "status": "company",
+      "bytes": 5684
+    },
+    {
+      "ticker": "MCD",
+      "file": "MCD.png",
+      "status": "company",
+      "bytes": 23001
+    },
+    {
+      "ticker": "MCHP",
+      "file": "MCHP.png",
+      "status": "company",
+      "bytes": 6165
+    },
+    {
+      "ticker": "MDB",
+      "file": "MDB.png",
+      "status": "company",
+      "bytes": 10566
+    },
+    {
+      "ticker": "MDLZ",
+      "file": "MDLZ.png",
+      "status": "company",
+      "bytes": 6310
+    },
+    {
+      "ticker": "MDT",
+      "file": "MDT.png",
+      "status": "company",
+      "bytes": 34986
+    },
+    {
+      "ticker": "MELI",
+      "file": "MELI.png",
+      "status": "company",
+      "bytes": 47721
+    },
+    {
+      "ticker": "MET",
+      "file": "MET.png",
+      "status": "company",
+      "bytes": 21171
+    },
+    {
+      "ticker": "META",
+      "file": "META.png",
+      "status": "company",
+      "bytes": 19367
+    },
+    {
+      "ticker": "MFC.TO",
+      "file": "MFC.TO.png",
+      "status": "company",
+      "bytes": 13166
+    },
+    {
+      "ticker": "MMM",
+      "file": "MMM.png",
+      "status": "company",
+      "bytes": 5011
+    },
+    {
+      "ticker": "MNST",
+      "file": "MNST.png",
+      "status": "company",
+      "bytes": 17115
+    },
+    {
+      "ticker": "MO",
+      "file": "MO.png",
+      "status": "company",
+      "bytes": 13164
+    },
+    {
+      "ticker": "MPWR",
+      "file": "MPWR.png",
+      "status": "company",
+      "bytes": 15352
+    },
+    {
+      "ticker": "MRK",
+      "file": "MRK.png",
+      "status": "company",
+      "bytes": 20629
+    },
+    {
+      "ticker": "MRU.TO",
+      "file": "MRU.TO.png",
+      "status": "company",
+      "bytes": 17512
+    },
+    {
+      "ticker": "MRVL",
+      "file": "MRVL.png",
+      "status": "company",
+      "bytes": 9983
+    },
+    {
+      "ticker": "MS",
+      "file": "MS.png",
+      "status": "company",
+      "bytes": 28670
+    },
+    {
+      "ticker": "MSFT",
+      "file": "MSFT.png",
+      "status": "company",
+      "bytes": 1011
+    },
+    {
+      "ticker": "MU",
+      "file": "MU.png",
+      "status": "company",
+      "bytes": 11111
+    },
+    {
+      "ticker": "MUFG",
+      "file": "MUFG.png",
+      "status": "company",
+      "bytes": 11227
+    },
+    {
+      "ticker": "MUV2.DE",
+      "file": "MUV2.DE.png",
+      "status": "company",
+      "bytes": 7548
+    },
+    {
+      "ticker": "NA.TO",
+      "file": "NA.TO.png",
+      "status": "company",
+      "bytes": 8968
+    },
+    {
+      "ticker": "NEE",
+      "file": "NEE.png",
+      "status": "company",
+      "bytes": 18642
+    },
+    {
+      "ticker": "NESN.SW",
+      "file": "NESN.SW.png",
+      "status": "company",
+      "bytes": 53373
+    },
+    {
+      "ticker": "NFLX",
+      "file": "NFLX.png",
+      "status": "company",
+      "bytes": 8497
+    },
+    {
+      "ticker": "NG.L",
+      "file": "NG.L.png",
+      "status": "company",
+      "bytes": 43648
+    },
+    {
+      "ticker": "NKE",
+      "file": "NKE.png",
+      "status": "company",
+      "bytes": 5464
+    },
+    {
+      "ticker": "NOVN.SW",
+      "file": "NOVN.SW.png",
+      "status": "company",
+      "bytes": 19218
+    },
+    {
+      "ticker": "NOW",
+      "file": "NOW.png",
+      "status": "company",
+      "bytes": 52227
+    },
+    {
+      "ticker": "NTR.TO",
+      "file": "NTR.TO.png",
+      "status": "company",
+      "bytes": 23854
+    },
+    {
+      "ticker": "NVDA",
+      "file": "NVDA.png",
+      "status": "company",
+      "bytes": 18344
+    },
+    {
+      "ticker": "NVO",
+      "file": "NVO.png",
+      "status": "company",
+      "bytes": 18204
+    },
+    {
+      "ticker": "NXPI",
+      "file": "NXPI.png",
+      "status": "company",
+      "bytes": 17377
+    },
+    {
+      "ticker": "ODFL",
+      "file": "ODFL.png",
+      "status": "company",
+      "bytes": 64656
+    },
+    {
+      "ticker": "ON",
+      "file": "ON.png",
+      "status": "company",
+      "bytes": 9809
+    },
+    {
+      "ticker": "OR.PA",
+      "file": "OR.PA.png",
+      "status": "company",
+      "bytes": 6090
+    },
+    {
+      "ticker": "ORCL",
+      "file": "ORCL.png",
+      "status": "company",
+      "bytes": 11482
+    },
+    {
+      "ticker": "ORLY",
+      "file": "ORLY.png",
+      "status": "company",
+      "bytes": 41079
+    },
+    {
+      "ticker": "OTEX.TO",
+      "file": "OTEX.TO.png",
+      "status": "company",
+      "bytes": 50377
+    },
+    {
+      "ticker": "PANW",
+      "file": "PANW.png",
+      "status": "company",
+      "bytes": 21145
+    },
+    {
+      "ticker": "PAYX",
+      "file": "PAYX.png",
+      "status": "company",
+      "bytes": 21464
+    },
+    {
+      "ticker": "PCAR",
+      "file": "PCAR.png",
+      "status": "company",
+      "bytes": 49174
+    },
+    {
+      "ticker": "PDD",
+      "file": "PDD.png",
+      "status": "company",
+      "bytes": 6804
+    },
+    {
+      "ticker": "PEP",
+      "file": "PEP.png",
+      "status": "company",
+      "bytes": 25716
+    },
+    {
+      "ticker": "PFE",
+      "file": "PFE.png",
+      "status": "company",
+      "bytes": 22448
+    },
+    {
+      "ticker": "PG",
+      "file": "PG.png",
+      "status": "company",
+      "bytes": 61242
+    },
+    {
+      "ticker": "PHIA.AS",
+      "file": "PHIA.AS.png",
+      "status": "company",
+      "bytes": 18922
+    },
+    {
+      "ticker": "PLTR",
+      "file": "PLTR.png",
+      "status": "company",
+      "bytes": 10902
+    },
+    {
+      "ticker": "PM",
+      "file": "PM.png",
+      "status": "company",
+      "bytes": 48770
+    },
+    {
+      "ticker": "POW.TO",
+      "file": "POW.TO.png",
+      "status": "company",
+      "bytes": 63145
+    },
+    {
+      "ticker": "PPL.TO",
+      "file": "PPL.TO.png",
+      "status": "company",
+      "bytes": 8838
+    },
+    {
+      "ticker": "QCOM",
+      "file": "QCOM.png",
+      "status": "company",
+      "bytes": 18895
+    },
+    {
+      "ticker": "QSR.TO",
+      "file": "QSR.TO.png",
+      "status": "company",
+      "bytes": 25343
+    },
+    {
+      "ticker": "RACE.MI",
+      "file": "RACE.MI.png",
+      "status": "company",
+      "bytes": 17641
+    },
+    {
+      "ticker": "RCI-B.TO",
+      "file": "RCI-B.TO.png",
+      "status": "company",
+      "bytes": 24292
+    },
+    {
+      "ticker": "REGN",
+      "file": "REGN.png",
+      "status": "company",
+      "bytes": 41612
+    },
+    {
+      "ticker": "REL.L",
+      "file": "REL.L.png",
+      "status": "company",
+      "bytes": 8642
+    },
+    {
+      "ticker": "RHHBY",
+      "file": "RHHBY.png",
+      "status": "company",
+      "bytes": 18612
+    },
+    {
+      "ticker": "RHM.DE",
+      "file": "RHM.DE.png",
+      "status": "company",
+      "bytes": 7108
+    },
+    {
+      "ticker": "RIO.L",
+      "file": "RIO.L.png",
+      "status": "company",
+      "bytes": 9898
+    },
+    {
+      "ticker": "RMS.PA",
+      "file": "RMS.PA.png",
+      "status": "company",
+      "bytes": 25509
+    },
+    {
+      "ticker": "ROP",
+      "file": "ROP.png",
+      "status": "company",
+      "bytes": 28526
+    },
+    {
+      "ticker": "ROST",
+      "file": "ROST.png",
+      "status": "company",
+      "bytes": 6873
+    },
+    {
+      "ticker": "RR.L",
+      "file": "RR.L.png",
+      "status": "company",
+      "bytes": 21005
+    },
+    {
+      "ticker": "RTX",
+      "file": "RTX.png",
+      "status": "company",
+      "bytes": 26581
+    },
+    {
+      "ticker": "RY.TO",
+      "file": "RY.TO.png",
+      "status": "company",
+      "bytes": 33285
+    },
+    {
+      "ticker": "SAF.PA",
+      "file": "SAF.PA.png",
+      "status": "company",
+      "bytes": 50171
+    },
+    {
+      "ticker": "SAN.PA",
+      "file": "SAN.PA.png",
+      "status": "company",
+      "bytes": 9931
+    },
+    {
+      "ticker": "SAP.DE",
+      "file": "SAP.DE.png",
+      "status": "company",
+      "bytes": 12665
+    },
+    {
+      "ticker": "SBUX",
+      "file": "SBUX.png",
+      "status": "company",
+      "bytes": 73501
+    },
+    {
+      "ticker": "SCHW",
+      "file": "SCHW.png",
+      "status": "company",
+      "bytes": 46463
+    },
+    {
+      "ticker": "SHEL.L",
+      "file": "SHEL.L.png",
+      "status": "company",
+      "bytes": 19659
+    },
+    {
+      "ticker": "SHOP.TO",
+      "file": "SHOP.TO.png",
+      "status": "company",
+      "bytes": 24364
+    },
+    {
+      "ticker": "SIE.DE",
+      "file": "SIE.DE.png",
+      "status": "company",
+      "bytes": 6082
+    },
+    {
+      "ticker": "SLF.TO",
+      "file": "SLF.TO.png",
+      "status": "company",
+      "bytes": 12131
+    },
+    {
+      "ticker": "SMIN.L",
+      "file": "SMIN.L.png",
+      "status": "company",
+      "bytes": 17098
+    },
+    {
+      "ticker": "SN.L",
+      "file": "SN.L.png",
+      "status": "company",
+      "bytes": 19292
+    },
+    {
+      "ticker": "SNPS",
+      "file": "SNPS.png",
+      "status": "company",
+      "bytes": 19807
+    },
+    {
+      "ticker": "SO",
+      "file": "SO.png",
+      "status": "company",
+      "bytes": 36089
+    },
+    {
+      "ticker": "SONY",
+      "file": "SONY.png",
+      "status": "company",
+      "bytes": 5563
+    },
+    {
+      "ticker": "SPG",
+      "file": "SPG.png",
+      "status": "company",
+      "bytes": 12889
+    },
+    {
+      "ticker": "STLAM.MI",
+      "file": "STLAM.MI.png",
+      "status": "company",
+      "bytes": 38150
+    },
+    {
+      "ticker": "STX",
+      "file": "STX.png",
+      "status": "company",
+      "bytes": 8430
+    },
+    {
+      "ticker": "SU.PA",
+      "file": "SU.PA.png",
+      "status": "company",
+      "bytes": 23093
+    },
+    {
+      "ticker": "SU.TO",
+      "file": "SU.TO.png",
+      "status": "company",
+      "bytes": 15981
+    },
+    {
+      "ticker": "T",
+      "file": "T.png",
+      "status": "company",
+      "bytes": 27847
+    },
+    {
+      "ticker": "T.TO",
+      "file": "T.TO.png",
+      "status": "company",
+      "bytes": 23245
+    },
+    {
+      "ticker": "TD.TO",
+      "file": "TD.TO.png",
+      "status": "company",
+      "bytes": 15587
+    },
+    {
+      "ticker": "TEAM",
+      "file": "TEAM.png",
+      "status": "company",
+      "bytes": 8095
+    },
+    {
+      "ticker": "TECK-B.TO",
+      "file": "TECK-B.TO.png",
+      "status": "company",
+      "bytes": 9595
+    },
+    {
+      "ticker": "TGT",
+      "file": "TGT.png",
+      "status": "company",
+      "bytes": 34505
+    },
+    {
+      "ticker": "TM",
+      "file": "TM.png",
+      "status": "company",
+      "bytes": 10514
+    },
+    {
+      "ticker": "TMO",
+      "file": "TMO.png",
+      "status": "company",
+      "bytes": 18612
+    },
+    {
+      "ticker": "TMUS",
+      "file": "TMUS.png",
+      "status": "company",
+      "bytes": 7715
+    },
+    {
+      "ticker": "TOU.TO",
+      "file": "TOU.TO.png",
+      "status": "company",
+      "bytes": 13195
+    },
+    {
+      "ticker": "TRI.TO",
+      "file": "TRI.TO.png",
+      "status": "company",
+      "bytes": 26168
+    },
+    {
+      "ticker": "TRP.TO",
+      "file": "TRP.TO.png",
+      "status": "company",
+      "bytes": 35220
+    },
+    {
+      "ticker": "TSLA",
+      "file": "TSLA.png",
+      "status": "company",
+      "bytes": 10378
+    },
+    {
+      "ticker": "TSM",
+      "file": "TSM.png",
+      "status": "company",
+      "bytes": 13849
+    },
+    {
+      "ticker": "TTE.PA",
+      "file": "TTE.PA.png",
+      "status": "company",
+      "bytes": 26123
+    },
+    {
+      "ticker": "TTWO",
+      "file": "TTWO.png",
+      "status": "company",
+      "bytes": 6265
+    },
+    {
+      "ticker": "TXN",
+      "file": "TXN.png",
+      "status": "company",
+      "bytes": 31756
+    },
+    {
+      "ticker": "UBER",
+      "file": "UBER.png",
+      "status": "company",
+      "bytes": 5790
+    },
+    {
+      "ticker": "UBSG.SW",
+      "file": "UBSG.SW.png",
+      "status": "company",
+      "bytes": 26962
+    },
+    {
+      "ticker": "ULVR.L",
+      "file": "ULVR.L.png",
+      "status": "company",
+      "bytes": 58237
+    },
+    {
+      "ticker": "UNH",
+      "file": "UNH.png",
+      "status": "company",
+      "bytes": 9930
+    },
+    {
+      "ticker": "UNP",
+      "file": "UNP.png",
+      "status": "company",
+      "bytes": 22741
+    },
+    {
+      "ticker": "UPS",
+      "file": "UPS.png",
+      "status": "company",
+      "bytes": 15096
+    },
+    {
+      "ticker": "USB",
+      "file": "USB.png",
+      "status": "company",
+      "bytes": 41711
+    },
+    {
+      "ticker": "V",
+      "file": "V.png",
+      "status": "company",
+      "bytes": 22548
+    },
+    {
+      "ticker": "VOD.L",
+      "file": "VOD.L.png",
+      "status": "company",
+      "bytes": 21328
+    },
+    {
+      "ticker": "VRSK",
+      "file": "VRSK.png",
+      "status": "company",
+      "bytes": 15166
+    },
+    {
+      "ticker": "VRTX",
+      "file": "VRTX.png",
+      "status": "company",
+      "bytes": 3965
+    },
+    {
+      "ticker": "VZ",
+      "file": "VZ.png",
+      "status": "company",
+      "bytes": 5072
+    },
+    {
+      "ticker": "WBD",
+      "file": "WBD.png",
+      "status": "company",
+      "bytes": 35250
+    },
+    {
+      "ticker": "WCN.TO",
+      "file": "WCN.TO.png",
+      "status": "company",
+      "bytes": 34809
+    },
+    {
+      "ticker": "WDAY",
+      "file": "WDAY.png",
+      "status": "company",
+      "bytes": 17722
+    },
+    {
+      "ticker": "WFC",
+      "file": "WFC.png",
+      "status": "company",
+      "bytes": 12449
+    },
+    {
+      "ticker": "WMT",
+      "file": "WMT.png",
+      "status": "company",
+      "bytes": 12393
+    },
+    {
+      "ticker": "WN.TO",
+      "file": "WN.TO.png",
+      "status": "company",
+      "bytes": 11688
+    },
+    {
+      "ticker": "WPM.TO",
+      "file": "WPM.TO.png",
+      "status": "company",
+      "bytes": 14359
+    },
+    {
+      "ticker": "WSP.TO",
+      "file": "WSP.TO.png",
+      "status": "company",
+      "bytes": 9326
+    },
+    {
+      "ticker": "XEL",
+      "file": "XEL.png",
+      "status": "company",
+      "bytes": 9251
+    },
+    {
+      "ticker": "XOM",
+      "file": "XOM.png",
+      "status": "company",
+      "bytes": 13598
+    },
+    {
+      "ticker": "ZS",
+      "file": "ZS.png",
+      "status": "company",
+      "bytes": 27567
+    },
+    {
+      "ticker": "ZURN.SW",
+      "file": "ZURN.SW.png",
+      "status": "company",
+      "bytes": 25609
+    }
+  ]
+}
