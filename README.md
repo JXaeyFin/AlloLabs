@@ -344,6 +344,298 @@ GitHub Actions runs the same checks on pushes and pull requests.
 Public-safe transcripts and a sample report are available in
 [`examples/`](examples/).
 
+# AlloLabs Installation Guide
+
+## 1. Download AlloLabs
+
+Go to the GitHub repository:
+
+```text
+https://github.com/JXaeyFin/AlloLabs/tree/unstable
+```
+
+Click:
+
+```text
+Code → Download ZIP
+```
+
+Then unzip it.
+
+Open the unzipped folder.
+
+---
+
+# Windows
+
+## Step 1 — Install Python
+
+Download and install **Python 3.11 or newer**.
+
+During install, check:
+
+```text
+Add Python to PATH
+```
+
+## Step 2 — Open Terminal
+
+Open the AlloLabs folder.
+
+Right-click inside the folder and choose:
+
+```text
+Open in Terminal
+```
+
+## Step 3 — Create Python environment
+
+Copy and paste:
+
+```powershell
+py -m venv .venv
+```
+
+## Step 4 — Activate it
+
+```powershell
+.venv\Scripts\activate
+```
+
+## Step 5 — Install AlloLabs packages
+
+```powershell
+python -m pip install -r requirements.txt
+```
+
+## Step 6 — Optional: add API key
+
+Use only the key you need.
+
+For OpenAI:
+
+```powershell
+$env:OPENAI_API_KEY="your_api_key_here"
+```
+
+For Anthropic:
+
+```powershell
+$env:ANTHROPIC_API_KEY="your_api_key_here"
+```
+
+For Gemini:
+
+```powershell
+$env:GEMINI_API_KEY="your_api_key_here"
+```
+
+## Step 7 — Start AlloLabs dashboard
+
+Simplest way:
+
+```powershell
+python dashboard/server.py
+```
+
+Then open this in your browser:
+
+```text
+http://127.0.0.1:8765
+```
+
+You can also double-click:
+
+```text
+start-dashboard.bat
+```
+
+or:
+
+```text
+start-allolabs-dashboard.bat
+```
+
+---
+
+# macOS
+
+## Step 1 — Install Python
+
+Install **Python 3.11 or newer**.
+
+## Step 2 — Open Terminal
+
+Open Terminal.
+
+Go into the AlloLabs folder. Example:
+
+```bash
+cd Downloads/AlloLabs
+```
+
+Use the real folder location if different.
+
+## Step 3 — Create Python environment
+
+```bash
+python3 -m venv .venv
+```
+
+## Step 4 — Activate it
+
+```bash
+source .venv/bin/activate
+```
+
+## Step 5 — Install AlloLabs packages
+
+```bash
+python3 -m pip install -r requirements.txt
+```
+
+## Step 6 — Optional: add API key
+
+For OpenAI:
+
+```bash
+export OPENAI_API_KEY="your_api_key_here"
+```
+
+For Anthropic:
+
+```bash
+export ANTHROPIC_API_KEY="your_api_key_here"
+```
+
+For Gemini:
+
+```bash
+export GEMINI_API_KEY="your_api_key_here"
+```
+
+## Step 7 — Start AlloLabs dashboard
+
+```bash
+python3 dashboard/server.py
+```
+
+Then open:
+
+```text
+http://127.0.0.1:8765
+```
+
+---
+
+# Linux
+
+## Step 1 — Install Python
+
+On Ubuntu/Debian:
+
+```bash
+sudo apt update
+sudo apt install python3 python3-venv python3-pip
+```
+
+## Step 2 — Open Terminal in the AlloLabs folder
+
+Example:
+
+```bash
+cd Downloads/AlloLabs
+```
+
+## Step 3 — Create Python environment
+
+```bash
+python3 -m venv .venv
+```
+
+## Step 4 — Activate it
+
+```bash
+source .venv/bin/activate
+```
+
+## Step 5 — Install AlloLabs packages
+
+```bash
+python3 -m pip install -r requirements.txt
+```
+
+## Step 6 — Optional: add API key
+
+For OpenAI:
+
+```bash
+export OPENAI_API_KEY="your_api_key_here"
+```
+
+For Anthropic:
+
+```bash
+export ANTHROPIC_API_KEY="your_api_key_here"
+```
+
+For Gemini:
+
+```bash
+export GEMINI_API_KEY="your_api_key_here"
+```
+
+## Step 7 — Start AlloLabs dashboard
+
+```bash
+python3 dashboard/server.py
+```
+
+Then open:
+
+```text
+http://127.0.0.1:8765
+```
+
+---
+
+# Optional: Build Desktop App
+
+The README says Windows can be built with:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File scripts/build-desktop.ps1
+```
+
+macOS/Linux can be built with:
+
+```bash
+chmod +x scripts/build-portable.sh
+scripts/build-portable.sh
+```
+
+The output will appear under the `dist/` folder. 
+
+---
+
+# Quick Test
+
+After installation, run:
+
+```bash
+python allolabs.py
+```
+
+On Windows, this may also work:
+
+```powershell
+python allolabs.py
+```
+
+
+Do **not** upload or commit real API keys.
+
+
 ## Author
 
 Jeffrey Xia
