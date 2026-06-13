@@ -4,7 +4,7 @@
 
 # AlloLabs
 
-Visit the website here: [AlloLabs](https://carrd.co)
+Visit the website here: [AlloLabs](https://allolabs.carrd.co/)
 
 AlloLabs is an AI-assisted global asset-allocation research platform. It
 combines live Yahoo Finance data, Modern Portfolio Theory, Black-Litterman
