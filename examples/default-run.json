@@ -5,8 +5,17 @@
                    "trainingYears":  1.0,
                    "oosMonths":  6,
                    "maxPositionPercent":  25,
+                   "longOnly":  true,
+                   "maxSectorPercent":  100,
+                   "regularization":  "none",
+                   "regularizationStrength":  0.0,
                    "universe":  "full",
                    "gptViews":  true,
+                   "researchProvider":  "openai",
+                   "researchModel":  "gpt-5.4",
+                   "auditViews":  false,
+                   "auditProvider":  "openai",
+                   "auditModel":  "gpt-5.5",
                    "refreshCache":  true
                },
     "periods":  {

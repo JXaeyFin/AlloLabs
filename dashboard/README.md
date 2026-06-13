@@ -13,11 +13,15 @@ Then open `http://127.0.0.1:8765`.
 
 ## Capabilities
 
-- Validated training, OOS, position-cap, and research-universe controls
+- One consolidated Run Console for all analysis and execution controls
+- Selectable long-only or bounded long/short weights, validated absolute position/sector maximums, and optional L2/smooth-L1 regularization
+- Separate OpenAI, Anthropic Claude, or Google Gemini provider/model selection for research generation and global audit
+- Compact Model Guide with published context/output limits and practical strengths/trade-offs
 - Background model execution with live terminal output
 - Automatic overview refresh after a successful run
 - Portfolio holdings and sector exposure
 - AI research views with Yahoo listing venue, country, currency, and flags
+- Optional high-capacity global audit of the complete generated research set
 - Embedded PDF report and OOS chart
 - Bundled example portfolios and AI research before the first local run
 - Optional bearer-token authentication for non-localhost binding

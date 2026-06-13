@@ -17,13 +17,13 @@ CURATED_RESEARCH_TICKERS = [
     "BAM.TO", "MFC.TO", "FTS.TO", "CNR.TO", "CP.TO", "SHOP.TO", "CSU.TO",
     "AEM.TO", "NTR.TO", "AZN.L", "SHEL.L", "HSBA.L", "ULVR.L", "LSEG.L",
     "ASML.AS", "SAP.DE", "SIE.DE", "MC.PA", "BNP.PA", "NESN.SW",
-    "NOVN.SW", "ROG.SW", "UBSG.SW",
+    "NOVN.SW", "RHHBY", "UBSG.SW",
 ]
 
 CANADA_RESEARCH_TICKERS = [
     "RY.TO", "TD.TO", "BMO.TO", "BNS.TO", "NA.TO", "CM.TO", "ENB.TO",
     "TRP.TO", "SU.TO", "CNQ.TO", "BAM.TO", "MFC.TO", "FTS.TO", "CNR.TO",
-    "CP.TO", "SHOP.TO", "CSU.TO", "WCN.TO", "AEM.TO", "NTR.TO",
+    "CP.TO", "SHOP.TO", "CSU.TO", "CLS.TO", "WCN.TO", "AEM.TO", "NTR.TO",
 ]
 
 LISTING_CACHE_MAX_AGE_DAYS = 30
@@ -41,6 +41,8 @@ EXCHANGE_DETAILS = {
     "FRA": ("Frankfurt Stock Exchange", "Germany", "🇩🇪"),
     "AMS": ("Euronext Amsterdam", "Netherlands", "🇳🇱"),
     "MIL": ("Borsa Italiana", "Italy", "🇮🇹"),
+    "MCE": ("Bolsa de Madrid", "Spain", "🇪🇸"),
+    "CPH": ("Nasdaq Copenhagen", "Denmark", "🇩🇰"),
     "BRU": ("Euronext Brussels", "Belgium", "🇧🇪"),
     "EBS": ("SIX Swiss Exchange", "Switzerland", "🇨🇭"),
     "SWX": ("SIX Swiss Exchange", "Switzerland", "🇨🇭"),
@@ -50,7 +52,8 @@ EXCHANGE_DETAILS = {
 def fallback_listing(ticker: str) -> dict:
     suffixes = (
         (".TO", "TOR"), (".L", "LSE"), (".PA", "PAR"), (".DE", "GER"),
-        (".AS", "AMS"), (".MI", "MIL"), (".BR", "BRU"), (".SW", "EBS"),
+        (".AS", "AMS"), (".MI", "MIL"), (".MC", "MCE"), (".CO", "CPH"),
+        (".BR", "BRU"), (".SW", "EBS"),
     )
     exchange_code = next((code for suffix, code in suffixes if ticker.upper().endswith(suffix)), "NMS")
     exchange_name, country, flag = EXCHANGE_DETAILS[exchange_code]
@@ -154,7 +157,9 @@ def configuration_environment(config: dict) -> dict[str, str]:
     training_years = float(config["trainingYears"])
     oos_years = int(config["oosMonths"]) / 12
     max_position = int(config["maxPositionPercent"]) / 100
+    max_sector = int(config["maxSectorPercent"]) / 100
     gpt_views = bool(config["gptViews"])
+    audit_views = bool(config["auditViews"])
     refresh_cache = bool(config["refreshCache"])
 
     universe = config["universe"]
@@ -171,7 +176,16 @@ def configuration_environment(config: dict) -> dict[str, str]:
         "WEALTHGPT_TRAINING_YEARS": str(training_years),
         "WEALTHGPT_OOS_YEARS": str(oos_years),
         "WEALTHGPT_MAX_POSITION_WEIGHT": str(max_position),
+        "WEALTHGPT_LONG_ONLY": "1" if config["longOnly"] else "0",
+        "WEALTHGPT_MAX_SECTOR_WEIGHT": str(max_sector),
+        "WEALTHGPT_REGULARIZATION": str(config["regularization"]),
+        "WEALTHGPT_REGULARIZATION_STRENGTH": str(config["regularizationStrength"]),
         "WEALTHGPT_GPT_VIEWS": "1" if gpt_views else "0",
+        "WEALTHGPT_RESEARCH_PROVIDER": str(config["researchProvider"]),
+        "WEALTHGPT_RESEARCH_MODEL": str(config["researchModel"]),
+        "WEALTHGPT_GPT_AUDIT": "1" if audit_views else "0",
+        "WEALTHGPT_AUDIT_PROVIDER": str(config["auditProvider"]),
+        "WEALTHGPT_GPT_AUDIT_MODEL": str(config["auditModel"]),
         "WEALTHGPT_REFRESH_CACHE": "1" if refresh_cache else "0",
         "WEALTHGPT_RESEARCH_TICKERS": json.dumps(subset),
     }
@@ -191,8 +205,8 @@ def portfolio_payload(tickers, weights, sectors, analysis):
     for ticker, raw_weight in zip(tickers, weights):
         weight = float(raw_weight)
         sector = sectors.get(ticker, "Unclassified")
-        sector_totals[sector] = sector_totals.get(sector, 0.0) + weight
-        if weight > 1e-7:
+        sector_totals[sector] = sector_totals.get(sector, 0.0) + abs(weight)
+        if abs(weight) > 1e-7:
             item = analysis.get(ticker, {})
             holdings.append(
                 {
@@ -205,11 +219,12 @@ def portfolio_payload(tickers, weights, sectors, analysis):
                     "view": item.get("view"),
                 }
             )
-    holdings.sort(key=lambda item: item["weight"], reverse=True)
+    holdings.sort(key=lambda item: abs(item["weight"]), reverse=True)
+    gross_exposure = sum(sector_totals.values())
     sectors_payload = [
-        {"sector": sector, "weight": weight}
+        {"sector": sector, "weight": weight / gross_exposure}
         for sector, weight in sorted(sector_totals.items(), key=lambda item: item[1], reverse=True)
-        if weight > 1e-7
+        if weight > 1e-7 and gross_exposure > 0
     ]
     return {"holdings": holdings, "sectors": sectors_payload}
 
@@ -279,12 +294,14 @@ def write_latest_run(namespace: dict, config: dict, script_path: Path) -> Path:
             for ticker, item in sorted(analysis.items())
             if isinstance(item, dict)
         ],
+        "researchAudit": namespace.get("gpt_audit_status", {}),
         "performance": performance,
         "artifacts": {
             "pdf": str(namespace["PORTFOLIO_REPORT_PATH"]),
             "allocations": str(script_path.parent / "portfolio_allocations.csv"),
             "sectorCache": str(script_path.parent / "sector_cache.json"),
             "listingCache": str(listing_cache_path),
+            "auditedViews": str(namespace.get("GPT_AUDITED_VIEWS_PATH", "")),
         },
     }
     output_path = script_path.parent / "latest_run.json"

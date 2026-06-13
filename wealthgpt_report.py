@@ -303,16 +303,27 @@ def _portfolio_frame(tickers, weights, analysis):
                 "view": item.get("view") or "No research rationale is available.",
             }
         )
-    return pd.DataFrame(records).sort_values("weight", ascending=False).reset_index(drop=True)
+    frame = pd.DataFrame(records)
+    return (
+        frame.assign(_absolute_weight=frame["weight"].abs())
+        .sort_values("_absolute_weight", ascending=False)
+        .drop(columns="_absolute_weight")
+        .reset_index(drop=True)
+    )
 
 
 def _sector_frame(frame):
-    return (
-        frame.groupby("sector", as_index=False)["weight"]
+    sectors = (
+        frame.assign(weight=frame["weight"].abs())
+        .groupby("sector", as_index=False)["weight"]
         .sum()
         .sort_values("weight", ascending=False)
         .reset_index(drop=True)
     )
+    gross_exposure = sectors["weight"].sum()
+    if gross_exposure > 0:
+        sectors["weight"] /= gross_exposure
+    return sectors
 
 
 def _effective_holdings(weights):
@@ -327,29 +338,40 @@ def _dominant_sector(sectors):
 
 def _draw_weight_chart(ax, frame, color, count=10):
     data = frame.head(count).sort_values("weight")
-    ax.barh(data["ticker"], data["weight"] * 100, color=color, alpha=0.92)
-    ax.set_title(f"Top {min(count, len(data))} holdings", loc="left", fontsize=11, weight="bold", color=INK)
+    bar_colors = [RED if value < 0 else color for value in data["weight"]]
+    ax.barh(data["ticker"], data["weight"] * 100, color=bar_colors, alpha=0.92)
+    ax.axvline(0, color=INK, linewidth=0.7)
+    ax.set_title(f"Top {min(count, len(data))} absolute positions", loc="left", fontsize=11, weight="bold", color=INK)
     ax.set_xlabel("Portfolio weight (%)", fontsize=8, color=MUTED)
     ax.tick_params(axis="both", labelsize=8, colors=INK)
     ax.grid(axis="x", color=GRID, linewidth=0.7)
     ax.set_axisbelow(True)
     ax.spines[["top", "right", "left"]].set_visible(False)
     ax.spines["bottom"].set_color(GRID)
-    maximum = float((data["weight"] * 100).max())
+    maximum = float((data["weight"].abs() * 100).max())
     for y_pos, value in enumerate(data["weight"] * 100):
-        if value >= 0.88 * maximum:
+        if abs(value) >= 0.88 * maximum:
             ax.text(
-                value - 0.25,
+                value - 0.25 if value >= 0 else value + 0.25,
                 y_pos,
                 f"{value:.1f}%",
                 va="center",
-                ha="right",
+                ha="right" if value >= 0 else "left",
                 fontsize=7.5,
                 color=WHITE,
                 weight="bold",
             )
         else:
-            ax.text(value + 0.2, y_pos, f"{value:.1f}%", va="center", fontsize=7.5, color=INK)
+            offset = 0.2 if value >= 0 else -0.2
+            ax.text(
+                value + offset,
+                y_pos,
+                f"{value:.1f}%",
+                va="center",
+                ha="left" if value >= 0 else "right",
+                fontsize=7.5,
+                color=INK,
+            )
 
 
 def _draw_sector_comparison(ax, max_sector, min_sector):
@@ -402,7 +424,7 @@ def _overview_page(
     )
     _metric_card(
         fig, 0.275, 0.79, 0.205, 0.085, "Max Sharpe risk",
-        f"{max_metrics['volatility']:.1%}", f"Top 5: {max_frame.head(5)['weight'].sum():.1%}", BLUE,
+        f"{max_metrics['volatility']:.1%}", f"Top 5 gross share: {max_frame.head(5)['weight'].abs().sum() / max_frame['weight'].abs().sum():.1%}", BLUE,
     )
     _metric_card(
         fig, 0.52, 0.79, 0.205, 0.085, "Min Vol return",
@@ -410,7 +432,7 @@ def _overview_page(
     )
     _metric_card(
         fig, 0.74, 0.79, 0.205, 0.085, "Min Vol risk",
-        f"{min_metrics['volatility']:.1%}", f"Top 5: {min_frame.head(5)['weight'].sum():.1%}", TEAL,
+        f"{min_metrics['volatility']:.1%}", f"Top 5 gross share: {min_frame.head(5)['weight'].abs().sum() / min_frame['weight'].abs().sum():.1%}", TEAL,
     )
 
     ax_left = fig.add_axes([0.075, 0.49, 0.39, 0.245], facecolor=WHITE)
@@ -425,7 +447,10 @@ def _overview_page(
 
     _rounded_box(fig, 0.635, 0.145, 0.31, 0.27)
     fig.text(0.66, 0.38, "PORTFOLIO CHARACTER", color=INK, fontsize=10, weight="bold")
-    overlap = float(np.minimum(max_frame["weight"], min_frame["weight"]).sum())
+    overlap = float(
+        np.minimum(max_frame["weight"].abs(), min_frame["weight"].abs()).sum()
+        / max(max_frame["weight"].abs().sum(), min_frame["weight"].abs().sum())
+    )
     notes = [
         ("Max Sharpe", f"Dominant sector: {_dominant_sector(max_sector)}"),
         ("Min Volatility", f"Dominant sector: {_dominant_sector(min_sector)}"),
@@ -440,7 +465,7 @@ def _overview_page(
 
     overview_note = (
         "Expected returns are Black-Litterman posterior estimates. Volatility and Sharpe metrics are "
-        "annualized in-sample estimates. Portfolio weights are long-only and sum to 100%."
+        "annualized in-sample estimates. Portfolio weights sum to 100% net; negative weights indicate short positions."
     )
     fig.text(0.055, 0.09, "\n".join(textwrap.wrap(overview_note, 125)), color=MUTED, fontsize=7.7)
     pdf.savefig(fig, facecolor=fig.get_facecolor())
@@ -458,7 +483,7 @@ def _portfolio_breakdown_page(pdf, frame, metrics, name, color, page_number):
     _metric_card(fig, 0.055, 0.79, 0.205, 0.085, "Expected return", f"{metrics['return']:.1%}", "Annualized", color)
     _metric_card(fig, 0.275, 0.79, 0.205, 0.085, "Volatility", f"{metrics['volatility']:.1%}", "Annualized", color)
     _metric_card(fig, 0.495, 0.79, 0.205, 0.085, "Sharpe ratio", f"{metrics['sharpe']:.2f}", "Risk-free adjusted", color)
-    active = frame[frame["weight"] > 0.0001]
+    active = frame[frame["weight"].abs() > 0.0001]
     _metric_card(fig, 0.715, 0.79, 0.23, 0.085, "Active positions", f"{len(active)}", f"Effective: {_effective_holdings(frame['weight']):.1f}", color)
 
     ax_weights = fig.add_axes([0.075, 0.43, 0.52, 0.29], facecolor=WHITE)
@@ -482,7 +507,7 @@ def _portfolio_breakdown_page(pdf, frame, metrics, name, color, page_number):
         autopct=lambda value: f"{value:.0f}%" if value >= 5 else "",
         pctdistance=0.78,
     )
-    ax_sector.set_title("Sector mix", fontsize=11, weight="bold", color=INK)
+    ax_sector.set_title("Gross sector mix", fontsize=11, weight="bold", color=INK)
 
     _rounded_box(fig, 0.055, 0.075, 0.89, 0.285)
     fig.text(0.075, 0.328, "TOP EIGHT HOLDINGS", color=INK, fontsize=10, weight="bold")
@@ -560,7 +585,7 @@ def _allocation_appendix(pdf, max_frame, min_frame, page_number):
         fig.text(left + 0.02, 0.812, "Ticker", color=MUTED, fontsize=7.5, weight="bold")
         fig.text(left + 0.14, 0.812, "Sector", color=MUTED, fontsize=7.5, weight="bold")
         fig.text(left + 0.37, 0.812, "Weight", color=MUTED, fontsize=7.5, weight="bold", ha="right")
-        active = frame[frame["weight"] > 0.0001].copy()
+        active = frame[frame["weight"].abs() > 0.0001].copy()
         y = 0.786
         line_height = min(0.022, 0.68 / max(len(active), 1))
         font_size = 7.3 if len(active) <= 30 else 6.5

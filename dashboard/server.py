@@ -7,6 +7,7 @@ import json
 import math
 import mimetypes
 import os
+import re
 import secrets
 import shutil
 import socket
@@ -18,19 +19,130 @@ from collections import deque
 from http import HTTPStatus
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
-from urllib.parse import parse_qs, urlparse
+from urllib.parse import parse_qs, unquote, urlparse
 
 
 ROOT = Path(__file__).resolve().parent
+RESOURCES_DIR = ROOT.parent / "resources"
+COMPANY_LOGOS_DIR = RESOURCES_DIR / "company-logos"
 RUNNER = ROOT / "runner.py"
+COMPANY_DETAILS_HELPER = ROOT / "company_details.py"
 DEFAULT_SCRIPT = ROOT.parent / "wealthgpt.py"
 EXAMPLES_DIR = ROOT.parent / "examples"
 DEFAULT_RESULTS = EXAMPLES_DIR / "default-run.json"
 DEFAULT_PDF = EXAMPLES_DIR / "default-portfolio-report.pdf"
 DEFAULT_CHART = EXAMPLES_DIR / "default-performance.png"
 ALLOWED_UNIVERSES = {"curated", "canada", "full"}
-API_VERSION = 5
+ALLOWED_REGULARIZATIONS = {"none", "l2", "smooth_l1"}
+AI_PROVIDER_MODELS = {
+    "openai": {"gpt-5.5", "gpt-5.4", "gpt-5.4-mini", "gpt-5.4-nano"},
+    "anthropic": {
+        "claude-fable-5",
+        "claude-opus-4-8",
+        "claude-sonnet-4-6",
+        "claude-haiku-4-5",
+    },
+    "gemini": {
+        "gemini-3.5-flash",
+        "gemini-3.1-pro-preview",
+        "gemini-3.1-flash-lite",
+        "gemini-3-flash-preview",
+        "gemini-2.5-pro",
+        "gemini-2.5-flash",
+        "gemini-2.5-flash-lite",
+    },
+}
+AI_PROVIDER_KEYS = {
+    "openai": ("OpenAI", "OPENAI_API_KEY"),
+    "anthropic": ("Anthropic", "ANTHROPIC_API_KEY"),
+    "gemini": ("Google Gemini", "GEMINI_API_KEY"),
+}
+ALLOWED_AI_MODELS = {
+    stage: {
+        provider: set(models)
+        for provider, models in AI_PROVIDER_MODELS.items()
+    }
+    for stage in ("research", "audit")
+}
+API_VERSION = 16
 REQUIRED_ANALYSIS_MODULES = ("matplotlib", "numpy", "pandas", "scipy", "yfinance")
+COMPANY_DETAILS_CACHE_SECONDS = 15 * 60
+TICKER_PATTERN = re.compile(r"^[A-Z0-9][A-Z0-9.\-]{0,19}$")
+
+
+def masked_api_key(value: str) -> str:
+    cleaned = value.strip()
+    if len(cleaned) <= 12:
+        return "********"
+    return f"{cleaned[:7]}********{cleaned[-4:]}"
+
+
+def windows_environment_value(name: str) -> tuple[str, str] | tuple[None, None]:
+    if os.name != "nt":
+        return None, None
+    try:
+        import winreg
+    except ImportError:
+        return None, None
+
+    locations = (
+        ("Windows user environment", winreg.HKEY_CURRENT_USER, "Environment"),
+        (
+            "Windows machine environment",
+            winreg.HKEY_LOCAL_MACHINE,
+            r"SYSTEM\CurrentControlSet\Control\Session Manager\Environment",
+        ),
+    )
+    for source, hive, path in locations:
+        try:
+            with winreg.OpenKey(hive, path) as key:
+                value, _ = winreg.QueryValueEx(key, name)
+        except (FileNotFoundError, OSError):
+            continue
+        cleaned = str(value or "").strip()
+        if cleaned:
+            return cleaned, source
+    return None, None
+
+
+def resolved_api_key(name: str) -> tuple[str, str] | tuple[None, None]:
+    process_value = os.getenv(name, "").strip()
+    if process_value:
+        return process_value, "Dashboard process"
+    return windows_environment_value(name)
+
+
+def provider_key_status() -> dict:
+    status = {}
+    for provider, (label, environment_name) in AI_PROVIDER_KEYS.items():
+        value, source = resolved_api_key(environment_name)
+        status[provider] = {
+            "label": label,
+            "environment": environment_name,
+            "active": bool(value),
+            "preview": masked_api_key(value) if value else None,
+            "source": source,
+        }
+    return status
+
+
+def result_company_tickers(results: dict) -> set[str]:
+    tickers = set()
+    for portfolio in (results.get("portfolios") or {}).values():
+        if not isinstance(portfolio, dict):
+            continue
+        for holding in portfolio.get("holdings") or []:
+            if isinstance(holding, dict) and holding.get("ticker"):
+                tickers.add(str(holding["ticker"]).strip().upper())
+    for research in results.get("research") or []:
+        if isinstance(research, dict) and research.get("ticker"):
+            tickers.add(str(research["ticker"]).strip().upper())
+    return tickers
+
+
+def result_portfolio_tickers(results: dict) -> set[str]:
+    """Backward-compatible alias for callers using the earlier helper name."""
+    return result_company_tickers(results)
 
 
 class RunState:
@@ -87,11 +199,15 @@ class RunState:
                     "error": self.analysis_error,
                     "required_modules": list(REQUIRED_ANALYSIS_MODULES),
                 },
+                "provider_keys": provider_key_status(),
                 "capabilities": {
                     "results": True,
                     "artifacts": True,
                     "pdf_viewer": True,
                     "chart_viewer": True,
+                    "company_details": True,
+                    "research_company_details": True,
+                    "provider_key_status": True,
                 },
             }
 
@@ -168,47 +284,102 @@ def validate_config(payload: dict) -> dict:
         raw_training_years = payload["trainingYears"]
         raw_oos_months = payload["oosMonths"]
         raw_max_position = payload["maxPositionPercent"]
+        long_only = payload["longOnly"]
+        raw_max_sector = payload["maxSectorPercent"]
+        raw_regularization_strength = payload["regularizationStrength"]
         universe = str(payload["universe"])
+        regularization = str(payload["regularization"])
+        research_provider = str(payload.get("researchProvider", "openai"))
+        research_model = str(payload.get("researchModel", payload.get("gptModel", "")))
+        audit_provider = str(payload.get("auditProvider", "openai"))
+        audit_model = str(payload["auditModel"])
         gpt_views = payload["gptViews"]
+        audit_views = payload["auditViews"]
         refresh_cache = payload["refreshCache"]
     except (KeyError, TypeError, ValueError) as exc:
         raise ValueError("Run configuration is incomplete or invalid.") from exc
 
-    numeric_values = (raw_training_years, raw_oos_months, raw_max_position)
+    numeric_values = (
+        raw_training_years,
+        raw_oos_months,
+        raw_max_position,
+        raw_max_sector,
+        raw_regularization_strength,
+    )
     if any(isinstance(value, bool) for value in numeric_values):
         raise ValueError("Numeric run settings cannot be boolean.")
     try:
         training_years = float(raw_training_years)
         oos_months_value = float(raw_oos_months)
         max_position_value = float(raw_max_position)
+        max_sector_value = float(raw_max_sector)
+        regularization_strength = float(raw_regularization_strength)
     except (TypeError, ValueError) as exc:
         raise ValueError("Run configuration contains a non-numeric setting.") from exc
     if not all(math.isfinite(value) for value in (
-        training_years, oos_months_value, max_position_value
+        training_years,
+        oos_months_value,
+        max_position_value,
+        max_sector_value,
+        regularization_strength,
     )):
         raise ValueError("Numeric run settings must be finite.")
-    if not oos_months_value.is_integer() or not max_position_value.is_integer():
-        raise ValueError("OOS months and maximum position must be whole numbers.")
+    if not all(value.is_integer() for value in (
+        oos_months_value, max_position_value, max_sector_value
+    )):
+        raise ValueError("OOS months and hard percentage limits must be whole numbers.")
     oos_months = int(oos_months_value)
     max_position = int(max_position_value)
+    max_sector = int(max_sector_value)
 
-    if not isinstance(gpt_views, bool) or not isinstance(refresh_cache, bool):
-        raise ValueError("GPT views and cache refresh settings must be boolean.")
+    if not all(isinstance(value, bool) for value in (
+        gpt_views, audit_views, long_only, refresh_cache
+    )):
+        raise ValueError(
+            "AI views, global audit, long-only, and cache refresh settings must be boolean."
+        )
+    if audit_views and not gpt_views:
+        raise ValueError("Global AI audit requires AI-assisted views.")
     if not 0.25 <= training_years <= 10:
         raise ValueError("Training lookback must be between 0.25 and 10 years.")
     if not 0 <= oos_months <= 60:
         raise ValueError("Out-of-sample window must be between 0 and 60 months.")
     if not 1 <= max_position <= 100:
         raise ValueError("Maximum position must be between 1 and 100 percent.")
+    if not 5 <= max_sector <= 100:
+        raise ValueError("Maximum sector weight must be between 5 and 100 percent.")
+    if not 0 <= regularization_strength <= 10:
+        raise ValueError("Regularization strength must be between 0 and 10.")
     if universe not in ALLOWED_UNIVERSES:
         raise ValueError("Research universe is not allowlisted.")
+    if regularization not in ALLOWED_REGULARIZATIONS:
+        raise ValueError("Regularization method is not allowlisted.")
+    if research_provider not in ALLOWED_AI_MODELS["research"]:
+        raise ValueError("Selected research provider is not allowlisted.")
+    if audit_provider not in ALLOWED_AI_MODELS["audit"]:
+        raise ValueError("Selected audit provider is not allowlisted.")
+    if research_model not in ALLOWED_AI_MODELS["research"][research_provider]:
+        raise ValueError("Selected research model is not allowlisted for its provider.")
+    if audit_model not in ALLOWED_AI_MODELS["audit"][audit_provider]:
+        raise ValueError("Selected audit model is not allowlisted for its provider.")
 
     return {
         "trainingYears": training_years,
         "oosMonths": oos_months,
         "maxPositionPercent": max_position,
+        "longOnly": long_only,
+        "maxSectorPercent": max_sector,
+        "regularization": regularization,
+        "regularizationStrength": (
+            regularization_strength if regularization != "none" else 0.0
+        ),
         "universe": universe,
         "gptViews": gpt_views,
+        "researchProvider": research_provider,
+        "researchModel": research_model,
+        "auditViews": audit_views,
+        "auditProvider": audit_provider,
+        "auditModel": audit_model,
         "refreshCache": refresh_cache,
     }
 
@@ -253,6 +424,10 @@ def start_run(state: RunState, config: dict) -> str:
         state.next_line_id = 1
 
         env = os.environ.copy()
+        for _, environment_name in AI_PROVIDER_KEYS.values():
+            value, _ = resolved_api_key(environment_name)
+            if value:
+                env[environment_name] = value
         env["PYTHONUTF8"] = "1"
         command = [
             str(state.analysis_python),
@@ -324,13 +499,24 @@ class Handler(BaseHTTPRequestHandler):
         self.wfile.write(body)
 
     def send_static(self, path: Path) -> None:
-        if not path.is_file() or path.parent != ROOT:
+        allowed_directories = {
+            ROOT.resolve(),
+            RESOURCES_DIR.resolve(),
+            COMPANY_LOGOS_DIR.resolve(),
+        }
+        try:
+            resolved = path.resolve(strict=True)
+        except FileNotFoundError:
             self.send_json({"error": "Not found."}, HTTPStatus.NOT_FOUND)
             return
-        body = path.read_bytes()
-        content_type = mimetypes.guess_type(path.name)[0] or "application/octet-stream"
+        if not resolved.is_file() or resolved.parent not in allowed_directories:
+            self.send_json({"error": "Not found."}, HTTPStatus.NOT_FOUND)
+            return
+        body = resolved.read_bytes()
+        content_type = mimetypes.guess_type(resolved.name)[0] or "application/octet-stream"
         self.send_response(HTTPStatus.OK)
-        self.send_header("Content-Type", f"{content_type}; charset=utf-8")
+        self.send_header("Content-Type", content_type)
+        self.send_header("Cache-Control", "public, max-age=86400")
         self.send_header("Content-Length", str(len(body)))
         self.end_headers()
         self.wfile.write(body)
@@ -373,6 +559,43 @@ class Handler(BaseHTTPRequestHandler):
         if source == "example":
             payload.setdefault("snapshotLabel", "Bundled example")
         return payload, source
+
+    def fetch_company_details(self, ticker: str) -> dict:
+        now = time.time()
+        with self.app.company_cache_lock:
+            cached = self.app.company_cache.get(ticker)
+            if cached and now - cached[0] < COMPANY_DETAILS_CACHE_SECONDS:
+                return cached[1]
+
+        if self.app.state.analysis_python is None:
+            raise RuntimeError(
+                self.app.state.analysis_error
+                or "The analysis Python environment is unavailable."
+            )
+        command = [
+            str(self.app.state.analysis_python),
+            str(COMPANY_DETAILS_HELPER),
+            ticker,
+        ]
+        completed = subprocess.run(
+            command,
+            cwd=self.app.state.script_path.parent,
+            capture_output=True,
+            text=True,
+            encoding="utf-8",
+            errors="replace",
+            timeout=45,
+            creationflags=subprocess.CREATE_NO_WINDOW if os.name == "nt" else 0,
+        )
+        if completed.returncode != 0:
+            detail = completed.stderr.strip() or "Yahoo Finance lookup failed."
+            raise RuntimeError(detail)
+        payload = json.loads(completed.stdout)
+        if not isinstance(payload, dict) or payload.get("ticker") != ticker:
+            raise ValueError("Company detail helper returned an invalid response.")
+        with self.app.company_cache_lock:
+            self.app.company_cache[ticker] = (now, payload)
+        return payload
 
     def authorized(self) -> bool:
         if not self.app.token:
@@ -432,6 +655,32 @@ class Handler(BaseHTTPRequestHandler):
                 return
             self.send_json(payload)
             return
+        if parsed.path == "/api/company":
+            if not self.require_auth():
+                return
+            ticker = parse_qs(parsed.query).get("ticker", [""])[0].strip().upper()
+            if not TICKER_PATTERN.fullmatch(ticker):
+                self.send_json({"error": "A valid portfolio ticker is required."}, HTTPStatus.BAD_REQUEST)
+                return
+            try:
+                results, _ = self.read_results()
+                if ticker not in result_company_tickers(results):
+                    self.send_json(
+                        {"error": "Ticker is not present in the displayed portfolios or AI research."},
+                        HTTPStatus.NOT_FOUND,
+                    )
+                    return
+                self.send_json(self.fetch_company_details(ticker))
+            except FileNotFoundError:
+                self.send_json({"error": "No portfolio results are available."}, HTTPStatus.NOT_FOUND)
+            except subprocess.TimeoutExpired:
+                self.send_json({"error": "Yahoo Finance lookup timed out."}, HTTPStatus.GATEWAY_TIMEOUT)
+            except (json.JSONDecodeError, OSError, RuntimeError, ValueError) as exc:
+                self.send_json(
+                    {"error": f"Could not load company details: {exc}"},
+                    HTTPStatus.BAD_GATEWAY,
+                )
+            return
         if parsed.path == "/api/artifacts/pdf":
             if not self.require_auth():
                 return
@@ -461,9 +710,18 @@ class Handler(BaseHTTPRequestHandler):
             "/styles.css": ROOT / "styles.css",
             "/terminal-theme.css": ROOT / "terminal-theme.css",
             "/app.js": ROOT / "app.js",
+            "/resources/wealthgpt-logo.png": RESOURCES_DIR / "wealthgpt-logo.png",
         }
         if parsed.path in static_files:
             self.send_static(static_files[parsed.path])
+            return
+        logo_prefix = "/resources/company-logos/"
+        if parsed.path.startswith(logo_prefix):
+            filename = unquote(parsed.path[len(logo_prefix):])
+            if re.fullmatch(r"[A-Z0-9][A-Z0-9.\-]{0,19}\.png", filename):
+                self.send_static(COMPANY_LOGOS_DIR / filename)
+            else:
+                self.send_json({"error": "Not found."}, HTTPStatus.NOT_FOUND)
             return
         self.send_json({"error": "Not found."}, HTTPStatus.NOT_FOUND)
 
@@ -501,6 +759,8 @@ class RunnerServer(ThreadingHTTPServer):
         super().__init__(address, Handler)
         self.state = state
         self.token = token
+        self.company_cache: dict[str, tuple[float, dict]] = {}
+        self.company_cache_lock = threading.Lock()
 
     def server_bind(self) -> None:
         if hasattr(socket, "SO_EXCLUSIVEADDRUSE"):
