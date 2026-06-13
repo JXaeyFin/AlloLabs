@@ -2,9 +2,7 @@
  <img width="250" height="250" alt="cropped_circle_image" src="https://github.com/user-attachments/assets/f284a51a-5554-4a10-aa39-d346345b4536" />
 </p>
 
-# AlloLabs
-
-Visit the website here: [AlloLabs](https://allolabs.carrd.co/)
+# [AlloLabs](https://allolabs.carrd.co/)
 
 AlloLabs is an AI-assisted global asset-allocation research platform. It
 combines live Yahoo Finance data, Modern Portfolio Theory, Black-Litterman
