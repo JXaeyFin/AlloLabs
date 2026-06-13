@@ -64,7 +64,7 @@ ALLOWED_AI_MODELS = {
     }
     for stage in ("research", "audit")
 }
-API_VERSION = 17
+API_VERSION = 18
 REQUIRED_ANALYSIS_MODULES = ("matplotlib", "numpy", "pandas", "scipy", "yfinance")
 COMPANY_DETAILS_CACHE_SECONDS = 15 * 60
 TICKER_PATTERN = re.compile(r"^[A-Z0-9][A-Z0-9.\-]{0,19}$")
@@ -152,11 +152,16 @@ class RunState:
         analysis_python: Path | None = None,
         analysis_python_version: str | None = None,
         analysis_error: str | None = None,
+        data_dir: Path | None = None,
+        worker_executable: Path | None = None,
     ) -> None:
         self.script_path = script_path
         self.analysis_python = analysis_python
         self.analysis_python_version = analysis_python_version
         self.analysis_error = analysis_error
+        self.data_dir = (data_dir or script_path.parent).resolve()
+        self.data_dir.mkdir(parents=True, exist_ok=True)
+        self.worker_executable = worker_executable
         self.lock = threading.Lock()
         self.process: subprocess.Popen[str] | None = None
         self.status = "idle"
@@ -175,7 +180,7 @@ class RunState:
 
     def snapshot(self) -> dict:
         with self.lock:
-            live_results_available = (self.script_path.parent / "latest_run.json").is_file()
+            live_results_available = (self.data_dir / "latest_run.json").is_file()
             default_results_available = DEFAULT_RESULTS.is_file()
             return {
                 "api_version": API_VERSION,
@@ -193,8 +198,12 @@ class RunState:
                 "live_results_available": live_results_available,
                 "default_results_available": default_results_available,
                 "analysis_environment": {
-                    "ready": self.analysis_python is not None,
-                    "python": str(self.analysis_python) if self.analysis_python else None,
+                    "ready": self.worker_executable is not None or self.analysis_python is not None,
+                    "python": (
+                        str(self.worker_executable)
+                        if self.worker_executable
+                        else (str(self.analysis_python) if self.analysis_python else None)
+                    ),
                     "version": self.analysis_python_version,
                     "error": self.analysis_error,
                     "required_modules": list(REQUIRED_ANALYSIS_MODULES),
@@ -407,7 +416,7 @@ def start_run(state: RunState, config: dict) -> str:
             raise RuntimeError("An AlloLabs run is already active.")
         if not state.script_path.is_file():
             raise FileNotFoundError(f"AlloLabs script not found: {state.script_path}")
-        if state.analysis_python is None:
+        if state.worker_executable is None and state.analysis_python is None:
             raise RuntimeError(
                 state.analysis_error
                 or "No compatible analysis Python is configured. Install the project requirements."
@@ -429,16 +438,26 @@ def start_run(state: RunState, config: dict) -> str:
             if value:
                 env[environment_name] = value
         env["PYTHONUTF8"] = "1"
-        command = [
-            str(state.analysis_python),
-            "-u",
-            str(RUNNER),
-            str(state.script_path),
-            json.dumps(config),
-        ]
+        env["ALLOLABS_DATA_DIR"] = str(state.data_dir)
+        env.setdefault("MPLBACKEND", "Agg")
+        if state.worker_executable is not None:
+            command = [
+                str(state.worker_executable),
+                "--run",
+                str(state.script_path),
+                json.dumps(config),
+            ]
+        else:
+            command = [
+                str(state.analysis_python),
+                "-u",
+                str(RUNNER),
+                str(state.script_path),
+                json.dumps(config),
+            ]
         process = subprocess.Popen(
             command,
-            cwd=state.script_path.parent,
+            cwd=state.data_dir,
             stdout=subprocess.PIPE,
             stderr=subprocess.STDOUT,
             text=True,
@@ -522,8 +541,11 @@ class Handler(BaseHTTPRequestHandler):
         self.wfile.write(body)
 
     def send_artifact(self, path: Path, content_type: str) -> None:
-        project_dir = self.app.state.script_path.parent.resolve()
-        allowed_directories = {project_dir, EXAMPLES_DIR.resolve()}
+        allowed_directories = {
+            self.app.state.script_path.parent.resolve(),
+            self.app.state.data_dir.resolve(),
+            EXAMPLES_DIR.resolve(),
+        }
         try:
             resolved = path.resolve(strict=True)
         except FileNotFoundError:
@@ -541,7 +563,7 @@ class Handler(BaseHTTPRequestHandler):
         self.wfile.write(body)
 
     def results_path(self) -> tuple[Path | None, str | None]:
-        live_path = self.app.state.script_path.parent / "latest_run.json"
+        live_path = self.app.state.data_dir / "latest_run.json"
         if live_path.is_file():
             return live_path, "live"
         if DEFAULT_RESULTS.is_file():
@@ -567,19 +589,26 @@ class Handler(BaseHTTPRequestHandler):
             if cached and now - cached[0] < COMPANY_DETAILS_CACHE_SECONDS:
                 return cached[1]
 
-        if self.app.state.analysis_python is None:
+        if self.app.state.worker_executable is None and self.app.state.analysis_python is None:
             raise RuntimeError(
                 self.app.state.analysis_error
                 or "The analysis Python environment is unavailable."
             )
-        command = [
-            str(self.app.state.analysis_python),
-            str(COMPANY_DETAILS_HELPER),
-            ticker,
-        ]
+        if self.app.state.worker_executable is not None:
+            command = [
+                str(self.app.state.worker_executable),
+                "--company-details",
+                ticker,
+            ]
+        else:
+            command = [
+                str(self.app.state.analysis_python),
+                str(COMPANY_DETAILS_HELPER),
+                ticker,
+            ]
         completed = subprocess.run(
             command,
-            cwd=self.app.state.script_path.parent,
+            cwd=self.app.state.data_dir,
             capture_output=True,
             text=True,
             encoding="utf-8",
@@ -685,7 +714,7 @@ class Handler(BaseHTTPRequestHandler):
             if not self.require_auth():
                 return
             _, source = self.results_path()
-            live_pdf = self.app.state.script_path.parent / "allolabs_portfolio_report.pdf"
+            live_pdf = self.app.state.data_dir / "allolabs_portfolio_report.pdf"
             pdf_path = live_pdf if source == "live" and live_pdf.is_file() else DEFAULT_PDF
             self.send_artifact(pdf_path, "application/pdf")
             return
@@ -700,7 +729,7 @@ class Handler(BaseHTTPRequestHandler):
             if not results.get("performance"):
                 self.send_json({"error": "The latest run did not generate an OOS chart."}, HTTPStatus.NOT_FOUND)
                 return
-            live_chart = self.app.state.script_path.parent / "portfolio_vs_markets_oos.png"
+            live_chart = self.app.state.data_dir / "portfolio_vs_markets_oos.png"
             chart_path = live_chart if source == "live" and live_chart.is_file() else DEFAULT_CHART
             self.send_artifact(chart_path, "image/png")
             return
@@ -780,6 +809,7 @@ def main() -> int:
         help="Python executable used for AlloLabs model runs.",
     )
     parser.add_argument("--token", default=os.getenv("ALLOLABS_REMOTE_TOKEN"))
+    parser.add_argument("--data-dir", type=Path, default=None)
     args = parser.parse_args()
 
     is_local = args.host in {"127.0.0.1", "localhost", "::1"}
@@ -792,6 +822,7 @@ def main() -> int:
         analysis_python=analysis_python,
         analysis_python_version=analysis_version,
         analysis_error=analysis_error,
+        data_dir=args.data_dir,
     )
     try:
         server = RunnerServer((args.host, args.port), state, args.token)

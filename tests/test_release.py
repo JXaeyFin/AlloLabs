@@ -12,6 +12,7 @@ from unittest.mock import patch
 
 import numpy as np
 
+import allolabs_paths
 from dashboard import runner, server
 
 try:
@@ -371,6 +372,44 @@ class ConfigurationTests(unittest.TestCase):
     def test_default_model_path_is_repository_local(self):
         self.assertEqual(server.DEFAULT_SCRIPT, REPOSITORY_ROOT / "allolabs.py")
 
+    def test_desktop_infrastructure_is_packaged_and_uses_writable_data_dir(self):
+        desktop_source = (REPOSITORY_ROOT / "desktop" / "app.py").read_text(encoding="utf-8")
+        worker_source = (REPOSITORY_ROOT / "desktop" / "worker.py").read_text(encoding="utf-8")
+        packaging_source = (REPOSITORY_ROOT / "packaging" / "allolabs.spec").read_text(encoding="utf-8")
+        server_source = (REPOSITORY_ROOT / "dashboard" / "server.py").read_text(encoding="utf-8")
+        runner_source = (REPOSITORY_ROOT / "dashboard" / "runner.py").read_text(encoding="utf-8")
+        browser_source = (REPOSITORY_ROOT / "dashboard" / "app.js").read_text(encoding="utf-8")
+
+        self.assertTrue((REPOSITORY_ROOT / "packaging" / "allolabs.spec").is_file())
+        self.assertTrue((REPOSITORY_ROOT / "packaging" / "allolabs.iss").is_file())
+        self.assertTrue((REPOSITORY_ROOT / "scripts" / "build-desktop.ps1").is_file())
+        self.assertIn("root = Path(SPECPATH).parent", packaging_source)
+        self.assertNotIn("Path(SPECPATH).parent.parent", packaging_source)
+        self.assertIn('name="AlloLabsWorker"', packaging_source)
+        self.assertIn("console=True", packaging_source)
+        self.assertIn("RunnerServer((\"127.0.0.1\", 0)", desktop_source)
+        self.assertIn("def bundled_worker_path", desktop_source)
+        self.assertIn('"AlloLabsWorker.exe" if os.name == "nt" else "AlloLabsWorker"', desktop_source)
+        self.assertIn('arguments[0] == "--run"', worker_source)
+        self.assertIn("worker_executable", server_source)
+        self.assertIn("ALLOLABS_DATA_DIR", server_source)
+        self.assertIn('namespace.get("DATA_DIR"', runner_source)
+        self.assertIn('desktopParameters.get("desktopToken")', browser_source)
+        self.assertTrue((REPOSITORY_ROOT / "scripts" / "build-portable.sh").is_file())
+        self.assertTrue((REPOSITORY_ROOT / "scripts" / "verify-portable.py").is_file())
+        self.assertTrue((REPOSITORY_ROOT / "requirements-desktop-macos.txt").is_file())
+        self.assertTrue((REPOSITORY_ROOT / "requirements-desktop-linux.txt").is_file())
+        self.assertTrue(
+            (REPOSITORY_ROOT / ".github" / "workflows" / "portable-unix-release.yml").is_file()
+        )
+
+    def test_explicit_data_directory_is_created_and_resolved(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            target = Path(temporary) / "generated"
+            with patch.dict(os.environ, {"ALLOLABS_DATA_DIR": str(target)}):
+                self.assertEqual(allolabs_paths.user_data_dir(), target.resolve())
+                self.assertTrue(target.is_dir())
+
     def test_bundled_dashboard_snapshot_is_available(self):
         payload = json.loads(server.DEFAULT_RESULTS.read_text(encoding="utf-8"))
         self.assertEqual(payload["dataMode"], "example")
@@ -435,7 +474,7 @@ class ConfigurationTests(unittest.TestCase):
         self.assertGreaterEqual(server.API_VERSION, 14)
 
         keys = {
-            "OPENAI_API_KEY": "sk-proj-example-secret-1234",
+            "OPENAI_API_KEY": "openai-test-secret-1234",
             "ANTHROPIC_API_KEY": "",
             "GEMINI_API_KEY": "short",
         }
@@ -443,7 +482,7 @@ class ConfigurationTests(unittest.TestCase):
             status = server.provider_key_status()
         encoded = json.dumps(status)
         self.assertTrue(status["openai"]["active"])
-        self.assertEqual(status["openai"]["preview"], "sk-proj********1234")
+        self.assertEqual(status["openai"]["preview"], "openai-********1234")
         self.assertEqual(status["openai"]["source"], "Dashboard process")
         self.assertFalse(status["anthropic"]["active"])
         self.assertIsNone(status["anthropic"]["preview"])
@@ -626,6 +665,51 @@ class ReportTests(unittest.TestCase):
         self.assertEqual(allolabs_report._format_optional_percent(float("nan")), "N/A")
         self.assertEqual(allolabs_report._format_optional_percent("invalid"), "N/A")
         self.assertEqual(allolabs_report._format_optional_percent(0.1234), "12.3%")
+
+    @unittest.skipIf(allolabs_report is None, "Scientific reporting dependencies are unavailable.")
+    def test_report_flags_extreme_returns_as_unstable_inputs(self):
+        frame = allolabs_report.pd.DataFrame(
+            {
+                "weight": [0.6, 0.4],
+                "historical_return": [0.70, 0.45],
+                "prior_return": [0.10, 0.08],
+                "expected_return": [0.18, 0.12],
+                "posterior_return": [0.50, 0.50],
+                "confidence": [0.75, 0.65],
+            }
+        )
+        diagnostics = allolabs_report._return_diagnostics(
+            frame,
+            {"return": 0.50, "volatility": 0.14},
+        )
+        self.assertTrue(diagnostics["extreme"])
+        self.assertEqual(
+            allolabs_report._diagnostic_label(diagnostics),
+            "HIGH / UNSTABLE INPUT",
+        )
+        self.assertEqual(diagnostics["mode"], "black_litterman")
+
+        historical_only = frame.assign(
+            historical_return=[None, None],
+            prior_return=[None, None],
+            expected_return=[None, None],
+        )
+        historical_only["posterior_return"] = None
+        historical_diagnostics = allolabs_report._return_diagnostics(
+            historical_only,
+            {"return": 0.32, "volatility": 0.18},
+        )
+        self.assertEqual(historical_diagnostics["mode"], "historical")
+        self.assertEqual(historical_diagnostics["historical"], 0.32)
+
+    def test_report_language_distinguishes_inputs_from_forecasts(self):
+        source = (REPOSITORY_ROOT / "allolabs_report.py").read_text(encoding="utf-8")
+        self.assertIn("Return Input Bridge", source)
+        self.assertIn("Historical is descriptive, not predictive.", source)
+        self.assertIn("MODEL INPUT - NOT FORECAST", source)
+        self.assertIn("The posterior is an optimization input.", source)
+        self.assertIn("WHY LARGE NUMBERS APPEAR", source)
+        self.assertNotIn('"Expected return", f"{metrics', source)
 
     @unittest.skipIf(allolabs_report is None, "Scientific reporting dependencies are unavailable.")
     def test_allocation_appendix_uses_threshold_and_multiple_pages(self):

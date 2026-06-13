@@ -41,9 +41,11 @@ from scipy.optimize import minimize
 from scipy import stats
 
 from allolabs_company import fetch_ticker_context
+from allolabs_paths import application_root, user_data_dir
 from allolabs_report import create_portfolio_pdf, resolve_sectors
 
-SCRIPT_DIR = Path(__file__).resolve().parent
+SCRIPT_DIR = application_root()
+DATA_DIR = user_data_dir()
 
 
 def stabilize_covariance(
@@ -204,12 +206,12 @@ def download_close_prices(tickers_list, start, end, *, label: str) -> pd.DataFra
 
 
 TERMINAL_BANNER = r"""
-     _    _ _       _          _           
-    / \  | | | ___ | |    __ _| |__  ___   
-   / _ \ | | |/ _ \| |   / _` | '_ \/ __|  
-  / ___ \| | | (_) | |__| (_| | |_) \__ \_ 
- /_/   \_\_|_|\___/|_____\__,_|_.__/|___(_)
-                                           
+ __        __         _ _   _      ____ ____ _____
+ \ \      / /__  __ _| | |_| |__  / ___|  _ \_   _|
+  \ \ /\ / / _ \/ _` | | __| '_ \| |  _| |_) || |
+   \ V  V /  __/ (_| | | |_| | | | |_| |  __/ | |
+    \_/\_/ \___|\__,_|_|\__|_| |_|\____|_|    |_|
+
               AI-assisted allocation research
                     Invest with caution
 """.strip("\n")
@@ -483,10 +485,10 @@ black_litterman_ticker_subset = env_ticker_subset(
     "ALLOLABS_RESEARCH_TICKERS"
 )
 
-BL_CACHE_PATH = SCRIPT_DIR / "black_litterman_stock_analysis.json"
-GPT_AUDITED_VIEWS_PATH = SCRIPT_DIR / "gpt_audited_views.json"
-GPT_VIEWS_CSV_PATH = SCRIPT_DIR / "gpt_views.csv"
-PORTFOLIO_REPORT_PATH = SCRIPT_DIR / "allolabs_portfolio_report.pdf"
+BL_CACHE_PATH = DATA_DIR / "black_litterman_stock_analysis.json"
+GPT_AUDITED_VIEWS_PATH = DATA_DIR / "gpt_audited_views.json"
+GPT_VIEWS_CSV_PATH = DATA_DIR / "gpt_views.csv"
+PORTFOLIO_REPORT_PATH = DATA_DIR / "allolabs_portfolio_report.pdf"
 
 gpt_audit_status = {
     "enabled": gpt_audit_enabled,
@@ -1640,7 +1642,7 @@ if max_sector_weight < 1.0:
         initial_guess,
         initial_guess,
         sector_analysis,
-        SCRIPT_DIR / "sector_cache.json",
+        DATA_DIR / "sector_cache.json",
     )
     for sector in sorted(set(optimizer_sectors.values())):
         if sector in {"Other", "Unclassified"}:
@@ -2087,7 +2089,7 @@ else:
     # Leave space on the right for the external legend and volatility box
     fig.tight_layout(rect=[0, 0, 0.85, 1])
 
-    out_path = SCRIPT_DIR / "portfolio_vs_markets_oos.png"
+    out_path = DATA_DIR / "portfolio_vs_markets_oos.png"
     plt.savefig(out_path, dpi=300, bbox_inches="tight")
     print(f"Chart saved -> {out_path}")
 

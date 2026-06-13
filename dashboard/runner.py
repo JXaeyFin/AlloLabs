@@ -230,6 +230,8 @@ def portfolio_payload(tickers, weights, sectors, analysis):
 
 
 def write_latest_run(namespace: dict, config: dict, script_path: Path) -> Path:
+    data_dir = Path(namespace.get("DATA_DIR", script_path.parent)).resolve()
+    data_dir.mkdir(parents=True, exist_ok=True)
     analysis_path = Path(namespace["BL_CACHE_PATH"])
     try:
         analysis = json.loads(analysis_path.read_text(encoding="utf-8"))
@@ -241,7 +243,7 @@ def write_latest_run(namespace: dict, config: dict, script_path: Path) -> Path:
     tickers = list(namespace["tickers"])
     max_weights = namespace["w_sharpe"]
     min_weights = namespace["w_vol"]
-    listing_cache_path = script_path.parent / "listing_metadata_cache.json"
+    listing_cache_path = data_dir / "listing_metadata_cache.json"
     listing_metadata = resolve_listing_metadata(analysis.keys(), listing_cache_path)
 
     cum_ret = namespace.get("cum_ret")
@@ -298,13 +300,13 @@ def write_latest_run(namespace: dict, config: dict, script_path: Path) -> Path:
         "performance": performance,
         "artifacts": {
             "pdf": str(namespace["PORTFOLIO_REPORT_PATH"]),
-            "allocations": str(script_path.parent / "portfolio_allocations.csv"),
-            "sectorCache": str(script_path.parent / "sector_cache.json"),
+            "allocations": str(data_dir / "portfolio_allocations.csv"),
+            "sectorCache": str(data_dir / "sector_cache.json"),
             "listingCache": str(listing_cache_path),
             "auditedViews": str(namespace.get("GPT_AUDITED_VIEWS_PATH", "")),
         },
     }
-    output_path = script_path.parent / "latest_run.json"
+    output_path = data_dir / "latest_run.json"
     temporary = output_path.with_suffix(".json.tmp")
     temporary.write_text(json.dumps(result, indent=2, default=json_value), encoding="utf-8")
     temporary.replace(output_path)

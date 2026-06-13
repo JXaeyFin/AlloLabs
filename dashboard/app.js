@@ -149,8 +149,16 @@ const PROVIDER_KEY_SETUP = {
   gemini: { label: "Google Gemini", environment: "GEMINI_API_KEY" }
 };
 let providerKeyStatusSignature = "";
+const operatingSystem = /Mac/i.test(navigator.platform)
+  ? "macos"
+  : /Linux/i.test(navigator.platform) ? "linux" : "windows";
 
 function providerSetupCommand(environment, persistent = false) {
+  if (operatingSystem !== "windows") {
+    return persistent
+      ? `Add export ${environment}="paste-key-here" to your shell profile, then relaunch AlloLabs`
+      : `export ${environment}="paste-key-here"`;
+  }
   if (persistent) {
     return `[Environment]::SetEnvironmentVariable("${environment}", "paste-key-here", "User")`;
   }
@@ -191,14 +199,14 @@ function renderProviderKeyStatus(providerKeys = null, apiVersion = 0) {
         </div>
         <details class="provider-key-instructions"${detected ? "" : " open"}>
           <summary>${detected ? "Replace key or review setup" : "How to configure"}</summary>
-          <p>For a temporary key, start the dashboard again from the same PowerShell window. For a persistent key, reopen PowerShell before restarting the dashboard.</p>
+          <p>For a temporary key, relaunch AlloLabs from the same terminal. Persistent environment setup varies by operating system and desktop session.</p>
           <label>
-            <span>Current PowerShell session</span>
+            <span>${operatingSystem === "windows" ? "Current PowerShell session" : "Current terminal session"}</span>
             <code>${escapeHtml(providerSetupCommand(environment))}</code>
             <button type="button" data-copy-provider-command="${escapeHtml(providerSetupCommand(environment))}">Copy</button>
           </label>
           <label>
-            <span>Persistent Windows user variable</span>
+            <span>${operatingSystem === "windows" ? "Persistent Windows user variable" : "Persistent shell environment"}</span>
             <code>${escapeHtml(providerSetupCommand(environment, true))}</code>
             <button type="button" data-copy-provider-command="${escapeHtml(providerSetupCommand(environment, true))}">Copy</button>
           </label>
@@ -842,7 +850,17 @@ let runProgressState = null;
 const hostedRunnerUrl = location.protocol === "http:" || location.protocol === "https:"
   ? location.origin
   : runnerUrl.value;
-runnerUrl.value = localStorage.getItem("allolabs-runner-url") || hostedRunnerUrl;
+const desktopParameters = new URLSearchParams(location.search);
+const desktopToken = desktopParameters.get("desktopToken");
+const desktopMode = desktopParameters.get("desktop") === "1";
+if (desktopToken) runnerToken.value = desktopToken;
+runnerUrl.value = desktopMode
+  ? hostedRunnerUrl
+  : (localStorage.getItem("allolabs-runner-url") || hostedRunnerUrl);
+if (desktopMode) {
+  document.documentElement.dataset.desktop = "true";
+  history.replaceState({}, document.title, `${location.pathname}${location.hash}`);
+}
 
 function runnerHeaders(includeJson = false) {
   const headers = {};

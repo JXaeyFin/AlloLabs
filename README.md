@@ -1,13 +1,18 @@
 <p align="center">
- <img width="250" height="250" alt="cropped_circle_image" src="https://github.com/user-attachments/assets/f284a51a-5554-4a10-aa39-d346345b4536" />
+  <img src="resources/allolabs-logo.png" alt="AlloLabs logo" width="150">
 </p>
 
-# [AlloLabs](https://allolabs.carrd.co/)
+# AlloLabs
 
 AlloLabs is an AI-assisted global asset-allocation research platform. It
 combines live Yahoo Finance data, Modern Portfolio Theory, Black-Litterman
 expected returns, structured OpenAI, Anthropic Claude, or Google Gemini research views, and a local
 Bloomberg-inspired dashboard.
+
+AlloLabs can run either as the existing local browser dashboard or as a
+packaged Windows desktop application. The desktop build opens in its own native
+window, uses an automatically selected localhost port, and runs analysis in a
+hidden bundled worker process.
 
 It constructs and compares:
 
@@ -59,8 +64,15 @@ stages, training window, and optional out-of-sample analysis.
 |   |-- app.js
 |   |-- styles.css
 |   `-- terminal-theme.css
+|-- desktop/
+|   |-- app.py                   # Native window and application lifecycle
+|   `-- worker.py                # Hidden analysis and company-data worker
+|-- packaging/
+|   |-- allolabs.spec            # PyInstaller desktop bundle
+|   `-- allolabs.iss             # Inno Setup installer
 |-- scripts/
 |   |-- cache-company-logos.py   # Rebuild the local ticker logo library
+|   |-- build-desktop.ps1        # Build the Windows app and installer
 |   `-- start-dashboard.ps1
 |-- resources/
 |   |-- company-logos/           # Locally cached universe logos and manifest
@@ -70,7 +82,11 @@ stages, training window, and optional out-of-sample analysis.
 |-- examples/                    # Sanitized transcripts and sample PDF
 |-- start-dashboard.bat
 |-- start-allolabs-dashboard.bat
+|-- start-allolabs-desktop.bat
 |-- requirements.txt
+|-- requirements-desktop.txt
+|-- requirements-desktop-macos.txt
+|-- requirements-desktop-linux.txt
 |-- .env.example
 `-- .github/workflows/ci.yml
 ```
@@ -107,6 +123,62 @@ $env:GEMINI_API_KEY="your_api_key"
 
 Only the key for the provider selected at each stage is used. Never commit a
 real API key or `.env` file.
+
+## Windows Desktop Application
+
+For a source checkout, `start-allolabs-desktop.bat` opens the dashboard in a
+dedicated application window. It uses pywebview when installed and can fall
+back to Microsoft Edge application mode during development.
+
+Build the self-contained Windows application:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File scripts/build-desktop.ps1
+```
+
+The build uses PyInstaller's one-directory mode for faster, more dependable
+scientific-library startup. If Inno Setup 6 is installed, the final installer
+is written under `release/`. Pass `-SkipInstaller` to produce only
+`dist/AlloLabs-Windows-x64/AlloLabs.exe`.
+
+The build automatically runs `scripts/verify-portable.ps1`. A valid portable
+folder contains both `AlloLabs.exe` and the hidden-process
+`AlloLabsWorker.exe`; the verifier imports every required analytical dependency
+without making network requests.
+
+Installed builds keep bundled application files read-only and write generated
+reports, results, caches, and settings under `%LOCALAPPDATA%\AlloLabs`.
+
+The `Windows Desktop Build` GitHub Actions workflow performs the same packaging
+on `windows-latest`. Run it manually or push a version tag to receive
+`AlloLabs-v1.3.0-Windows-x64.zip` and `AlloLabs-Setup-1.3.0.exe`.
+
+## macOS And Linux Portable Applications
+
+PyInstaller creates native binaries and cannot cross-compile them from Windows.
+On a Mac or Linux machine, run:
+
+```bash
+chmod +x scripts/build-portable.sh
+scripts/build-portable.sh
+```
+
+The detected platform and processor determine the output:
+
+```text
+dist/AlloLabs-macOS-arm64/
+dist/AlloLabs-macOS-x64/
+dist/AlloLabs-Linux-arm64/
+dist/AlloLabs-Linux-x64/
+```
+
+macOS receives an ad-hoc-signed `AlloLabs.app` bundle and ZIP archive. Linux
+receives native `AlloLabs` and `AlloLabsWorker` executables plus a `.tar.gz`
+archive. Every build runs the offline worker self-test before it is packaged.
+
+The `macOS and Linux Portable Builds` GitHub Actions workflow creates the
+available native artifacts automatically. The artifact architecture is derived
+from the hosted runner rather than being mislabeled.
 
 To rebuild the bundled company logos after changing `ASSET_UNIVERSE`, set the
 Logo.dev publishable key only for the command and run:
@@ -226,11 +298,13 @@ sector_cache.json
 allolabs_portfolio_report.pdf
 ```
 
-The PDF includes portfolio metrics, top holdings, sector exposure,
-concentration, effective holdings, rationales for the eight largest positions,
-and a paginated detailed allocation appendix covering positions down to 0.005%
-absolute portfolio weight. The holding-rationale cards use locally bundled
-rounded-square company marks where a cached logo is available.
+The Bloomberg-terminal-inspired PDF leads with risk, construction, and
+concentration rather than presenting model returns as promises. It includes a
+return-input bridge separating historical observations, equilibrium priors, AI
+views, and Black-Litterman posterior inputs; educational model-risk notes;
+security rationales; sector exposure; and a paginated allocation appendix down
+to 0.005% absolute weight. Holding-rationale cards use locally bundled
+rounded-square company marks where available.
 
 ## Validation
 
