@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="resources/allolabs-logo.png" alt="AlloLabs logo" width="150">
+ <img width="250" height="250" alt="cropped_circle_image" src="https://github.com/user-attachments/assets/f284a51a-5554-4a10-aa39-d346345b4536" />
 </p>
 
 # AlloLabs
