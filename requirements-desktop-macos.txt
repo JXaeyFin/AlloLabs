@@ -1,0 +1,4 @@
+-r requirements.txt
+pywebview[cocoa]>=6.2.1,<7
+pyinstaller>=6.21,<7
+

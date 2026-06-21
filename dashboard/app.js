@@ -8,6 +8,7 @@ const emptyPortfolio = {
 
 let portfolioData = { max: emptyPortfolio, min: emptyPortfolio };
 let researchData = [];
+let performanceCache = null;
 const companyDetailsCache = new Map();
 let companyModalTrigger = null;
 
@@ -149,8 +150,16 @@ const PROVIDER_KEY_SETUP = {
   gemini: { label: "Google Gemini", environment: "GEMINI_API_KEY" }
 };
 let providerKeyStatusSignature = "";
+const operatingSystem = /Mac/i.test(navigator.platform)
+  ? "macos"
+  : /Linux/i.test(navigator.platform) ? "linux" : "windows";
 
 function providerSetupCommand(environment, persistent = false) {
+  if (operatingSystem !== "windows") {
+    return persistent
+      ? `Add export ${environment}="paste-key-here" to your shell profile, then relaunch AlloLabs`
+      : `export ${environment}="paste-key-here"`;
+  }
   if (persistent) {
     return `[Environment]::SetEnvironmentVariable("${environment}", "paste-key-here", "User")`;
   }
@@ -191,14 +200,14 @@ function renderProviderKeyStatus(providerKeys = null, apiVersion = 0) {
         </div>
         <details class="provider-key-instructions"${detected ? "" : " open"}>
           <summary>${detected ? "Replace key or review setup" : "How to configure"}</summary>
-          <p>For a temporary key, start the dashboard again from the same PowerShell window. For a persistent key, reopen PowerShell before restarting the dashboard.</p>
+          <p>For a temporary key, relaunch AlloLabs from the same terminal. Persistent environment setup varies by operating system and desktop session.</p>
           <label>
-            <span>Current PowerShell session</span>
+            <span>${operatingSystem === "windows" ? "Current PowerShell session" : "Current terminal session"}</span>
             <code>${escapeHtml(providerSetupCommand(environment))}</code>
             <button type="button" data-copy-provider-command="${escapeHtml(providerSetupCommand(environment))}">Copy</button>
           </label>
           <label>
-            <span>Persistent Windows user variable</span>
+            <span>${operatingSystem === "windows" ? "Persistent Windows user variable" : "Persistent shell environment"}</span>
             <code>${escapeHtml(providerSetupCommand(environment, true))}</code>
             <button type="button" data-copy-provider-command="${escapeHtml(providerSetupCommand(environment, true))}">Copy</button>
           </label>
@@ -430,30 +439,50 @@ function companyLogoUrl(ticker) {
   return `/resources/company-logos/${encodeURIComponent(normalizedTicker)}.png`;
 }
 
+function animateValue(element, newText) {
+  if (element.textContent === newText) return;
+  element.classList.remove("counter-flash");
+  void element.offsetWidth;
+  element.textContent = newText;
+  element.classList.add("counter-flash");
+}
+
 function setFinanceValue(elementId, value, text, neutral = false) {
   const element = document.getElementById(elementId);
-  element.textContent = text;
+  animateValue(element, text);
   element.classList.remove("finance-positive", "finance-negative", "finance-neutral");
   element.classList.add(financeClass(value, neutral));
 }
 
 const pageTitles = {
-  overview: "Overview",
-  portfolios: "Portfolios",
-  research: "AI Research",
-  console: "Run Console",
-  report: "Report",
-  models: "Model Guide"
+  overview: "Dashboard",
+  research: "Research",
+  console: "Console",
+  reference: "Reference"
+};
+
+const viewAliases = {
+  portfolios: "overview",
+  models: "reference",
+  report: "reference"
 };
 
 function showView(viewName) {
-  if (!pageTitles[viewName]) return;
+  const resolved = viewAliases[viewName] || viewName;
+  if (!pageTitles[resolved]) return;
   document.querySelectorAll(".view").forEach((view) => view.classList.remove("active"));
   document.querySelectorAll(".nav-item").forEach((item) => item.classList.remove("active"));
-  document.getElementById(`${viewName}-view`)?.classList.add("active");
-  document.querySelector(`[data-view="${viewName}"]`)?.classList.add("active");
-  document.getElementById("page-title").textContent = pageTitles[viewName];
-  history.replaceState(null, "", `#${viewName}`);
+  const viewId = resolved === "reference" ? "report-view" : `${resolved}-view`;
+  const target = document.getElementById(viewId);
+  if (target) {
+    target.style.animation = "none";
+    void target.offsetWidth;
+    target.style.animation = "";
+    target.classList.add("active");
+  }
+  document.querySelector(`[data-view="${resolved}"]`)?.classList.add("active");
+  document.getElementById("page-title").textContent = pageTitles[resolved];
+  history.replaceState(null, "", `#${resolved}`);
   window.scrollTo({ top: 0, behavior: "smooth" });
 }
 
@@ -556,7 +585,7 @@ function livePortfolio(portfolio, metrics) {
   ]);
   const grossWeight = holdings.reduce((sum, item) => sum + Math.abs(item[1]), 0);
   const topFive = holdings.slice(0, 5).reduce((sum, item) => sum + Math.abs(item[1]), 0);
-  const palette = ["#f4f5f6", "#3ad17d", "#aeb5bd", "#737b85", "#d8dce0", "#ff5e68", "#555d66"];
+  const palette = ["#3b82f6", "#10b981", "#f59e0b", "#8b5cf6", "#06b6d4", "#f87171", "#ec4899", "#64748b"];
   return {
     metricValues: {
       return: Number(metrics.return),
@@ -596,6 +625,7 @@ function chartPath(values, minimum, maximum) {
 
 function renderPerformance(performance) {
   if (!performance?.dates?.length || !performance.series) return;
+  performanceCache = performance;
   const maxSeries = performance.series.Max_Sharpe || [];
   const minSeries = performance.series.Min_Vol || [];
   const benchmarkName = Object.keys(performance.series).find((name) => !["Max_Sharpe", "Min_Vol"].includes(name));
@@ -607,6 +637,18 @@ function renderPerformance(performance) {
   document.getElementById("chart-max").setAttribute("d", chartPath(maxSeries, minimum, maximum));
   document.getElementById("chart-min").setAttribute("d", chartPath(minSeries, minimum, maximum));
   document.getElementById("chart-benchmark").setAttribute("d", chartPath(benchmarkSeries, minimum, maximum));
+
+  if (maxSeries.length) {
+    const areaPath = chartPath(maxSeries, minimum, maximum);
+    const lastX = 48 + ((maxSeries.length - 1) / Math.max(maxSeries.length - 1, 1)) * (730 - 48);
+    document.getElementById("chart-area").setAttribute("d", `${areaPath} L${lastX.toFixed(1)} 250 L48 250 Z`);
+  }
+
+  document.querySelectorAll(".chart-path").forEach((path) => {
+    path.classList.remove("chart-draw");
+    void path.offsetWidth;
+    path.classList.add("chart-draw");
+  });
 
   const dates = performance.dates;
   const labelIndexes = [...new Set([0, Math.floor((dates.length - 1) / 2), dates.length - 1])];
@@ -694,6 +736,8 @@ function applyLiveResults(results) {
   document.getElementById("remote-regularization").value = results.config.regularization || "none";
   document.getElementById("remote-regularization-strength").value = results.config.regularizationStrength ?? 0.10;
   document.getElementById("remote-refresh").checked = Boolean(results.config.refreshCache);
+  document.getElementById("remote-analyst-seed").value = results.config.analystSeedPrompt || "";
+  document.getElementById("remote-auditor-seed").value = results.config.auditorSeedPrompt || "";
   syncConfigurationControls();
   renderPerformance(results.performance);
 }
@@ -706,9 +750,9 @@ document.querySelectorAll("[data-shortcut-view]").forEach((item) => {
   item.addEventListener("click", () => showView(item.dataset.shortcutView));
 });
 
-const functionViews = ["overview", "portfolios", "research", "console", "report", "models"];
+const functionViews = ["overview", "research", "console", "reference"];
 document.addEventListener("keydown", (event) => {
-  const match = /^F([1-6])$/.exec(event.key);
+  const match = /^F([1-4])$/.exec(event.key);
   if (!match) return;
   event.preventDefault();
   showView(functionViews[Number(match[1]) - 1]);
@@ -756,7 +800,7 @@ document.querySelectorAll("[data-go]").forEach((item) => {
 
 document.getElementById("configure-button").addEventListener("click", () => showView("console"));
 document.getElementById("open-report-button").addEventListener("click", () => {
-  showView("report");
+  showView("reference");
   if (runnerConnected) refreshReportArtifacts();
 });
 
@@ -842,7 +886,17 @@ let runProgressState = null;
 const hostedRunnerUrl = location.protocol === "http:" || location.protocol === "https:"
   ? location.origin
   : runnerUrl.value;
-runnerUrl.value = localStorage.getItem("allolabs-runner-url") || hostedRunnerUrl;
+const desktopParameters = new URLSearchParams(location.search);
+const desktopToken = desktopParameters.get("desktopToken");
+const desktopMode = desktopParameters.get("desktop") === "1";
+if (desktopToken) runnerToken.value = desktopToken;
+runnerUrl.value = desktopMode
+  ? hostedRunnerUrl
+  : (localStorage.getItem("allolabs-runner-url") || hostedRunnerUrl);
+if (desktopMode) {
+  document.documentElement.dataset.desktop = "true";
+  history.replaceState({}, document.title, `${location.pathname}${location.hash}`);
+}
 
 function runnerHeaders(includeJson = false) {
   const headers = {};
@@ -1419,7 +1473,10 @@ async function pollRunner() {
       finishRunProgress("failed");
     } else {
       setRunnerState("connected", status.status === "completed" ? "Completed" : status.status === "stopped" ? "Stopped" : "Connected");
-      if (status.status === "completed") finishRunProgress("completed");
+      if (status.status === "completed") {
+        finishRunProgress("completed");
+        triggerLogoAnimation("logo-pulse");
+      }
       if (status.status === "stopped") finishRunProgress("stopped");
       if (status.status === "completed" && status.run_id !== loadedResultRunId) {
         await loadCompletedResults(status);
@@ -1430,6 +1487,7 @@ async function pollRunner() {
     setRunnerState("disconnected", "Disconnected");
     renderProviderKeyStatus();
     appendTerminal(`[relay] ${error.message}`, "error");
+    triggerLogoAnimation("logo-shake");
     clearInterval(runnerPollTimer);
     runnerPollTimer = null;
   }
@@ -1493,7 +1551,9 @@ runnerStart.addEventListener("click", async () => {
     auditViews: remoteAuditToggle.checked,
     auditProvider: remoteAuditProvider.value,
     auditModel: remoteAuditModel.value,
-    refreshCache: document.getElementById("remote-refresh").checked
+    refreshCache: document.getElementById("remote-refresh").checked,
+    analystSeedPrompt: document.getElementById("remote-analyst-seed").value.trim(),
+    auditorSeedPrompt: document.getElementById("remote-auditor-seed").value.trim()
   };
   try {
     if (config.trainingYears < 0.25 || config.trainingYears > 10) throw new Error("Training lookback must be between 0.25 and 10 years.");
@@ -1502,6 +1562,8 @@ runnerStart.addEventListener("click", async () => {
     if (config.maxSectorPercent < 5 || config.maxSectorPercent > 100) throw new Error("Maximum sector weight must be between 5% and 100%.");
     if (config.regularizationStrength < 0 || config.regularizationStrength > 10) throw new Error("Regularization strength must be between 0 and 10.");
     if (config.auditViews && !config.gptViews) throw new Error("Global AI audit requires AI-assisted views.");
+    if (config.analystSeedPrompt.length > 12000) throw new Error("Analyst seed prompt must be 12,000 characters or fewer.");
+    if (config.auditorSeedPrompt.length > 12000) throw new Error("Auditor seed prompt must be 12,000 characters or fewer.");
     const result = await runnerRequest("/api/run", { method: "POST", body: JSON.stringify(config) });
     beginRunProgress(config);
     runProgressState.runId = result.run_id;
@@ -1544,8 +1606,247 @@ document.getElementById("terminal-copy").addEventListener("click", async () => {
   }
 });
 
+/* === Interactive chart tooltip ================================= */
+(function initChartTooltip() {
+  const overlay = document.getElementById("chart-overlay");
+  const tooltip = document.getElementById("chart-tooltip");
+  const crosshair = document.getElementById("chart-crosshair");
+  const dotMax = document.getElementById("chart-dot-max");
+  const dotMin = document.getElementById("chart-dot-min");
+  const dotBench = document.getElementById("chart-dot-bench");
+  if (!overlay) return;
+
+  const LEFT = 48, RIGHT = 730, TOP = 35, BOTTOM = 235;
+
+  function yPos(val, min, max) {
+    const span = max - min || 1;
+    return BOTTOM - ((Number(val) - min) / span) * (BOTTOM - TOP);
+  }
+
+  overlay.addEventListener("mousemove", (event) => {
+    if (!performanceCache?.dates?.length) return;
+    const svg = overlay.closest("svg");
+    const pt = svg.createSVGPoint();
+    pt.x = event.clientX;
+    pt.y = event.clientY;
+    const svgPt = pt.matrixTransform(svg.getScreenCTM().inverse());
+
+    const dataLen = performanceCache.dates.length;
+    const index = Math.round(((svgPt.x - LEFT) / (RIGHT - LEFT)) * (dataLen - 1));
+    const i = Math.max(0, Math.min(dataLen - 1, index));
+
+    const maxSeries = performanceCache.series.Max_Sharpe || [];
+    const minSeries = performanceCache.series.Min_Vol || [];
+    const benchName = Object.keys(performanceCache.series).find((n) => !["Max_Sharpe", "Min_Vol"].includes(n));
+    const benchSeries = benchName ? performanceCache.series[benchName] : [];
+    const allVals = [...maxSeries, ...minSeries, ...benchSeries].map(Number).filter(Number.isFinite);
+    if (!allVals.length) return;
+    const min = Math.min(...allVals);
+    const max = Math.max(...allVals);
+
+    const x = LEFT + (i / Math.max(dataLen - 1, 1)) * (RIGHT - LEFT);
+
+    crosshair.setAttribute("x1", x);
+    crosshair.setAttribute("x2", x);
+    crosshair.setAttribute("visibility", "visible");
+
+    if (maxSeries[i] != null) {
+      dotMax.setAttribute("cx", x);
+      dotMax.setAttribute("cy", yPos(maxSeries[i], min, max));
+      dotMax.setAttribute("visibility", "visible");
+    }
+    if (minSeries[i] != null) {
+      dotMin.setAttribute("cx", x);
+      dotMin.setAttribute("cy", yPos(minSeries[i], min, max));
+      dotMin.setAttribute("visibility", "visible");
+    }
+    if (benchSeries[i] != null) {
+      dotBench.setAttribute("cx", x);
+      dotBench.setAttribute("cy", yPos(benchSeries[i], min, max));
+      dotBench.setAttribute("visibility", "visible");
+    }
+
+    const date = new Date(performanceCache.dates[i]);
+    document.getElementById("chart-tooltip-date").textContent =
+      date.toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" });
+    document.getElementById("chart-tooltip-max").textContent =
+      maxSeries[i] != null ? Number(maxSeries[i]).toFixed(4) : "--";
+    document.getElementById("chart-tooltip-min").textContent =
+      minSeries[i] != null ? Number(minSeries[i]).toFixed(4) : "--";
+    document.getElementById("chart-tooltip-bench").textContent =
+      benchSeries[i] != null ? Number(benchSeries[i]).toFixed(4) : "--";
+
+    const chartWrap = svg.closest(".chart-wrap");
+    const wrapRect = chartWrap.getBoundingClientRect();
+    const svgRect = svg.getBoundingClientRect();
+    const scale = svgRect.width / 760;
+    let tooltipX = (x * scale) + (svgRect.left - wrapRect.left);
+    const tooltipWidth = tooltip.offsetWidth || 180;
+    if (tooltipX + tooltipWidth / 2 > wrapRect.width) tooltipX = wrapRect.width - tooltipWidth / 2 - 4;
+    if (tooltipX - tooltipWidth / 2 < 0) tooltipX = tooltipWidth / 2 + 4;
+    tooltip.style.left = `${tooltipX}px`;
+    tooltip.style.top = "4px";
+    tooltip.style.transform = "translateX(-50%)";
+    tooltip.classList.add("visible");
+  });
+
+  overlay.addEventListener("mouseleave", () => {
+    crosshair.setAttribute("visibility", "hidden");
+    dotMax.setAttribute("visibility", "hidden");
+    dotMin.setAttribute("visibility", "hidden");
+    dotBench.setAttribute("visibility", "hidden");
+    tooltip.classList.remove("visible");
+  });
+})();
+
+/* === Interactive donut tooltip ================================= */
+(function initDonutTooltip() {
+  const donut = document.getElementById("sector-donut");
+  const tooltip = document.getElementById("donut-tooltip");
+  if (!donut || !tooltip) return;
+
+  donut.addEventListener("mousemove", (event) => {
+    const rect = donut.getBoundingClientRect();
+    const cx = rect.left + rect.width / 2;
+    const cy = rect.top + rect.height / 2;
+    const dx = event.clientX - cx;
+    const dy = event.clientY - cy;
+    const distance = Math.sqrt(dx * dx + dy * dy);
+    const outerR = rect.width / 2;
+    const innerR = outerR * 0.65;
+
+    if (distance < innerR || distance > outerR) {
+      tooltip.classList.remove("visible");
+      return;
+    }
+
+    let angle = Math.atan2(dx, -dy) * (180 / Math.PI);
+    if (angle < 0) angle += 360;
+
+    const key = document.querySelector("[data-portfolio].active")?.dataset.portfolio || "max";
+    const sectors = portfolioData[key].sectors;
+    let cumulative = 0;
+    let found = null;
+    for (const [sector, value, color] of sectors) {
+      const sectorAngle = (value / 100) * 360;
+      if (angle >= cumulative && angle < cumulative + sectorAngle) {
+        found = { sector, value, color };
+        break;
+      }
+      cumulative += sectorAngle;
+    }
+
+    if (!found) { tooltip.classList.remove("visible"); return; }
+
+    document.getElementById("donut-tooltip-sector").textContent = found.sector;
+    document.getElementById("donut-tooltip-sector").style.color = found.color;
+    document.getElementById("donut-tooltip-value").textContent = `${found.value.toFixed(1)}%`;
+
+    const layout = donut.closest(".donut-layout");
+    const layoutRect = layout.getBoundingClientRect();
+    tooltip.style.left = `${event.clientX - layoutRect.left + 14}px`;
+    tooltip.style.top = `${event.clientY - layoutRect.top - 10}px`;
+    tooltip.classList.add("visible");
+  });
+
+  donut.addEventListener("mouseleave", () => {
+    tooltip.classList.remove("visible");
+  });
+})();
+
+/* === Splash screen with preloading ============================= */
+(function initSplash() {
+  const splash = document.getElementById("splash");
+  const statusEl = document.getElementById("splash-status");
+  if (!splash) return;
+  if (sessionStorage.getItem("allolabs-splash-seen")) {
+    splash.hidden = true;
+    return;
+  }
+
+  let preloadDone = false;
+  let animationDone = false;
+
+  function updateStatus(text, ready) {
+    if (!statusEl) return;
+    statusEl.textContent = text;
+    if (ready) statusEl.classList.add("ready");
+  }
+
+  function tryDismiss() {
+    if (!preloadDone || !animationDone) return;
+    updateStatus("Ready", true);
+    setTimeout(() => {
+      splash.classList.add("out");
+      setTimeout(() => {
+        splash.hidden = true;
+        sessionStorage.setItem("allolabs-splash-seen", "1");
+      }, 600);
+    }, 400);
+  }
+
+  setTimeout(() => {
+    animationDone = true;
+    tryDismiss();
+  }, 3800);
+
+  (async function preload() {
+    try {
+      updateStatus("Connecting to runner...");
+      const base = (location.protocol === "http:" || location.protocol === "https:")
+        ? location.origin : "http://127.0.0.1:8765";
+      const token = new URLSearchParams(location.search).get("desktopToken") || "";
+      const headers = token ? { Authorization: `Bearer ${token}` } : {};
+      const response = await fetch(`${base}/api/status`, { headers });
+      const status = await response.json();
+
+      if (status.provider_keys) {
+        const providers = Object.values(status.provider_keys);
+        const active = providers.filter((p) => p.active).length;
+        updateStatus(`${active}/${providers.length} API keys detected`);
+      } else {
+        updateStatus("Runner connected");
+      }
+
+      if (status.results_available) {
+        updateStatus("Loading portfolio data...");
+        await fetch(`${base}/api/results`, { headers });
+        updateStatus("Portfolio data loaded");
+      }
+    } catch {
+      updateStatus("Offline mode");
+    }
+    preloadDone = true;
+    tryDismiss();
+  })();
+})();
+
+/* === Living logo =============================================== */
+const brandLogo = document.getElementById("brand-logo");
+
+function triggerLogoAnimation(className) {
+  if (!brandLogo) return;
+  brandLogo.classList.remove("logo-breathe", "logo-bounce", "logo-pulse", "logo-shake");
+  void brandLogo.offsetWidth;
+  brandLogo.classList.add(className);
+  brandLogo.addEventListener("animationend", () => {
+    brandLogo.classList.remove(className);
+  }, { once: true });
+}
+
+document.querySelectorAll(".nav-item").forEach((item) => {
+  item.addEventListener("click", () => triggerLogoAnimation("logo-bounce"));
+});
+document.querySelectorAll("[data-shortcut-view]").forEach((item) => {
+  item.addEventListener("click", () => triggerLogoAnimation("logo-bounce"));
+});
+document.querySelectorAll("[data-portfolio]").forEach((button) => {
+  button.addEventListener("click", () => triggerLogoAnimation("logo-bounce"));
+});
+
 const initialView = location.hash.replace("#", "");
-showView(pageTitles[initialView] ? initialView : "overview");
+const resolvedInitial = viewAliases[initialView] || initialView;
+showView(pageTitles[resolvedInitial] ? resolvedInitial : "overview");
 renderPortfolio("max");
 renderResearch();
 if (location.protocol === "http:" || location.protocol === "https:") connectRunner();

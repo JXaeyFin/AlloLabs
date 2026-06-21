@@ -1,7 +1,7 @@
 {
   "generatedAt": "2026-06-13T01:06:44.077419+00:00",
   "source": "Logo.dev ticker endpoint",
-  "universeFile": "wealthgpt.py",
+  "universeFile": "allolabs.py",
   "tickerCount": 285,
   "counts": {
     "company": 284,

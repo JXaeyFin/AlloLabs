@@ -1,11 +1,21 @@
-# AlloLabs v1.2.0
+# AlloLabs v1.3.1
 
-AlloLabs v1.2.0 completes the platform's rebrand and introduces a
+AlloLabs v1.3.1 extends the v1.3 desktop release with user-supplied AI context,
+larger terminal-readable dashboard text, and a refreshed installer-ready build.
+
+AlloLabs v1.3.0 completed the platform's rebrand, introduced a
 Bloomberg-terminal-inspired web interface for
-configuring, running, and reviewing the portfolio research pipeline.
+configuring, running, and reviewing the portfolio research pipeline, and
+reworks the PDF report as an educational portfolio research monitor. It also
+introduces a native Windows application shell and reproducible installer build.
 
 ## Highlights
 
+- New analyst and auditor seed prompts let users inject their own thesis,
+  hypotheses, risk preferences, and scenario assumptions into the AI research
+  and audit stages while preserving evidence and calibration guardrails.
+- Dashboard typography and control sizing were enlarged and balanced for a more
+  readable terminal-style desktop experience.
 - Complete product, module, launcher, environment-variable, report, and
   artifact rebrand to AlloLabs while retaining the established logo artwork.
 - Unified Run Console with dynamic optimizer, training, out-of-sample, AI
@@ -27,6 +37,19 @@ configuring, running, and reviewing the portfolio research pipeline.
   down to 0.005% absolute portfolio weight.
 - Refined holding-rationale pages with locally bundled rounded-square company
   marks and graceful fallback when a logo is unavailable.
+- Native desktop window backed by the existing dashboard and local relay.
+- Self-contained hidden analysis workers, random localhost ports, per-launch
+  authentication, single-instance protection, and graceful shutdown.
+- Writable reports, results, and caches under `%LOCALAPPDATA%\AlloLabs` in
+  installed builds, keeping application assets read-only.
+- PyInstaller one-directory packaging and an Inno Setup installer definition.
+- Native macOS and Linux portable build pipelines with platform-specific
+  webview dependencies, data directories, self-tests, and release archives.
+- Rebuilt the PDF as a Bloomberg-terminal-style research monitor that leads
+  with risk and construction, separates historical returns from equilibrium
+  priors, AI views, and Black-Litterman inputs, flags unstable estimates, and
+  explains model and implementation limitations without presenting optimized
+  returns as promised outcomes.
 
 ## Distribution Notes
 

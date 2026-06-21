@@ -1,0 +1,70 @@
+# Credentials and local configuration
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+*.pfx
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyd
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.venv/
+venv/
+.desktop-build/
+build/
+dist/
+release/
+webview-profile/
+installer-builder/build/
+installer-builder/*.spec
+
+# Editor and operating-system files
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Raw or licensed datasets
+*.csv
+!example_*.csv
+
+# Generated model research and allocations
+black_litterman_stock_analysis.json
+gpt_audited_views.json
+gpt_views.csv
+latest_run.json
+listing_metadata_cache.json
+portfolio_allocations.csv
+sector_cache.json
+
+# Generated reports and charts
+*.pdf
+!examples/*.pdf
+allolabs_portfolio_report.pdf
+portfolio_vs_markets_oos.png
+portfolio_*.png
+allolabs_*.png
+!resources/allolabs-logo.png
+efficient_frontier_monte_carlo.png
+
+# Logs and temporary files
+*.log
+*.tmp
+~$*
+
+# Local development artifacts and archived workspace files
+_local_archive/
+outputs/
+work/
+
+# Claude Code local state
+.claude/
+
+# Installer payload binaries
+installer-payload/*.zip

@@ -15,16 +15,20 @@ from matplotlib.backends.backend_pdf import PdfPages
 from matplotlib.patches import FancyBboxPatch, Rectangle
 
 
-NAVY = "#102A43"
-BLUE = "#2F6B9A"
-TEAL = "#1A9A8A"
-GOLD = "#D4A72C"
-RED = "#C85C5C"
-INK = "#243B53"
-MUTED = "#627D98"
-PALE = "#F3F7FA"
-GRID = "#D9E2EC"
-WHITE = "#FFFFFF"
+NAVY = "#05070A"
+BLUE = "#4DA3FF"
+TEAL = "#20C77A"
+GOLD = "#F0A202"
+RED = "#FF5A5F"
+INK = "#F4F7FA"
+MUTED = "#9AA4B2"
+PALE = "#070A0E"
+GRID = "#2B333D"
+WHITE = "#11161C"
+PANEL_ALT = "#161C23"
+LOGO_BG = "#FFFFFF"
+POSITIVE = "#42D392"
+TERMINAL_ORANGE = "#FFB000"
 ALLOCATION_APPENDIX_MIN_WEIGHT = 0.00005
 ALLOCATION_APPENDIX_ROWS_PER_PAGE = 28
 COMPANY_LOGO_DIR = Path(__file__).resolve().parent / "resources" / "company-logos"
@@ -282,7 +286,7 @@ def _draw_company_logo(fig, ticker, x, y, size):
         boxstyle="round,pad=0,rounding_size=0.18",
         transform=ax.transAxes,
         linewidth=0,
-        facecolor=WHITE,
+        facecolor=LOGO_BG,
         zorder=0,
     )
     ax.add_patch(clip)
@@ -310,7 +314,7 @@ def _page_header(fig, title, subtitle, page_number):
         Rectangle((0, 0.91), 1, 0.09, transform=fig.transFigure, color=NAVY, zorder=0)
     )
     fig.text(0.055, 0.958, title, color=WHITE, fontsize=20, weight="bold", va="center")
-    fig.text(0.055, 0.925, subtitle, color="#D9EAF3", fontsize=9.5, va="center")
+    fig.text(0.055, 0.925, subtitle, color=MUTED, fontsize=9.3, va="center")
     fig.text(
         0.945,
         0.035,
@@ -322,7 +326,7 @@ def _page_header(fig, title, subtitle, page_number):
     fig.text(
         0.055,
         0.035,
-        "Research model output. Not investment advice.",
+        "RESEARCH SYSTEM OUTPUT // EDUCATIONAL USE // NOT INVESTMENT ADVICE",
         color=MUTED,
         fontsize=7.5,
     )
@@ -336,6 +340,73 @@ def _metric_card(fig, x, y, width, height, label, value, detail, accent):
     fig.text(x + 0.025, y + height - 0.024, label.upper(), color=MUTED, fontsize=7.4, weight="bold")
     fig.text(x + 0.025, y + 0.035, value, color=INK, fontsize=17, weight="bold")
     fig.text(x + 0.025, y + 0.014, detail, color=MUTED, fontsize=7.5)
+
+
+def _safe_float(value):
+    try:
+        numeric = float(value)
+    except (TypeError, ValueError):
+        return None
+    return numeric if np.isfinite(numeric) else None
+
+
+def _weighted_input(frame, column):
+    if column not in frame:
+        return None
+    values = pd.to_numeric(frame[column], errors="coerce")
+    mask = values.notna()
+    if not mask.any():
+        return None
+    weights = frame.loc[mask, "weight"].astype(float)
+    return float(np.dot(weights, values[mask]))
+
+
+def _return_diagnostics(frame, metrics):
+    model_return = _safe_float(metrics.get("return"))
+    volatility = _safe_float(metrics.get("volatility"))
+    historical = _weighted_input(frame, "historical_return")
+    equilibrium = _weighted_input(frame, "prior_return")
+    ai_view = _weighted_input(frame, "expected_return")
+    posterior = _weighted_input(frame, "posterior_return")
+    uses_black_litterman = posterior is not None or equilibrium is not None or ai_view is not None
+    if historical is None and not uses_black_litterman:
+        historical = model_return
+    confidence = pd.to_numeric(frame["confidence"], errors="coerce")
+    covered = confidence.notna()
+    gross = float(frame["weight"].abs().sum())
+    covered_gross = float(frame.loc[covered, "weight"].abs().sum()) if covered.any() else 0.0
+    avg_confidence = (
+        float(np.average(confidence[covered], weights=frame.loc[covered, "weight"].abs()))
+        if covered.any() and covered_gross > 0
+        else None
+    )
+    extreme = bool(
+        model_return is not None
+        and (
+            abs(model_return) >= 0.25
+            or (volatility is not None and volatility > 0 and abs(model_return) >= 2.0 * volatility)
+        )
+    )
+    return {
+        "historical": historical,
+        "equilibrium": equilibrium,
+        "ai_view": ai_view,
+        "posterior": posterior,
+        "optimizer_input": model_return,
+        "mode": "black_litterman" if uses_black_litterman else "historical",
+        "volatility": volatility,
+        "coverage": covered_gross / gross if gross > 0 else 0.0,
+        "confidence": avg_confidence,
+        "extreme": extreme,
+    }
+
+
+def _diagnostic_label(diagnostics):
+    if diagnostics["extreme"]:
+        return "HIGH / UNSTABLE INPUT"
+    if diagnostics["coverage"] < 0.75:
+        return "PARTIAL VIEW COVERAGE"
+    return "MODEL INPUT - NOT FORECAST"
 
 
 def _format_optional_percent(value, decimals=1):
@@ -359,7 +430,10 @@ def _portfolio_frame(tickers, weights, analysis):
                 "weight": float(weight),
                 "sector": SECTOR_MAP.get(ticker, "Unclassified"),
                 "industry": item.get("industry") or "Not classified",
+                "historical_return": item.get("historical_return"),
+                "prior_return": item.get("prior_return"),
                 "posterior_return": item.get("posterior_return"),
+                "delta_return": item.get("delta_return"),
                 "expected_return": item.get("expected_return"),
                 "confidence": item.get("confidence"),
                 "view": item.get("view") or "No research rationale is available.",
@@ -401,8 +475,9 @@ def _dominant_sector(sectors):
 def _draw_weight_chart(ax, frame, color, count=10):
     data = frame.head(count).sort_values("weight")
     bar_colors = [RED if value < 0 else color for value in data["weight"]]
+    ax.set_facecolor(WHITE)
     ax.barh(data["ticker"], data["weight"] * 100, color=bar_colors, alpha=0.92)
-    ax.axvline(0, color=INK, linewidth=0.7)
+    ax.axvline(0, color=MUTED, linewidth=0.7)
     ax.set_title(f"Top {min(count, len(data))} absolute positions", loc="left", fontsize=11, weight="bold", color=INK)
     ax.set_xlabel("Portfolio weight (%)", fontsize=8, color=MUTED)
     ax.tick_params(axis="both", labelsize=8, colors=INK)
@@ -420,7 +495,7 @@ def _draw_weight_chart(ax, frame, color, count=10):
                 va="center",
                 ha="right" if value >= 0 else "left",
                 fontsize=7.5,
-                color=WHITE,
+                color=NAVY,
                 weight="bold",
             )
         else:
@@ -437,6 +512,7 @@ def _draw_weight_chart(ax, frame, color, count=10):
 
 
 def _draw_sector_comparison(ax, max_sector, min_sector):
+    ax.set_facecolor(WHITE)
     sector_order = list(
         dict.fromkeys(max_sector["sector"].tolist() + min_sector["sector"].tolist())
     )
@@ -460,7 +536,114 @@ def _draw_sector_comparison(ax, max_sector, min_sector):
     ax.set_axisbelow(True)
     ax.spines[["top", "right", "left"]].set_visible(False)
     ax.spines["bottom"].set_color(GRID)
-    ax.legend(frameon=False, fontsize=8, loc="lower right")
+    legend = ax.legend(frameon=False, fontsize=8, loc="lower right")
+    for label in legend.get_texts():
+        label.set_color(INK)
+
+
+def _return_bridge_page(pdf, max_frame, min_frame, max_metrics, min_metrics, page_number):
+    fig = plt.figure(figsize=(8.5, 11))
+    _page_header(
+        fig,
+        "Return Input Bridge",
+        "Separating observed history, equilibrium assumptions, AI views, and optimizer inputs",
+        page_number,
+    )
+    diagnostics = (
+        ("MAXIMUM SHARPE", _return_diagnostics(max_frame, max_metrics), BLUE),
+        ("MINIMUM VOLATILITY", _return_diagnostics(min_frame, min_metrics), TEAL),
+    )
+    labels = [
+        ("Historical sample", "Annualized arithmetic return observed in the training window."),
+        ("Equilibrium prior", "Risk-and-covariance-implied return before security views."),
+        ("AI view", "Weighted 12-month security views where research is available."),
+        ("Optimizer input", "Black-Litterman posterior when enabled; otherwise the historical input."),
+    ]
+    for left, (name, values, color) in zip((0.055, 0.52), diagnostics):
+        _rounded_box(fig, left, 0.45, 0.425, 0.42, facecolor=WHITE)
+        fig.text(left + 0.02, 0.835, name, color=color, fontsize=10.5, weight="bold")
+        fig.text(
+            left + 0.37,
+            0.835,
+            _diagnostic_label(values),
+            color=RED if values["extreme"] else MUTED,
+            fontsize=6.8,
+            ha="right",
+            weight="bold",
+        )
+        series = (
+            values["historical"],
+            values["equilibrium"],
+            values["ai_view"],
+            values["optimizer_input"],
+        )
+        y = 0.782
+        for (label, explanation), value in zip(labels, series):
+            fig.text(left + 0.02, y, label.upper(), color=MUTED, fontsize=7.2, weight="bold")
+            fig.text(
+                left + 0.37,
+                y,
+                _format_optional_percent(value, 1),
+                color=color if label == "Optimizer input" else INK,
+                fontsize=12 if label == "Optimizer input" else 10,
+                ha="right",
+                weight="bold" if label == "Optimizer input" else "normal",
+            )
+            fig.text(
+                left + 0.02,
+                y - 0.025,
+                "\n".join(textwrap.wrap(explanation, 51)),
+                color=MUTED,
+                fontsize=7.1,
+                linespacing=1.2,
+            )
+            y -= 0.083
+        fig.text(
+            left + 0.02,
+            0.493,
+            f"MODE  {values['mode'].replace('_', ' ').upper()}",
+            color=GOLD,
+            fontsize=7.4,
+            weight="bold",
+        )
+        fig.text(
+            left + 0.02,
+            0.473,
+            (
+                f"Research coverage {values['coverage']:.0%}"
+                + (
+                    f"  |  mean confidence {values['confidence']:.0%}"
+                    if values["confidence"] is not None
+                    else "  |  confidence unavailable"
+                )
+            ),
+            color=MUTED,
+            fontsize=7.1,
+        )
+
+    _rounded_box(fig, 0.055, 0.105, 0.89, 0.285, facecolor=PANEL_ALT)
+    fig.text(0.08, 0.35, "HOW TO READ THESE NUMBERS", color=TERMINAL_ORANGE, fontsize=10, weight="bold")
+    guidance = [
+        (
+            "Historical is descriptive, not predictive.",
+            "A strong training period can annualize to an implausibly high figure. It records what occurred in that sample; it is not a promise that the same return will repeat.",
+        ),
+        (
+            "The posterior is an optimization input.",
+            "Black-Litterman regularizes the prior with security views, but the result remains model-sensitive. It should be used to compare allocations, not quoted as a precise realized-return forecast.",
+        ),
+        (
+            "Risk estimates are also conditional.",
+            "Annualized volatility and Sharpe are based on the same covariance window. Regime changes, correlation spikes, transaction costs, taxes, and liquidity can materially alter realized outcomes.",
+        ),
+    ]
+    y = 0.31
+    for heading, body in guidance:
+        fig.text(0.08, y, heading, color=INK, fontsize=8.4, weight="bold")
+        fig.text(0.08, y - 0.024, "\n".join(textwrap.wrap(body, 126)), color=MUTED, fontsize=7.6)
+        y -= 0.077
+    pdf.savefig(fig, facecolor=fig.get_facecolor())
+    plt.close(fig)
 
 
 def _overview_page(
@@ -475,26 +658,28 @@ def _overview_page(
     fig = plt.figure(figsize=(8.5, 11))
     _page_header(
         fig,
-        "Portfolio Summary",
-        f"Global allocation model  |  Training: {training_start} to {training_end}",
+        "Allocation Monitor",
+        f"MODEL RUN // TRAINING WINDOW {training_start} TO {training_end} // VALUES ARE CONDITIONAL ESTIMATES",
         1,
     )
+    max_diag = _return_diagnostics(max_frame, max_metrics)
+    min_diag = _return_diagnostics(min_frame, min_metrics)
 
     _metric_card(
-        fig, 0.055, 0.79, 0.205, 0.085, "Max Sharpe return",
-        f"{max_metrics['return']:.1%}", f"Sharpe {max_metrics['sharpe']:.2f}", BLUE,
+        fig, 0.055, 0.79, 0.205, 0.085, "Max Sharpe risk",
+        f"{max_metrics['volatility']:.1%}", "Annualized covariance estimate", BLUE,
     )
     _metric_card(
-        fig, 0.275, 0.79, 0.205, 0.085, "Max Sharpe risk",
-        f"{max_metrics['volatility']:.1%}", f"Top 5 gross share: {max_frame.head(5)['weight'].abs().sum() / max_frame['weight'].abs().sum():.1%}", BLUE,
+        fig, 0.275, 0.79, 0.205, 0.085, "Max model return",
+        f"{max_metrics['return']:.1%}", _diagnostic_label(max_diag), GOLD,
     )
     _metric_card(
-        fig, 0.52, 0.79, 0.205, 0.085, "Min Vol return",
-        f"{min_metrics['return']:.1%}", f"Sharpe {min_metrics['sharpe']:.2f}", TEAL,
+        fig, 0.52, 0.79, 0.205, 0.085, "Min Volatility risk",
+        f"{min_metrics['volatility']:.1%}", "Annualized covariance estimate", TEAL,
     )
     _metric_card(
-        fig, 0.74, 0.79, 0.205, 0.085, "Min Vol risk",
-        f"{min_metrics['volatility']:.1%}", f"Top 5 gross share: {min_frame.head(5)['weight'].abs().sum() / min_frame['weight'].abs().sum():.1%}", TEAL,
+        fig, 0.74, 0.79, 0.205, 0.085, "Min Vol model return",
+        f"{min_metrics['return']:.1%}", _diagnostic_label(min_diag), GOLD,
     )
 
     ax_left = fig.add_axes([0.075, 0.49, 0.39, 0.245], facecolor=WHITE)
@@ -526,8 +711,9 @@ def _overview_page(
         y -= 0.058
 
     overview_note = (
-        "Expected returns are Black-Litterman posterior estimates. Volatility and Sharpe metrics are "
-        "annualized in-sample estimates. Portfolio weights sum to 100% net; negative weights indicate short positions."
+        "MODEL DISCIPLINE: displayed returns are Black-Litterman optimizer inputs, not realized-return forecasts. "
+        "They combine sample-dependent estimates, an equilibrium prior, and optional AI views. Use the portfolios "
+        "to study relative allocation and risk trade-offs. Portfolio weights sum to 100% net; negative weights are shorts."
     )
     fig.text(0.055, 0.09, "\n".join(textwrap.wrap(overview_note, 125)), color=MUTED, fontsize=7.7)
     pdf.savefig(fig, facecolor=fig.get_facecolor())
@@ -539,12 +725,13 @@ def _portfolio_breakdown_page(pdf, frame, metrics, name, color, page_number):
     _page_header(
         fig,
         f"{name} Portfolio",
-        "Allocation breakdown, concentration, and sector structure",
+        "Construction, concentration, sector structure, and conditional model diagnostics",
         page_number,
     )
-    _metric_card(fig, 0.055, 0.79, 0.205, 0.085, "Expected return", f"{metrics['return']:.1%}", "Annualized", color)
-    _metric_card(fig, 0.275, 0.79, 0.205, 0.085, "Volatility", f"{metrics['volatility']:.1%}", "Annualized", color)
-    _metric_card(fig, 0.495, 0.79, 0.205, 0.085, "Sharpe ratio", f"{metrics['sharpe']:.2f}", "Risk-free adjusted", color)
+    diagnostics = _return_diagnostics(frame, metrics)
+    _metric_card(fig, 0.055, 0.79, 0.205, 0.085, "Model return input", f"{metrics['return']:.1%}", _diagnostic_label(diagnostics), GOLD)
+    _metric_card(fig, 0.275, 0.79, 0.205, 0.085, "Model volatility", f"{metrics['volatility']:.1%}", "Sample covariance estimate", color)
+    _metric_card(fig, 0.495, 0.79, 0.205, 0.085, "Optimizer score", f"{metrics['sharpe']:.2f}", "In-sample Sharpe objective", color)
     active = frame[frame["weight"].abs() > 0.0001]
     _metric_card(fig, 0.715, 0.79, 0.23, 0.085, "Active positions", f"{len(active)}", f"Effective: {_effective_holdings(frame['weight']):.1f}", color)
 
@@ -575,7 +762,7 @@ def _portfolio_breakdown_page(pdf, frame, metrics, name, color, page_number):
     fig.text(0.075, 0.328, "TOP EIGHT HOLDINGS", color=INK, fontsize=10, weight="bold")
     top = frame.head(8)
     columns = [0.075, 0.19, 0.31, 0.55, 0.72, 0.84]
-    headers = ["Ticker", "Weight", "Sector", "Posterior", "Confidence", "Rank"]
+    headers = ["Ticker", "Weight", "Sector", "BL input", "Confidence", "Rank"]
     for x, header in zip(columns, headers):
         fig.text(x, 0.296, header, color=MUTED, fontsize=7.8, weight="bold")
     y = 0.268
@@ -601,7 +788,7 @@ def _rationale_pages(pdf, frame, name, color, starting_page):
         _page_header(
             fig,
             f"{name}: Holding Rationale",
-            f"Research views for top holdings {start + 1}-{start + 4}; weights also reflect covariance and portfolio constraints",
+            f"SECURITY NOTES {start + 1}-{start + 4} // THESIS, MODEL INPUTS, AND PRINCIPAL RISK",
             starting_page + page_offset,
         )
         y_positions = [0.73, 0.53, 0.33, 0.13]
@@ -626,7 +813,7 @@ def _rationale_pages(pdf, frame, name, color, starting_page):
                 position + 0.113,
                 (
                     f"{row['weight']:.2%} weight  |  {row['sector']}  |  "
-                    f"Posterior {_format_optional_percent(row['posterior_return'], 1)}"
+                    f"BL input {_format_optional_percent(row['posterior_return'], 1)}"
                 ),
                 color=MUTED,
                 fontsize=8.2,
@@ -634,6 +821,12 @@ def _rationale_pages(pdf, frame, name, color, starting_page):
             rationale = " ".join(str(row["view"]).split())
             wrapped = "\n".join(textwrap.wrap(rationale, width=112))
             fig.text(0.082, position + 0.078, wrapped, color=INK, fontsize=8.1, va="top", linespacing=1.3)
+            bridge = (
+                f"Prior {_format_optional_percent(row['prior_return'], 1)}  |  "
+                f"AI view {_format_optional_percent(row['expected_return'], 1)}  |  "
+                f"Confidence {_format_optional_percent(row['confidence'], 0)}"
+            )
+            fig.text(0.69, position + 0.018, bridge, color=GOLD, fontsize=6.7, ha="right")
         fig.text(
             0.945,
             0.052,
@@ -645,6 +838,76 @@ def _rationale_pages(pdf, frame, name, color, starting_page):
         )
         pdf.savefig(fig, facecolor=fig.get_facecolor())
         plt.close(fig)
+
+
+def _methodology_page(pdf, max_frame, min_frame, max_metrics, min_metrics, page_number):
+    fig = plt.figure(figsize=(8.5, 11))
+    _page_header(
+        fig,
+        "Model Notes & Risk Controls",
+        "What the system estimates, what it does not know, and how to use the output responsibly",
+        page_number,
+    )
+    sections = [
+        (
+            "01  RETURN ESTIMATION",
+            "When AI-assisted Black-Litterman is enabled, an equilibrium prior is blended with security views. When it "
+            "is disabled, the optimizer may use annualized historical returns directly. In either mode, the displayed "
+            "return is an uncertain optimization input, not a promised 12-month outcome.",
+        ),
+        (
+            "02  WHY LARGE NUMBERS APPEAR",
+            "Short or unusually strong training windows can produce extreme annualized observations. Concentrated "
+            "portfolios can also magnify a few high posterior inputs. Figures above roughly 25% should be treated as "
+            "instability warnings that warrant sensitivity testing, not as base-case forecasts.",
+        ),
+        (
+            "03  RISK MODEL",
+            "Volatility and correlations are estimated from the selected training sample. They can understate risk "
+            "during regime changes, liquidity shocks, crowded unwinds, or structural breaks. Correlations often rise "
+            "when diversification is needed most.",
+        ),
+        (
+            "04  AI RESEARCH LAYER",
+            "AI views summarize supplied fundamentals and headlines into probability-weighted return inputs. Confidence "
+            "measures evidence quality, not the probability of a positive return. Generated analysis may be incomplete, "
+            "stale, biased, or wrong and should be independently verified.",
+        ),
+        (
+            "05  IMPLEMENTATION GAP",
+            "The model excludes taxes, bid-ask spreads, market impact, borrow availability, financing costs, and most "
+            "turnover effects unless approximated through regularization. Real portfolios should include these costs, "
+            "position liquidity, mandate limits, and rebalancing governance.",
+        ),
+    ]
+    y = 0.835
+    for heading, body in sections:
+        _rounded_box(fig, 0.055, y - 0.122, 0.89, 0.135, facecolor=WHITE)
+        fig.text(0.078, y - 0.018, heading, color=TERMINAL_ORANGE, fontsize=9, weight="bold")
+        fig.text(
+            0.078,
+            y - 0.052,
+            "\n".join(textwrap.wrap(body, 124)),
+            color=INK,
+            fontsize=7.7,
+            va="top",
+            linespacing=1.3,
+        )
+        y -= 0.146
+
+    max_diag = _return_diagnostics(max_frame, max_metrics)
+    min_diag = _return_diagnostics(min_frame, min_metrics)
+    _rounded_box(fig, 0.055, 0.075, 0.89, 0.105, facecolor=PANEL_ALT)
+    fig.text(0.078, 0.15, "RUN-SPECIFIC FLAGS", color=TERMINAL_ORANGE, fontsize=8.5, weight="bold")
+    flags = []
+    for label, diag in (("Max Sharpe", max_diag), ("Min Volatility", min_diag)):
+        flags.append(
+            f"{label}: {_diagnostic_label(diag).lower()}, research coverage {diag['coverage']:.0%}, "
+            f"effective model volatility {_format_optional_percent(diag['volatility'], 1)}."
+        )
+    fig.text(0.078, 0.118, "\n".join(flags), color=INK, fontsize=7.5, linespacing=1.4)
+    pdf.savefig(fig, facecolor=fig.get_facecolor())
+    plt.close(fig)
 
 
 def _allocation_appendix(pdf, max_frame, min_frame, page_number):
@@ -730,7 +993,7 @@ def create_portfolio_pdf(
     training_start,
     training_end,
 ):
-    """Create a polished multi-page PDF portfolio summary."""
+    """Create an educational terminal-style portfolio research report."""
     output_path = Path(output_path)
     analysis_path = Path(analysis_path)
     try:
@@ -760,10 +1023,10 @@ def create_portfolio_pdf(
     allocation_export.to_csv(output_path.with_name("portfolio_allocations.csv"), index=False)
 
     metadata = {
-        "Title": "AlloLabs Portfolio Summary",
+        "Title": "AlloLabs Portfolio Research Monitor",
         "Author": "Jeffrey Xia",
-        "Subject": "Global portfolio allocation model summary",
-        "Keywords": "portfolio optimization, Black-Litterman, MPT, global equities",
+        "Subject": "Educational global portfolio construction and model-risk report",
+        "Keywords": "portfolio optimization, Black-Litterman, model risk, MPT, global equities",
     }
     with PdfPages(output_path, metadata=metadata) as pdf:
         _overview_page(
@@ -775,10 +1038,12 @@ def create_portfolio_pdf(
             training_start,
             training_end,
         )
-        _portfolio_breakdown_page(pdf, max_frame, max_metrics, "Maximum Sharpe", BLUE, 2)
-        _rationale_pages(pdf, max_frame, "Maximum Sharpe", BLUE, 3)
-        _portfolio_breakdown_page(pdf, min_frame, min_metrics, "Minimum Volatility", TEAL, 5)
-        _rationale_pages(pdf, min_frame, "Minimum Volatility", TEAL, 6)
-        _allocation_appendix(pdf, max_frame, min_frame, 8)
+        _return_bridge_page(pdf, max_frame, min_frame, max_metrics, min_metrics, 2)
+        _portfolio_breakdown_page(pdf, max_frame, max_metrics, "Maximum Sharpe", BLUE, 3)
+        _rationale_pages(pdf, max_frame, "Maximum Sharpe", BLUE, 4)
+        _portfolio_breakdown_page(pdf, min_frame, min_metrics, "Minimum Volatility", TEAL, 6)
+        _rationale_pages(pdf, min_frame, "Minimum Volatility", TEAL, 7)
+        _methodology_page(pdf, max_frame, min_frame, max_metrics, min_metrics, 9)
+        _allocation_appendix(pdf, max_frame, min_frame, 10)
 
     return output_path

@@ -1,0 +1,45 @@
+name: Windows Desktop Build
+
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - "v*"
+
+jobs:
+  build-windows:
+    runs-on: windows-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+      - name: Install desktop build requirements
+        run: python -m pip install -r requirements-desktop.txt
+      - name: Build portable desktop application
+        run: python -m PyInstaller --noconfirm --clean packaging/allolabs.spec
+      - name: Verify portable desktop application
+        shell: powershell
+        run: ./scripts/verify-portable.ps1 -PortablePath ./dist/AlloLabs
+      - name: Apply portable naming convention
+        shell: powershell
+        run: Move-Item -LiteralPath dist/AlloLabs -Destination dist/AlloLabs-Windows-x64
+      - name: Create portable archive
+        shell: powershell
+        run: Compress-Archive -Path dist/AlloLabs-Windows-x64/* -DestinationPath dist/AlloLabs-v1.3.1-Windows-x64.zip
+      - name: Install Inno Setup
+        run: choco install innosetup --no-progress -y
+      - name: Build Windows installer
+        shell: powershell
+        run: '& "${env:ProgramFiles(x86)}\Inno Setup 6\ISCC.exe" packaging/allolabs.iss'
+      - uses: actions/upload-artifact@v4
+        with:
+          name: AlloLabs-v1.3.1-Windows
+          if-no-files-found: error
+          path: |
+            dist/AlloLabs-Windows-x64
+            dist/AlloLabs-v1.3.1-Windows-x64.zip
+            release/AlloLabs-Setup-1.3.1.exe

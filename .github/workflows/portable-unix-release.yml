@@ -1,0 +1,51 @@
+name: macOS and Linux Portable Builds
+
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - "v*"
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: macos-14
+            label: macOS
+          - os: ubuntu-24.04
+            label: Linux
+    runs-on: ${{ matrix.os }}
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+      - name: Install Linux desktop runtime libraries
+        if: matrix.label == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libegl1 libgl1 libxkbcommon-x11-0 libxcb-cursor0
+      - name: Build and verify native portable release
+        run: |
+          chmod +x scripts/build-portable.sh
+          scripts/build-portable.sh
+      - name: Detect architecture
+        id: platform
+        shell: bash
+        run: |
+          case "$(uname -m)" in
+            arm64|aarch64) echo "arch=arm64" >> "$GITHUB_OUTPUT" ;;
+            *) echo "arch=x64" >> "$GITHUB_OUTPUT" ;;
+          esac
+      - uses: actions/upload-artifact@v4
+        with:
+          name: AlloLabs-v1.3.1-${{ matrix.label }}-${{ steps.platform.outputs.arch }}
+          if-no-files-found: error
+          path: |
+            dist/AlloLabs-${{ matrix.label }}-${{ steps.platform.outputs.arch }}
+            dist/AlloLabs-v1.3.1-${{ matrix.label }}-${{ steps.platform.outputs.arch }}.*
