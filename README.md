@@ -281,3 +281,7 @@ GitHub Actions runs the same checks on pushes and pull requests.
 ## Author
 
 Jeffrey Xia
+
+Leveraging support from:
+OpenAI Codex
+Anthropic Claude Code
