@@ -837,6 +837,7 @@ function applyLiveResults(results) {
   document.getElementById("remote-analyst-seed").value = results.config.analystSeedPrompt || "";
   document.getElementById("remote-auditor-seed").value = results.config.auditorSeedPrompt || "";
   document.getElementById("remote-max-news").value = results.config.maxNewsArticles ?? 5;
+  document.getElementById("remote-batch-size").value = results.config.researchBatchSize ?? 12;
   syncConfigurationControls();
   renderPerformance(results.performance);
 }
@@ -2024,6 +2025,7 @@ runnerStart.addEventListener("click", async () => {
     auditModel: remoteAuditModel.value,
     refreshCache: document.getElementById("remote-refresh").checked,
     maxNewsArticles: Math.max(1, Math.min(20, parseInt(document.getElementById("remote-max-news").value) || 5)),
+    researchBatchSize: Math.max(1, Math.min(30, parseInt(document.getElementById("remote-batch-size").value) || 12)),
     analystSeedPrompt: document.getElementById("remote-analyst-seed").value.trim(),
     auditorSeedPrompt: document.getElementById("remote-auditor-seed").value.trim()
   };

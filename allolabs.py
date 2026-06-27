@@ -477,7 +477,7 @@ research_model = (
     or DEFAULT_RESEARCH_MODELS[research_provider]
 ).strip()
 research_api_key = os.getenv(AI_API_KEY_ENV[research_provider])
-gpt_batch_size = 12
+gpt_batch_size = env_int("ALLOLABS_RESEARCH_BATCH_SIZE", 12, minimum=1, maximum=30)
 gpt_max_output_tokens = 7000
 gpt_request_attempts = 3
 gpt_refresh_cache = env_bool("ALLOLABS_REFRESH_CACHE", False)

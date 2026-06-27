@@ -323,6 +323,7 @@ def validate_config(payload: dict) -> dict:
         analyst_seed_prompt = str(payload.get("analystSeedPrompt", "")).strip()
         auditor_seed_prompt = str(payload.get("auditorSeedPrompt", "")).strip()
         raw_max_news = payload.get("maxNewsArticles", 5)
+        raw_batch_size = payload.get("researchBatchSize", 12)
     except (KeyError, TypeError, ValueError) as exc:
         raise ValueError("Run configuration is incomplete or invalid.") from exc
 
@@ -427,6 +428,12 @@ def validate_config(payload: dict) -> dict:
         raise ValueError("News articles per ticker must be a number.") from exc
     if not 1 <= max_news_articles <= 20:
         raise ValueError("News articles per ticker must be between 1 and 20.")
+    try:
+        research_batch_size = int(float(raw_batch_size))
+    except (TypeError, ValueError) as exc:
+        raise ValueError("Research batch size must be a number.") from exc
+    if not 1 <= research_batch_size <= 30:
+        raise ValueError("Research batch size must be between 1 and 30.")
 
     return {
         "trainingYears": training_years,
@@ -450,6 +457,7 @@ def validate_config(payload: dict) -> dict:
         "analystSeedPrompt": analyst_seed_prompt,
         "auditorSeedPrompt": auditor_seed_prompt,
         "maxNewsArticles": max_news_articles,
+        "researchBatchSize": research_batch_size,
     }
 
 

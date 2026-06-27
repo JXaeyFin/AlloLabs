@@ -187,6 +187,7 @@ def configuration_environment(config: dict) -> dict[str, str]:
         "ALLOLABS_ANALYST_SEED_PROMPT": str(config.get("analystSeedPrompt", "")),
         "ALLOLABS_AUDITOR_SEED_PROMPT": str(config.get("auditorSeedPrompt", "")),
         "ALLOLABS_MAX_NEWS_ARTICLES": str(int(config.get("maxNewsArticles", 5))),
+        "ALLOLABS_RESEARCH_BATCH_SIZE": str(int(config.get("researchBatchSize", 12))),
     }
 
 
