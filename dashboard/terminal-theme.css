@@ -807,6 +807,47 @@ button, input, select, textarea {
   font-weight: 500;
 }
 
+
+/* === MARKET & CURRENCY EXPOSURE ================================ */
+.exposure-section-title {
+  margin: 0 0 10px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.exposure-row {
+  padding: 4px 0;
+  font-size: 12px;
+}
+
+.exposure-label {
+  color: var(--text-secondary);
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.exposure-track {
+  height: 6px;
+  background: rgba(255,255,255,0.04);
+}
+
+.exposure-fill {
+  box-shadow: 0 0 8px rgba(79,143,247,0.12);
+  animation: bar-grow 0.7s var(--ease-out) both;
+}
+
+.exposure-value {
+  color: var(--text-muted);
+  font-variant-numeric: tabular-nums;
+  font-size: 11px;
+  text-align: right;
+}
+
 .holding-ticker {
   justify-self: start;
   padding: 0;
@@ -1943,6 +1984,7 @@ body.modal-open { overflow: hidden; }
   .console-layout { grid-template-columns: 1fr; }
   .terminal-card { position: static; }
   .metric-grid { grid-template-columns: repeat(2, 1fr); }
+  .exposure-grid { grid-template-columns: 1fr; }
   .remote-fields, .seed-prompt-grid { grid-template-columns: 1fr; }
   .model-row { grid-template-columns: 1fr; gap: 8px; }
   .model-row.model-header { display: none; }

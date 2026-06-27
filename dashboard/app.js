@@ -3,7 +3,9 @@ const emptyPortfolio = {
   metricValues: { return: NaN, risk: NaN, sharpe: NaN, concentration: NaN },
   note: "Run an analysis to populate the portfolio allocation and sector breakdown.",
   holdings: [],
-  sectors: []
+  sectors: [],
+  markets: [],
+  currencies: []
 };
 
 let portfolioData = { max: emptyPortfolio, min: emptyPortfolio };
@@ -326,6 +328,33 @@ const ADR_REFERENCES = {
   TSM: ["TAIEX", "EWT"]
 };
 
+const MARKET_COLORS = {
+  "U.S.":         "#4f8ff7",
+  "Canada / TSX": "#f87171",
+  "UK / LSE":     "#8b5cf6",
+  "Europe":       "#10b981",
+  "Global ADR":   "#f59e0b",
+};
+const CURRENCY_COLORS = {
+  USD: "#4f8ff7",
+  CAD: "#f87171",
+  GBP: "#8b5cf6",
+  EUR: "#10b981",
+  CHF: "#f59e0b",
+  Other: "#64748b",
+};
+
+function classifyTicker(ticker) {
+  const t = String(ticker).toUpperCase();
+  if (t.endsWith(".TO")) return { market: "Canada / TSX", currency: "CAD" };
+  if (t.endsWith(".L"))  return { market: "UK / LSE",     currency: "GBP" };
+  if (/\.(DE|PA|AS|MC|BR|IT)$/.test(t)) return { market: "Europe", currency: "EUR" };
+  if (t.endsWith(".SW")) return { market: "Europe",       currency: "CHF" };
+  if (t.endsWith(".CO")) return { market: "Europe",       currency: "EUR" };
+  if (ADR_REFERENCES[t]) return { market: "Global ADR",  currency: "USD" };
+  return                  { market: "U.S.",              currency: "USD" };
+}
+
 function marketMetadata(ticker, listing = {}) {
   const normalized = String(ticker || "").toUpperCase();
   const dynamicExchange = listing.exchange || listing.fullExchangeName;
@@ -494,6 +523,21 @@ function showView(viewName) {
   if (resolved === "history" && runnerConnected) loadHistoryCatalog();
 }
 
+function renderExposureBars(containerId, items) {
+  const el = document.getElementById(containerId);
+  if (!el) return;
+  el.innerHTML = items.length
+    ? items.map(([label, value, color]) => `
+        <div class="exposure-row">
+          <span class="exposure-label">${escapeHtml(label)}</span>
+          <div class="exposure-track">
+            <div class="exposure-fill" style="width:${value.toFixed(1)}%;background:${color}"></div>
+          </div>
+          <span class="exposure-value">${value.toFixed(1)}%</span>
+        </div>`).join("")
+    : '<span class="terminal-muted">Awaiting run</span>';
+}
+
 function renderPortfolio(key) {
   const data = portfolioData[key];
   const isMin = key === "min";
@@ -530,6 +574,9 @@ function renderPortfolio(key) {
       <strong class="finance-neutral">${value.toFixed(1)}%</strong>
     </div>
   `).join("") : '<span class="terminal-muted">Awaiting run</span>';
+
+  renderExposureBars("market-exposure-bars", data.markets);
+  renderExposureBars("currency-exposure-bars", data.currencies);
 }
 
 // Tiered search: 0=exact, 1=prefix, 2=ticker-contains, 3=secondary-contains, 4=fuzzy
@@ -646,7 +693,22 @@ function livePortfolio(portfolio, metrics) {
       item.sector,
       Number(item.weight) * 100,
       palette[index % palette.length]
-    ])
+    ]),
+    ...(() => {
+      const mkt = {}, cur = {};
+      for (const [ticker, weight] of holdings) {
+        const abs = Math.abs(weight);
+        const { market, currency } = classifyTicker(ticker);
+        mkt[market] = (mkt[market] || 0) + abs;
+        cur[currency] = (cur[currency] || 0) + abs;
+      }
+      const total = Object.values(mkt).reduce((s, v) => s + v, 0) || 1;
+      const toRows = (map, colorMap) =>
+        Object.entries(map)
+          .sort((a, b) => b[1] - a[1])
+          .map(([label, abs]) => [label, (abs / total) * 100, colorMap[label] || "#64748b"]);
+      return { markets: toRows(mkt, MARKET_COLORS), currencies: toRows(cur, CURRENCY_COLORS) };
+    })()
   };
 }
 
