@@ -16,7 +16,7 @@
   <div class="splash" id="splash">
     <div class="splash-glow"></div>
     <div class="splash-content">
-      <svg class="splash-logo" viewBox="-80 -80 1184 1184" fill="none">
+      <svg class="splash-logo" viewBox="96 -24 832 1024" preserveAspectRatio="xMidYMid meet" fill="none">
         <defs>
           <linearGradient id="logo-grad" x1="0" y1="0" x2="1" y2="1">
             <stop offset="0%" stop-color="#4f8ff7"/>
@@ -37,7 +37,7 @@
       </svg>
       <div class="splash-text">
         <span class="splash-name">AlloLabs</span>
-        <span class="splash-version">v1.3.2</span>
+        <span class="splash-version">v1.3.1</span>
       </div>
       <div class="splash-status" id="splash-status">Initializing</div>
     </div>
@@ -46,7 +46,7 @@
   <div class="app-shell">
     <aside class="sidebar">
       <a class="brand" href="#overview" data-go="overview" aria-label="AlloLabs home">
-        <svg class="brand-logo-svg" id="brand-logo" viewBox="0 0 1024 1024">
+        <svg class="brand-logo-svg" id="brand-logo" viewBox="96 -24 832 1024" preserveAspectRatio="xMidYMid meet">
           <defs>
             <linearGradient id="nav-logo-grad" x1="0" y1="0" x2="1" y2="1">
               <stop offset="0%" stop-color="#4f8ff7"/>
@@ -73,11 +73,17 @@
         <button class="nav-item" data-view="research">
           <span class="nav-icon">02</span> Research
         </button>
+        <button class="nav-item" data-view="universe">
+          <span class="nav-icon">03</span> Universe
+        </button>
         <button class="nav-item" data-view="console">
-          <span class="nav-icon">03</span> Console
+          <span class="nav-icon">04</span> Console
+        </button>
+        <button class="nav-item" data-view="history">
+          <span class="nav-icon">05</span> History
         </button>
         <button class="nav-item" data-view="reference">
-          <span class="nav-icon">04</span> Reference
+          <span class="nav-icon">06</span> Reference
         </button>
       </nav>
 
@@ -129,25 +135,26 @@
         </div>
 
         <div class="metric-grid">
+          <p class="metrics-mode-badge" id="metrics-mode-badge"></p>
           <article class="metric-card blue">
-            <span>Max Sharpe return</span>
+            <span id="overview-max-return-label">Max Sharpe return</span>
             <strong id="overview-max-return">--</strong>
-            <small>Sharpe <span id="overview-max-sharpe">--</span></small>
+            <small id="overview-max-return-sub">Sharpe <span id="overview-max-sharpe">--</span></small>
           </article>
           <article class="metric-card blue">
-            <span>Max Sharpe risk</span>
+            <span id="overview-max-risk-label">Max Sharpe risk</span>
             <strong id="overview-max-risk">--</strong>
-            <small>Annualized volatility</small>
+            <small id="overview-max-risk-sub">Annualized volatility</small>
           </article>
           <article class="metric-card teal">
-            <span>Min Vol return</span>
+            <span id="overview-min-return-label">Min Vol return</span>
             <strong id="overview-min-return">--</strong>
-            <small>Sharpe <span id="overview-min-sharpe">--</span></small>
+            <small id="overview-min-return-sub">Sharpe <span id="overview-min-sharpe">--</span></small>
           </article>
           <article class="metric-card teal">
-            <span>Min Vol risk</span>
+            <span id="overview-min-risk-label">Min Vol risk</span>
             <strong id="overview-min-risk">--</strong>
-            <small>Annualized volatility</small>
+            <small id="overview-min-risk-sub">Annualized volatility</small>
           </article>
         </div>
 
@@ -292,6 +299,57 @@
         <div class="research-list" id="research-list"></div>
       </section>
 
+      <!-- === UNIVERSE === -->
+      <section class="view" id="universe-view">
+        <div class="section-intro universe-intro">
+          <div>
+            <p class="eyebrow">Run coverage</p>
+            <h2>Customize the Investment Universe</h2>
+            <p>Start with a quick preset, select a complete market group, or check individual securities. Your choices drive market data, AI research, and portfolio optimization for the next run.</p>
+          </div>
+          <div class="universe-total" aria-live="polite">
+            <strong id="universe-selected-count">0</strong>
+            <span>selected</span>
+          </div>
+        </div>
+
+        <section class="universe-presets" aria-labelledby="universe-presets-title">
+          <div class="universe-section-heading">
+            <div><p class="eyebrow">Quick customization</p><h3 id="universe-presets-title">Choose a starting universe</h3></div>
+            <span>One click replaces the current selection</span>
+          </div>
+          <div class="universe-preset-grid" id="universe-presets">
+            <div class="universe-loading">Connect to the runner to load available universes.</div>
+          </div>
+        </section>
+
+        <section class="universe-manual" aria-labelledby="universe-manual-title">
+          <div class="universe-toolbar">
+            <div>
+              <p class="eyebrow">Manual customization</p>
+              <h3 id="universe-manual-title">Markets and securities</h3>
+            </div>
+            <label class="search-box universe-search">
+              <span>Search</span>
+              <input id="universe-search" type="search" placeholder="Ticker or market" autocomplete="off">
+            </label>
+            <button class="button button-secondary button-small" id="universe-clear" type="button">Clear all</button>
+          </div>
+          <div class="universe-market-jump" id="universe-market-jump" aria-label="Market filters"></div>
+          <div class="universe-groups" id="universe-groups">
+            <div class="universe-loading">Universe data will appear after the runner connects.</div>
+          </div>
+        </section>
+
+        <div class="universe-footer">
+          <div>
+            <strong id="universe-selection-label">No universe loaded</strong>
+            <span id="universe-selection-detail">Connect to view available securities.</span>
+          </div>
+          <button class="button button-primary" type="button" data-shortcut-view="console">Continue to run console</button>
+        </div>
+      </section>
+
       <!-- === CONSOLE === -->
       <section class="view" id="console-view">
         <div class="section-intro">
@@ -339,14 +397,10 @@
                   <span>OOS window <small>0-60 mo</small></span>
                   <input id="remote-oos" type="number" min="0" max="60" step="1" value="6">
                 </label>
-                <label class="field">
-                  <span>Research universe</span>
-                  <select id="remote-universe">
-                    <option value="curated" selected>Curated token-efficient</option>
-                    <option value="canada">Canada core</option>
-                    <option value="full">Full universe</option>
-                  </select>
-                </label>
+              </div>
+              <div class="universe-run-summary">
+                <div><span>Investment universe</span><strong id="console-universe-count">Loading selection</strong></div>
+                <button class="button button-secondary button-small" type="button" data-shortcut-view="universe">Customize</button>
               </div>
               </div>
               <div class="config-section">
@@ -394,6 +448,12 @@
                 <input id="remote-refresh" type="checkbox">
                 <i class="switch"></i>
               </label>
+              <div class="remote-fields">
+                <label class="field">
+                  <span>News articles per ticker <small>1–20</small></span>
+                  <input id="remote-max-news" type="number" min="1" max="20" step="1" value="5">
+                </label>
+              </div>
               <div class="seed-prompt-grid">
                 <label class="field seed-field">
                   <span>Analyst seed prompt</span>
@@ -483,6 +543,40 @@
         </div>
       </section>
 
+      <!-- === LOCAL RUN HISTORY === -->
+      <section class="view" id="history-view">
+        <div class="section-intro">
+          <div>
+            <p class="eyebrow">Local model memory</p>
+            <h2>Run history</h2>
+            <p>Browse completed configurations, AI opinions, portfolios, and reports stored on this computer.</p>
+          </div>
+          <div class="report-actions">
+            <span class="panel-badge" id="history-count">0 runs</span>
+            <button class="button button-secondary" id="refresh-history">Refresh</button>
+          </div>
+        </div>
+
+        <div class="history-layout">
+          <aside class="panel history-catalog-panel">
+            <div class="panel-heading">
+              <div><p class="eyebrow">Archive catalog</p><h3>Completed runs</h3></div>
+            </div>
+            <div class="history-folder" id="history-folder">Connect to view the local archive folder.</div>
+            <div class="history-list" id="history-list">
+              <div class="empty-state">No archived runs loaded.</div>
+            </div>
+          </aside>
+
+          <article class="panel history-detail-panel" id="history-detail">
+            <div class="history-empty">
+              <strong>Select a completed run</strong>
+              <span>Its configuration, allocations, AI views, PDF, and chart will remain available independently of newer runs.</span>
+            </div>
+          </article>
+        </div>
+      </section>
+
       <!-- === REFERENCE (merged report + model guide) === -->
       <section class="view" id="report-view">
         <div class="section-intro">
@@ -501,11 +595,11 @@
         <div class="report-grid">
           <article class="panel pdf-panel">
             <div class="panel-heading">
-              <div><p class="eyebrow">PDF output</p><h3>Portfolio summary</h3></div>
+              <div><p class="eyebrow">PDF output</p><h3>Portfolio allocation memorandum</h3></div>
               <span class="panel-badge" id="pdf-status">Not loaded</span>
             </div>
             <div class="pdf-viewer-shell">
-              <iframe id="pdf-viewer" title="AlloLabs portfolio summary PDF"></iframe>
+              <iframe id="pdf-viewer" title="AlloLabs portfolio allocation memorandum PDF"></iframe>
               <div class="artifact-placeholder" id="pdf-placeholder">
                 <strong>No PDF loaded</strong>
                 <span>Connect to the runner or complete an analysis.</span>
@@ -585,8 +679,10 @@
   <div class="function-bar" aria-label="Keyboard shortcuts">
     <button data-shortcut-view="overview"><kbd>F1</kbd> DASHBOARD</button>
     <button data-shortcut-view="research"><kbd>F2</kbd> RESEARCH</button>
-    <button data-shortcut-view="console"><kbd>F3</kbd> CONSOLE</button>
-    <button data-shortcut-view="reference"><kbd>F4</kbd> REFERENCE</button>
+    <button data-shortcut-view="universe"><kbd>F3</kbd> UNIVERSE</button>
+    <button data-shortcut-view="console"><kbd>F4</kbd> CONSOLE</button>
+    <button data-shortcut-view="history"><kbd>F5</kbd> HISTORY</button>
+    <button data-shortcut-view="reference"><kbd>F6</kbd> REFERENCE</button>
     <span>ALLOLABS // RESEARCH USE ONLY</span>
   </div>
 

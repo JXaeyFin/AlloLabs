@@ -107,6 +107,18 @@ button, a { -webkit-tap-highlight-color: transparent; }
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
 }
+.metrics-mode-badge {
+  grid-column: 1 / -1;
+  margin: 0 0 2px;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: .07em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+.metrics-mode-badge[data-mode="ai"]         { color: var(--blue); }
+.metrics-mode-badge[data-mode="oos"]        { color: var(--teal); }
+.metrics-mode-badge[data-mode="historical"] { color: var(--text-muted); }
 
 .metric-card { position: relative; overflow: hidden; }
 .metric-card::before { position: absolute; inset: 0 auto 0 0; content: ""; }

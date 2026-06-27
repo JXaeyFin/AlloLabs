@@ -30,8 +30,8 @@ Download the latest release from
 
 | File | Description |
 |------|-------------|
-| `AlloLabs-Setup-1.3.2.exe` | One-click installer with Start Menu and Desktop shortcuts |
-| `AlloLabs-v1.3.2-Windows-x64.zip` | Portable build — extract anywhere and run `AlloLabs.exe` |
+| `AlloLabs-Setup-1.3.1.exe` | One-click installer with Start Menu and Desktop shortcuts |
+| `AlloLabs-v1.3.1-Windows-x64.zip` | Portable build — extract anywhere and run `AlloLabs.exe` |
 
 The installer places the application in `%LOCALAPPDATA%\Programs\AlloLabs`,
 creates Start Menu and Desktop shortcuts, and launches the app. No admin
@@ -99,17 +99,25 @@ supported override.
 ## Features
 
 - Large-cap U.S., Canadian, U.K., European, and international ADR universe
+- Dedicated universe customization with presets, market-level selection, and individual ticker checkboxes
 - Adjusted price and company metadata from `yfinance`
 - Long-only or bounded long/short SLSQP optimization with position and sector caps
 - Optional L2 or smooth-L1 portfolio regularization
-- Multi-provider AI-assisted Black-Litterman expected returns
+- Multi-provider AI-assisted Black-Litterman expected returns with a **market-cap-weighted equilibrium prior** (caps fetched live from yfinance; mean-fills any missing values)
 - Independent AI provider and model selection for research and audit stages
 - Optional global AI consistency audit with cross-sectional bias detection
 - Analyst and auditor seed prompts for thesis, risk, and scenario context
+- Configurable per-ticker news depth (1–20 articles, default 5) with full article summaries included in the AI prompt
 - Validated and reusable research, sector, and listing caches
 - Out-of-sample testing against broad market benchmarks with Jobson-Korkie tests
-- Multi-page PDF portfolio report and CSV allocation export
+- Institutional-style PDF allocation memorandum with industry profiles, hedge analysis, macro/micro sensitivity maps, security briefs, and complete allocation schedules
 - Interactive dashboard with hover tooltips, animated SVG startup, and live terminal relay
+- **Dynamic overview metric cards** that automatically switch between three display modes:
+  - *Historical* — in-sample optimizer estimates (Max Sharpe / Min Vol return, risk, Sharpe)
+  - *AI views* — Black-Litterman posterior expected returns with historical volatility estimates
+  - *OOS* — realized out-of-sample return, volatility, and Sharpe for the test window
+- Tiered ticker search across research views and the universe picker (exact → prefix → contains → fuzzy/subsequence)
+- Local run history for browsing and reloading dated configurations, portfolios, AI opinions, charts, and PDFs
 - Bundled example portfolios and AI research visible before the first run
 
 ---
@@ -152,6 +160,7 @@ $env:ALLOLABS_RESEARCH_MODEL="claude-sonnet-4-6"
 $env:ALLOLABS_GPT_AUDIT="true"
 $env:ALLOLABS_AUDIT_PROVIDER="gemini"
 $env:ALLOLABS_GPT_AUDIT_MODEL="gemini-3.1-pro-preview"
+$env:ALLOLABS_MAX_NEWS_ARTICLES="10"   # news articles per ticker in AI prompt (1–20, default 5)
 python allolabs.py
 ```
 
@@ -208,9 +217,11 @@ Remove-Item Env:LOGO_DEV_PUBLISHABLE_KEY
 allolabs.py                  Main research and optimization pipeline
 allolabs_company.py          Company context and market-data helpers
 allolabs_report.py           PDF reporting and sector classification
+allolabs_report_memo.py      Editorial memo layout, exhibits, and sensitivity analysis
 dashboard/
   server.py                  Constrained local HTTP runner
   runner.py                  Model configuration and result adapter
+  universe.py                Shared market groups, presets, and ticker catalog
   index.html                 Dashboard interface (liquid glass UI)
   app.js                     Client-side logic and interactions
   styles.css                 Structural layout skeleton
@@ -246,6 +257,18 @@ portfolio_allocations.csv
 portfolio_vs_markets_oos.png
 sector_cache.json
 allolabs_portfolio_report.pdf
+run-history/
+  YYYY-MM-DD/
+    YYYY-MM-DD_HHMMSS_universe_model/
+      manifest.json
+      run-results.json
+      run-config.json
+      run-config.csv
+      all-tickers.csv
+      ai-opinions.csv
+      ai-opinions.json
+      portfolio-report.pdf
+      performance-chart.png
 ```
 
 Desktop builds write these to `%LOCALAPPDATA%\AlloLabs` (Windows),

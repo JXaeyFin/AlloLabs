@@ -30,6 +30,7 @@ worker_hidden_imports = collect_submodules("yfinance") + [
     "allolabs_company",
     "allolabs_paths",
     "allolabs_report",
+    "allolabs_report_memo",
     "dashboard.company_details",
     "dashboard.runner",
     "matplotlib.backends.backend_agg",
@@ -125,8 +126,8 @@ if is_macos:
         bundle_identifier="com.allolabs.desktop",
         info_plist={
             "CFBundleDisplayName": "AlloLabs",
-            "CFBundleShortVersionString": "1.3.2",
-            "CFBundleVersion": "1.3.2",
+            "CFBundleShortVersionString": "1.3.1",
+            "CFBundleVersion": "1.3.1",
             "LSMinimumSystemVersion": "12.0",
             "NSHighResolutionCapable": True,
         },

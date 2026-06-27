@@ -11,6 +11,11 @@ let researchData = [];
 let performanceCache = null;
 const companyDetailsCache = new Map();
 let companyModalTrigger = null;
+const UNIVERSE_STORAGE_KEY = "allolabs-universe-selection-v1";
+let universeCatalogData = null;
+let selectedUniverseTickers = new Set();
+let pendingUniverseConfig = null;
+let activeUniverseMarket = "all";
 
 const AI_MODELS = {
   openai: [
@@ -457,7 +462,9 @@ function setFinanceValue(elementId, value, text, neutral = false) {
 const pageTitles = {
   overview: "Dashboard",
   research: "Research",
+  universe: "Universe",
   console: "Console",
+  history: "History",
   reference: "Reference"
 };
 
@@ -484,6 +491,7 @@ function showView(viewName) {
   document.getElementById("page-title").textContent = pageTitles[resolved];
   history.replaceState(null, "", `#${resolved}`);
   window.scrollTo({ top: 0, behavior: "smooth" });
+  if (resolved === "history" && runnerConnected) loadHistoryCatalog();
 }
 
 function renderPortfolio(key) {
@@ -524,14 +532,47 @@ function renderPortfolio(key) {
   `).join("") : '<span class="terminal-muted">Awaiting run</span>';
 }
 
+// Tiered search: 0=exact, 1=prefix, 2=ticker-contains, 3=secondary-contains, 4=fuzzy
+function rankSearch(items, rawQuery, tickerFn, secondaryFn) {
+  if (!rawQuery || !rawQuery.trim()) return items;
+  const q = rawQuery.trim().toUpperCase();
+  function isSubseq(str) {
+    let qi = 0;
+    const s = str.toUpperCase();
+    for (let i = 0; i < s.length && qi < q.length; i++) {
+      if (s[i] === q[qi]) qi++;
+    }
+    return qi === q.length;
+  }
+  const scored = [];
+  for (const item of items) {
+    const t = tickerFn(item).toUpperCase();
+    const sec = secondaryFn ? secondaryFn(item).toUpperCase() : "";
+    let score;
+    if (t === q)              score = 0;
+    else if (t.startsWith(q)) score = 1;
+    else if (t.includes(q))   score = 2;
+    else if (sec.includes(q)) score = 3;
+    else if (isSubseq(t))     score = 4;
+    else if (sec && isSubseq(sec)) score = 5;
+    else continue;
+    scored.push({ item, score });
+  }
+  scored.sort((a, b) => a.score - b.score || tickerFn(a.item).localeCompare(tickerFn(b.item)));
+  return scored.map((s) => s.item);
+}
+
 function renderResearch(query = "") {
-  const normalized = query.trim().toLowerCase();
-  const filtered = researchData.filter((item) =>
-    `${item.ticker} ${item.industry} ${item.thesis}`.toLowerCase().includes(normalized)
+  const filtered = rankSearch(
+    researchData,
+    query,
+    (item) => item.ticker,
+    (item) => `${item.industry} ${item.thesis}`
   );
   const container = document.getElementById("research-list");
   if (!filtered.length) {
-    container.innerHTML = `<div class="empty-state">${normalized ? "No research views match that search." : "No completed research run is available."}</div>`;
+    const hasQuery = query.trim().length > 0;
+    container.innerHTML = `<div class="empty-state">${hasQuery ? "No research views match that search." : "No completed research run is available."}</div>`;
     return;
   }
   container.innerHTML = filtered.map((item) => `
@@ -623,6 +664,61 @@ function chartPath(values, minimum, maximum) {
   }).join(" ");
 }
 
+function renderOverviewMetrics(results) {
+  const mode = results.metricsMode || (
+    results.oosMetrics ? "oos" :
+    results.config?.gptViews ? "ai" : "historical"
+  );
+  const oosMonths = Number(results.config?.oosMonths || 0);
+  const badge = document.getElementById("metrics-mode-badge");
+  badge.dataset.mode = mode;
+
+  let maxRet, maxRisk, maxSharpe, minRet, minRisk, minSharpe;
+
+  if (mode === "oos" && results.oosMetrics) {
+    ({ return: maxRet, risk: maxRisk, sharpe: maxSharpe } = results.oosMetrics.max);
+    ({ return: minRet, risk: minRisk, sharpe: minSharpe } = results.oosMetrics.min);
+    document.getElementById("overview-max-return-label").textContent = "Max Sharpe OOS return";
+    document.getElementById("overview-max-risk-label").textContent   = "Max Sharpe OOS volatility";
+    document.getElementById("overview-min-return-label").textContent = "Min Vol OOS return";
+    document.getElementById("overview-min-risk-label").textContent   = "Min Vol OOS volatility";
+    document.getElementById("overview-max-return-sub").innerHTML = `Realized Sharpe <span id="overview-max-sharpe">${Number(maxSharpe).toFixed(2)}</span>`;
+    document.getElementById("overview-max-risk-sub").textContent  = "Realized annualized volatility";
+    document.getElementById("overview-min-return-sub").innerHTML = `Realized Sharpe <span id="overview-min-sharpe">${Number(minSharpe).toFixed(2)}</span>`;
+    document.getElementById("overview-min-risk-sub").textContent  = "Realized annualized volatility";
+    badge.textContent = `Realized out-of-sample performance · ${oosMonths}-month test window`;
+  } else if (mode === "ai") {
+    ({ return: maxRet, risk: maxRisk, sharpe: maxSharpe } = results.metrics.max);
+    ({ return: minRet, risk: minRisk, sharpe: minSharpe } = results.metrics.min);
+    document.getElementById("overview-max-return-label").textContent = "Max Sharpe AI expected return";
+    document.getElementById("overview-max-risk-label").textContent   = "Max Sharpe risk";
+    document.getElementById("overview-min-return-label").textContent = "Min Vol AI expected return";
+    document.getElementById("overview-min-risk-label").textContent   = "Min Vol risk";
+    document.getElementById("overview-max-return-sub").innerHTML = `Sharpe <span id="overview-max-sharpe">${Number(maxSharpe).toFixed(2)}</span>`;
+    document.getElementById("overview-max-risk-sub").textContent  = "Historical volatility estimate";
+    document.getElementById("overview-min-return-sub").innerHTML = `Sharpe <span id="overview-min-sharpe">${Number(minSharpe).toFixed(2)}</span>`;
+    document.getElementById("overview-min-risk-sub").textContent  = "Historical volatility estimate";
+    badge.textContent = "AI-forecast returns · Historical volatility estimate";
+  } else {
+    ({ return: maxRet, risk: maxRisk, sharpe: maxSharpe } = results.metrics.max);
+    ({ return: minRet, risk: minRisk, sharpe: minSharpe } = results.metrics.min);
+    document.getElementById("overview-max-return-label").textContent = "Max Sharpe return";
+    document.getElementById("overview-max-risk-label").textContent   = "Max Sharpe risk";
+    document.getElementById("overview-min-return-label").textContent = "Min Vol return";
+    document.getElementById("overview-min-risk-label").textContent   = "Min Vol risk";
+    document.getElementById("overview-max-return-sub").innerHTML = `Sharpe <span id="overview-max-sharpe">${Number(maxSharpe).toFixed(2)}</span>`;
+    document.getElementById("overview-max-risk-sub").textContent  = "Annualized volatility";
+    document.getElementById("overview-min-return-sub").innerHTML = `Sharpe <span id="overview-min-sharpe">${Number(minSharpe).toFixed(2)}</span>`;
+    document.getElementById("overview-min-risk-sub").textContent  = "Annualized volatility";
+    badge.textContent = "In-sample training period estimates";
+  }
+
+  setFinanceValue("overview-max-return", maxRet, formatPercent(maxRet));
+  setFinanceValue("overview-max-risk",   maxRisk, formatPercent(maxRisk), true);
+  setFinanceValue("overview-min-return", minRet, formatPercent(minRet));
+  setFinanceValue("overview-min-risk",   minRisk, formatPercent(minRisk), true);
+}
+
 function renderPerformance(performance) {
   if (!performance?.dates?.length || !performance.series) return;
   performanceCache = performance;
@@ -664,23 +760,26 @@ function renderPerformance(performance) {
 function applyLiveResults(results) {
   if (!results?.metrics || !results?.portfolios || !results?.config) return;
   const isExample = results.dataMode === "example";
-  currentResultMode = isExample ? "example" : "live";
+  const isHistory = results.dataMode === "history";
+  currentResultMode = isExample ? "example" : isHistory ? "history" : "live";
+  currentHistoryRunId = isHistory ? (results.archive?.id || currentHistoryRunId) : null;
   const durations = formatDuration(results.config);
   document.getElementById("hero-training").textContent = durations.training;
   document.getElementById("hero-oos").textContent = durations.oos;
   document.getElementById("hero-cap").textContent = `${Number(results.config.maxPositionPercent).toFixed(0)}%`;
   document.getElementById("data-date").textContent = isExample
     ? `${results.snapshotLabel || "Bundled example"} · Data through ${results.dataThrough || "snapshot date"}`
-    : `Live run · Data through ${results.dataThrough || "latest completed run"}`;
-  document.getElementById("data-mode").textContent = isExample ? "ALLOLABS SNAPSHOT" : "ALLOLABS LIVE";
-  document.getElementById("run-label").textContent = isExample ? "Bundled example portfolio" : "Latest model run";
+    : isHistory
+      ? `Archived ${new Date(results.generatedAt).toLocaleString()} · Data through ${results.dataThrough || "run date"}`
+      : `Live run · Data through ${results.dataThrough || "latest completed run"}`;
+  document.getElementById("data-mode").textContent = isExample
+    ? "ALLOLABS SNAPSHOT"
+    : isHistory ? "ALLOLABS HISTORY" : "ALLOLABS LIVE";
+  document.getElementById("run-label").textContent = isExample
+    ? "Bundled example portfolio"
+    : isHistory ? "Archived model run" : "Latest model run";
 
-  setFinanceValue("overview-max-return", results.metrics.max.return, formatPercent(results.metrics.max.return));
-  setFinanceValue("overview-max-risk", results.metrics.max.risk, formatPercent(results.metrics.max.risk), true);
-  setFinanceValue("overview-max-sharpe", results.metrics.max.sharpe, Number(results.metrics.max.sharpe).toFixed(2));
-  setFinanceValue("overview-min-return", results.metrics.min.return, formatPercent(results.metrics.min.return));
-  setFinanceValue("overview-min-risk", results.metrics.min.risk, formatPercent(results.metrics.min.risk), true);
-  setFinanceValue("overview-min-sharpe", results.metrics.min.sharpe, Number(results.metrics.min.sharpe).toFixed(2));
+  renderOverviewMetrics(results);
 
   portfolioData = {
     max: livePortfolio(results.portfolios.max, results.metrics.max),
@@ -710,7 +809,6 @@ function applyLiveResults(results) {
   document.getElementById("remote-oos").value = results.config.oosMonths;
   document.getElementById("remote-position").value = results.config.maxPositionPercent;
   document.getElementById("remote-long-only").checked = results.config.longOnly !== false;
-  document.getElementById("remote-universe").value = results.config.universe;
   document.getElementById("remote-gpt").checked = Boolean(results.config.gptViews);
   const researchProvider = results.config.researchProvider || "openai";
   document.getElementById("remote-research-provider").value = researchProvider;
@@ -738,6 +836,7 @@ function applyLiveResults(results) {
   document.getElementById("remote-refresh").checked = Boolean(results.config.refreshCache);
   document.getElementById("remote-analyst-seed").value = results.config.analystSeedPrompt || "";
   document.getElementById("remote-auditor-seed").value = results.config.auditorSeedPrompt || "";
+  document.getElementById("remote-max-news").value = results.config.maxNewsArticles ?? 5;
   syncConfigurationControls();
   renderPerformance(results.performance);
 }
@@ -750,13 +849,185 @@ document.querySelectorAll("[data-shortcut-view]").forEach((item) => {
   item.addEventListener("click", () => showView(item.dataset.shortcutView));
 });
 
-const functionViews = ["overview", "research", "console", "reference"];
+const functionViews = ["overview", "research", "universe", "console", "history", "reference"];
 document.addEventListener("keydown", (event) => {
-  const match = /^F([1-4])$/.exec(event.key);
+  const match = /^F([1-6])$/.exec(event.key);
   if (!match) return;
   event.preventDefault();
   showView(functionViews[Number(match[1]) - 1]);
 });
+
+function orderedUniverseSelection() {
+  if (!universeCatalogData) return [...selectedUniverseTickers];
+  return universeCatalogData.groups
+    .flatMap((group) => group.tickers)
+    .filter((ticker) => selectedUniverseTickers.has(ticker));
+}
+
+function matchingUniversePreset() {
+  if (!universeCatalogData) return null;
+  return universeCatalogData.presets.find((preset) =>
+    preset.tickers.length === selectedUniverseTickers.size
+    && preset.tickers.every((ticker) => selectedUniverseTickers.has(ticker))
+  ) || null;
+}
+
+function saveUniverseSelection() {
+  localStorage.setItem(UNIVERSE_STORAGE_KEY, JSON.stringify(orderedUniverseSelection()));
+}
+
+function setUniverseSelection(tickers, persist = true) {
+  const allowed = universeCatalogData
+    ? new Set(universeCatalogData.groups.flatMap((group) => group.tickers))
+    : null;
+  selectedUniverseTickers = new Set(
+    (Array.isArray(tickers) ? tickers : [])
+      .map((ticker) => String(ticker).trim().toUpperCase())
+      .filter((ticker) => ticker && (!allowed || allowed.has(ticker)))
+  );
+  if (persist && universeCatalogData) saveUniverseSelection();
+  renderUniverseSelector();
+}
+
+function universeSelectionLabel() {
+  return matchingUniversePreset()?.label || "Custom universe";
+}
+
+function renderUniverseSelector() {
+  const selectedCount = selectedUniverseTickers.size;
+  document.getElementById("universe-selected-count").textContent = selectedCount;
+  document.getElementById("console-universe-count").textContent = universeCatalogData
+    ? `${selectedCount} securities · ${universeSelectionLabel()}`
+    : "Connect to choose securities";
+  document.getElementById("universe-selection-label").textContent = universeCatalogData
+    ? universeSelectionLabel()
+    : "No universe loaded";
+  document.getElementById("universe-selection-detail").textContent = universeCatalogData
+    ? `${selectedCount} of ${universeCatalogData.tickerCount} supported securities selected for the next run.`
+    : "Connect to view available securities.";
+  if (!universeCatalogData) return;
+
+  const matchingPreset = matchingUniversePreset();
+  document.getElementById("universe-presets").innerHTML = universeCatalogData.presets.map((preset) => `
+    <button class="universe-preset${matchingPreset?.id === preset.id ? " active" : ""}" type="button" data-universe-preset="${escapeHtml(preset.id)}">
+      <span>${escapeHtml(preset.label)}</span>
+      <strong>${preset.tickers.length}</strong>
+      <small>${escapeHtml(preset.description)}</small>
+    </button>
+  `).join("");
+
+  document.getElementById("universe-market-jump").innerHTML = [
+    `<button type="button" class="${activeUniverseMarket === "all" ? "active" : ""}" data-universe-market="all">All markets</button>`,
+    ...universeCatalogData.groups.map((group) => {
+      const count = group.tickers.filter((ticker) => selectedUniverseTickers.has(ticker)).length;
+      return `<button type="button" class="${activeUniverseMarket === group.id ? "active" : ""}" data-universe-market="${escapeHtml(group.id)}">${escapeHtml(group.shortLabel)} <b>${count}/${group.tickers.length}</b></button>`;
+    })
+  ].join("");
+
+  const query = document.getElementById("universe-search").value.trim().toUpperCase();
+  const visibleGroups = universeCatalogData.groups.filter((group) =>
+    activeUniverseMarket === "all" || activeUniverseMarket === group.id
+  );
+  const groupMarkup = visibleGroups.map((group) => {
+    const tickers = query
+      ? rankSearch(group.tickers, query, (t) => t, null)
+      : group.tickers;
+    if (!tickers.length) return "";
+    const groupSelected = group.tickers.filter((ticker) => selectedUniverseTickers.has(ticker)).length;
+    return `
+      <article class="universe-group" data-universe-group="${escapeHtml(group.id)}">
+        <header>
+          <div>
+            <p class="eyebrow">${escapeHtml(group.shortLabel)}</p>
+            <h4>${escapeHtml(group.label)}</h4>
+            <span>${escapeHtml(group.description)}</span>
+          </div>
+          <div class="universe-group-actions">
+            <strong>${groupSelected}/${group.tickers.length}</strong>
+            <button type="button" data-universe-group-action="select" data-universe-group-id="${escapeHtml(group.id)}">Select market</button>
+            <button type="button" data-universe-group-action="clear" data-universe-group-id="${escapeHtml(group.id)}">Clear</button>
+          </div>
+        </header>
+        <div class="universe-ticker-grid">
+          ${tickers.map((ticker) => `
+            <label class="universe-ticker${selectedUniverseTickers.has(ticker) ? " selected" : ""}">
+              <input type="checkbox" data-universe-ticker="${escapeHtml(ticker)}"${selectedUniverseTickers.has(ticker) ? " checked" : ""}>
+              <i aria-hidden="true">&#10003;</i>
+              <span>${escapeHtml(ticker)}</span>
+            </label>
+          `).join("")}
+        </div>
+      </article>
+    `;
+  }).join("");
+  document.getElementById("universe-groups").innerHTML = groupMarkup
+    || '<div class="empty-state">No markets or tickers match that search.</div>';
+}
+
+async function loadUniverseCatalog() {
+  universeCatalogData = await runnerRequest("/api/universe");
+  let selection = null;
+  try {
+    const stored = JSON.parse(localStorage.getItem(UNIVERSE_STORAGE_KEY) || "null");
+    if (Array.isArray(stored)) {
+      const supported = new Set(universeCatalogData.groups.flatMap((group) => group.tickers));
+      const validStored = stored.filter((ticker) => supported.has(String(ticker).toUpperCase()));
+      if (validStored.length >= 2) selection = validStored;
+    }
+  } catch {
+    localStorage.removeItem(UNIVERSE_STORAGE_KEY);
+  }
+  if (!selection && pendingUniverseConfig?.selectedTickers) {
+    selection = pendingUniverseConfig.selectedTickers;
+  } else if (!selection && pendingUniverseConfig?.universe) {
+    selection = universeCatalogData.presets.find(
+      (preset) => preset.id === pendingUniverseConfig.universe
+    )?.tickers;
+  }
+  if (!selection) selection = universeCatalogData.presets[0].tickers;
+  pendingUniverseConfig = null;
+  setUniverseSelection(selection, false);
+}
+
+document.getElementById("universe-presets").addEventListener("click", (event) => {
+  const button = event.target.closest("[data-universe-preset]");
+  if (!button || !universeCatalogData) return;
+  const preset = universeCatalogData.presets.find((item) => item.id === button.dataset.universePreset);
+  if (preset) setUniverseSelection(preset.tickers);
+});
+
+document.getElementById("universe-market-jump").addEventListener("click", (event) => {
+  const button = event.target.closest("[data-universe-market]");
+  if (!button) return;
+  activeUniverseMarket = button.dataset.universeMarket;
+  renderUniverseSelector();
+});
+
+document.getElementById("universe-groups").addEventListener("click", (event) => {
+  const button = event.target.closest("[data-universe-group-action]");
+  if (!button || !universeCatalogData) return;
+  const group = universeCatalogData.groups.find((item) => item.id === button.dataset.universeGroupId);
+  if (!group) return;
+  const next = new Set(selectedUniverseTickers);
+  group.tickers.forEach((ticker) => {
+    if (button.dataset.universeGroupAction === "select") next.add(ticker);
+    else next.delete(ticker);
+  });
+  setUniverseSelection([...next]);
+});
+
+document.getElementById("universe-groups").addEventListener("change", (event) => {
+  const checkbox = event.target.closest("[data-universe-ticker]");
+  if (!checkbox) return;
+  const next = new Set(selectedUniverseTickers);
+  if (checkbox.checked) next.add(checkbox.dataset.universeTicker);
+  else next.delete(checkbox.dataset.universeTicker);
+  setUniverseSelection([...next]);
+});
+
+document.getElementById("universe-search").addEventListener("input", renderUniverseSelector);
+document.getElementById("universe-clear").addEventListener("click", () => setUniverseSelection([]));
+renderUniverseSelector();
 
 renderModelGuide();
 renderProviderKeyStatus();
@@ -874,6 +1145,10 @@ let runnerCapabilities = {};
 let artifactCompatibilityNoticeShown = false;
 let analysisEnvironmentReady = false;
 let currentResultMode = "empty";
+let currentHistoryRunId = null;
+let historyRuns = [];
+let selectedHistoryRun = null;
+let selectedHistoryResults = null;
 const runProgressElement = document.getElementById("run-progress");
 const runProgressTrack = document.getElementById("run-progress-track");
 const runProgressFill = document.getElementById("run-progress-fill");
@@ -1072,10 +1347,12 @@ async function openCompanyModal(ticker, trigger) {
   }
 
   try {
-    let details = companyDetailsCache.get(ticker);
+    const historyQuery = currentHistoryRunId ? `&run=${encodeURIComponent(currentHistoryRunId)}` : "";
+    const cacheKey = `${currentHistoryRunId || "current"}:${ticker}`;
+    let details = companyDetailsCache.get(cacheKey);
     if (!details) {
-      details = await runnerRequest(`/api/company?ticker=${encodeURIComponent(ticker)}`);
-      companyDetailsCache.set(ticker, details);
+      details = await runnerRequest(`/api/company?ticker=${encodeURIComponent(ticker)}${historyQuery}`);
+      companyDetailsCache.set(cacheKey, details);
     }
     renderCompanyDetails(details);
   } catch (error) {
@@ -1118,14 +1395,15 @@ function applyRunConfig(config) {
   document.getElementById("hero-cap").textContent = `${Number(config.maxPositionPercent).toFixed(0)}%`;
 }
 
-function estimatedUniverseSize(universe) {
-  if (universe === "canada") return 21;
-  if (universe === "curated") return 39;
-  return 249;
+function estimatedUniverseSize(config = {}) {
+  if (Array.isArray(config.selectedTickers)) return config.selectedTickers.length;
+  if (config.universe === "canada") return 51;
+  if (config.universe === "curated") return 39;
+  return universeCatalogData?.tickerCount || 285;
 }
 
 function buildRunProgressPlan(config = {}) {
-  const universeSize = estimatedUniverseSize(config.universe);
+  const universeSize = estimatedUniverseSize(config);
   const stages = [
     { id: "setup", label: "Starting run", seconds: 6 },
     {
@@ -1276,10 +1554,10 @@ function processRunProgressLine(text) {
     if (runProgressState.plan.stages.some((stage) => stage.id === "oos")) {
       setRunProgressStage("oos", 0.99, "Out-of-sample stage complete");
     }
-  } else if (line.includes("Generating portfolio summary PDF")) {
-    setRunProgressStage("report", 0.12, "Building portfolio summary PDF");
-  } else if (line.includes("Portfolio summary saved")) {
-    setRunProgressStage("report", 0.94, "Portfolio report saved");
+  } else if (line.includes("Generating portfolio allocation memorandum PDF") || line.includes("Generating portfolio summary PDF")) {
+    setRunProgressStage("report", 0.12, "Building portfolio allocation memorandum");
+  } else if (line.includes("Portfolio memorandum saved") || line.includes("Portfolio summary saved")) {
+    setRunProgressStage("report", 0.94, "Portfolio memorandum saved");
   } else if (line.includes("Live dashboard results saved")) {
     setRunProgressStage("results", 0.96, "Publishing results to the dashboard");
   }
@@ -1340,6 +1618,7 @@ async function loadCompletedResults(status) {
       "system"
     );
     await refreshReportArtifacts();
+    if (runnerCapabilities.run_history) await loadHistoryCatalog();
     return true;
   } catch (error) {
     if (error.status === 404) {
@@ -1362,13 +1641,199 @@ async function fetchArtifact(path) {
   return response.blob();
 }
 
+function historyDate(value) {
+  const date = new Date(value);
+  return Number.isNaN(date.getTime()) ? String(value || "Unknown date") : date.toLocaleString();
+}
+
+function historySettingLabel(key) {
+  return String(key)
+    .replace(/([a-z])([A-Z])/g, "$1 $2")
+    .replace(/^./, (character) => character.toUpperCase());
+}
+
+function renderHistoryList() {
+  const list = document.getElementById("history-list");
+  document.getElementById("history-count").textContent = `${historyRuns.length} ${historyRuns.length === 1 ? "run" : "runs"}`;
+  if (!historyRuns.length) {
+    list.innerHTML = '<div class="empty-state">No completed runs have been archived yet.</div>';
+    return;
+  }
+  list.innerHTML = historyRuns.map((run) => `
+    <button class="history-run${selectedHistoryRun?.id === run.id ? " active" : ""}" type="button" data-history-run="${escapeHtml(run.id)}">
+      <strong>${escapeHtml(historyDate(run.generatedAt))}</strong>
+      <span>${escapeHtml(run.universe || "universe")} · ${escapeHtml(run.researchModel || "No AI views")}</span>
+      <small>${Number(run.tickerCount || 0)} tickers · ${Number(run.opinionCount || 0)} AI opinions${run.auditEnabled ? " · audited" : ""}</small>
+    </button>
+  `).join("");
+}
+
+function historyPortfolioRows(results) {
+  const rows = new Map();
+  ["max", "min"].forEach((portfolioKey) => {
+    (results.portfolios?.[portfolioKey]?.holdings || []).forEach((holding) => {
+      const row = rows.get(holding.ticker) || {
+        ticker: holding.ticker,
+        sector: holding.sector || "Unclassified",
+        max: 0,
+        min: 0
+      };
+      row[portfolioKey] = Number(holding.weight || 0);
+      rows.set(holding.ticker, row);
+    });
+  });
+  return [...rows.values()].sort((left, right) =>
+    Math.max(Math.abs(right.max), Math.abs(right.min)) - Math.max(Math.abs(left.max), Math.abs(left.min))
+  );
+}
+
+function renderHistoryDetail(results, manifest) {
+  const detail = document.getElementById("history-detail");
+  const config = results.config || {};
+  const portfolioRows = historyPortfolioRows(results);
+  const opinions = (results.research || []).filter((item) => item.view);
+  const configItems = Object.entries(config).map(([key, value]) => `
+    <div class="history-config-item">
+      <span>${escapeHtml(historySettingLabel(key))}</span>
+      <strong>${escapeHtml(typeof value === "boolean" ? (value ? "Enabled" : "Disabled") : String(value === "" ? "Not supplied" : value))}</strong>
+    </div>
+  `).join("");
+  const portfolioTable = portfolioRows.map((row) => `
+    <tr>
+      <td>${escapeHtml(row.ticker)}</td>
+      <td>${escapeHtml(row.sector)}</td>
+      <td class="${financeClass(row.max)}">${(row.max * 100).toFixed(3)}%</td>
+      <td class="${financeClass(row.min)}">${(row.min * 100).toFixed(3)}%</td>
+    </tr>
+  `).join("");
+  const opinionTable = opinions.map((item) => `
+    <tr>
+      <td>${escapeHtml(item.ticker)}</td>
+      <td class="${financeClass(Number(item.posteriorReturn))}">${formatPercent(item.posteriorReturn)}</td>
+      <td>${Math.round(Number(item.confidence || 0) * 100)}%</td>
+      <td class="history-thesis">${escapeHtml(item.view)}</td>
+    </tr>
+  `).join("");
+  detail.innerHTML = `
+    <div class="history-detail-header">
+      <div>
+        <p class="eyebrow">Archived snapshot</p>
+        <h3>${escapeHtml(historyDate(results.generatedAt))}</h3>
+        <p>${escapeHtml(manifest.id)} · Data through ${escapeHtml(results.dataThrough || "unknown")}</p>
+      </div>
+      <div class="history-actions">
+        <button class="button button-primary" type="button" data-history-action="dashboard">Load dashboard</button>
+        <button class="button button-secondary" type="button" data-history-action="report"${manifest.artifacts?.pdf ? "" : " disabled"}>View report</button>
+        <button class="button button-secondary" type="button" data-history-artifact="all-tickers">Ticker CSV</button>
+        <button class="button button-secondary" type="button" data-history-artifact="ai-opinions">AI CSV</button>
+        <button class="button button-secondary" type="button" data-history-artifact="config">Config CSV</button>
+      </div>
+    </div>
+    <div class="history-stat-grid">
+      <div class="history-stat"><span>Max Sharpe return</span><strong class="${financeClass(results.metrics.max.return)}">${formatPercent(results.metrics.max.return)}</strong></div>
+      <div class="history-stat"><span>Max Sharpe risk</span><strong>${formatPercent(results.metrics.max.risk)}</strong></div>
+      <div class="history-stat"><span>Min Vol return</span><strong class="${financeClass(results.metrics.min.return)}">${formatPercent(results.metrics.min.return)}</strong></div>
+      <div class="history-stat"><span>Min Vol risk</span><strong>${formatPercent(results.metrics.min.risk)}</strong></div>
+    </div>
+    <h4 class="history-section-title">Run configuration</h4>
+    <div class="history-config-grid">${configItems}</div>
+    <h4 class="history-section-title">All portfolio holdings</h4>
+    <div class="history-table-shell">
+      <table class="history-table">
+        <thead><tr><th>Ticker</th><th>Sector</th><th>Max Sharpe</th><th>Min Volatility</th></tr></thead>
+        <tbody>${portfolioTable || '<tr><td colspan="4">No holdings stored.</td></tr>'}</tbody>
+      </table>
+    </div>
+    <h4 class="history-section-title">AI opinions (${opinions.length})</h4>
+    <div class="history-table-shell">
+      <table class="history-table">
+        <thead><tr><th>Ticker</th><th>View</th><th>Confidence</th><th>Rationale</th></tr></thead>
+        <tbody>${opinionTable || '<tr><td colspan="4">AI views were disabled for this run.</td></tr>'}</tbody>
+      </table>
+    </div>
+  `;
+}
+
+async function selectHistoryRun(historyId) {
+  const manifest = historyRuns.find((run) => run.id === historyId);
+  if (!manifest) return;
+  selectedHistoryRun = manifest;
+  renderHistoryList();
+  document.getElementById("history-detail").innerHTML = '<div class="history-empty"><strong>Loading archived run</strong><span>Reading local results and configuration.</span></div>';
+  try {
+    const results = await runnerRequest(`/api/results?run=${encodeURIComponent(historyId)}`);
+    selectedHistoryResults = results;
+    renderHistoryDetail(results, manifest);
+  } catch (error) {
+    selectedHistoryResults = null;
+    document.getElementById("history-detail").innerHTML = `<div class="history-empty"><strong>Could not load run</strong><span>${escapeHtml(error.message)}</span></div>`;
+  }
+}
+
+async function loadHistoryCatalog() {
+  if (!runnerConnected || !runnerCapabilities.run_history) {
+    if (runnerConnected) {
+      document.getElementById("history-list").innerHTML = '<div class="empty-state">Restart the dashboard service to enable run history.</div>';
+    }
+    return;
+  }
+  try {
+    const payload = await runnerRequest("/api/history");
+    historyRuns = Array.isArray(payload.runs) ? payload.runs : [];
+    document.getElementById("history-folder").textContent = payload.folder || "Local run-history folder";
+    if (selectedHistoryRun && !historyRuns.some((run) => run.id === selectedHistoryRun.id)) {
+      selectedHistoryRun = null;
+      selectedHistoryResults = null;
+    }
+    renderHistoryList();
+    if (!selectedHistoryRun && historyRuns.length) await selectHistoryRun(historyRuns[0].id);
+  } catch (error) {
+    document.getElementById("history-list").innerHTML = `<div class="empty-state">${escapeHtml(error.message)}</div>`;
+  }
+}
+
+async function downloadHistoryArtifact(kind) {
+  if (!selectedHistoryRun) return;
+  const blob = await fetchArtifact(`/api/history/artifact?run=${encodeURIComponent(selectedHistoryRun.id)}&kind=${encodeURIComponent(kind)}`);
+  const names = { "all-tickers": "all-tickers.csv", "ai-opinions": "ai-opinions.csv", config: "run-config.csv" };
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = `${selectedHistoryRun.id.replace("/", "_")}_${names[kind] || "artifact"}`;
+  link.click();
+  window.setTimeout(() => URL.revokeObjectURL(url), 1000);
+}
+
+document.getElementById("refresh-history").addEventListener("click", loadHistoryCatalog);
+document.getElementById("history-list").addEventListener("click", (event) => {
+  const button = event.target.closest("[data-history-run]");
+  if (button) selectHistoryRun(button.dataset.historyRun);
+});
+document.getElementById("history-detail").addEventListener("click", async (event) => {
+  const action = event.target.closest("[data-history-action]")?.dataset.historyAction;
+  const artifact = event.target.closest("[data-history-artifact]")?.dataset.historyArtifact;
+  try {
+    if (artifact) await downloadHistoryArtifact(artifact);
+    if (!action || !selectedHistoryResults || !selectedHistoryRun) return;
+    applyLiveResults(selectedHistoryResults);
+    if (action === "report") {
+      showView("reference");
+      await refreshReportArtifacts(selectedHistoryRun.id);
+    } else {
+      showView("overview");
+    }
+  } catch (error) {
+    appendTerminal(`[relay] History: ${error.message}`, "error");
+  }
+});
+
 function setReportState(status, label) {
   const element = document.getElementById("report-state");
   element.className = `runner-state ${status}`;
   element.querySelector("strong").textContent = label;
 }
 
-async function refreshReportArtifacts() {
+async function refreshReportArtifacts(historyId = currentHistoryRunId) {
   if (!runnerConnected) {
     setReportState("disconnected", "Runner disconnected");
     return;
@@ -1384,9 +1849,10 @@ async function refreshReportArtifacts() {
     return;
   }
   setReportState("running", "Loading artifacts");
+  const historyQuery = historyId ? `?run=${encodeURIComponent(historyId)}` : "";
 
   try {
-    const pdfBlob = await fetchArtifact("/api/artifacts/pdf");
+    const pdfBlob = await fetchArtifact(`/api/artifacts/pdf${historyQuery}`);
     if (pdfBlobUrl) URL.revokeObjectURL(pdfBlobUrl);
     pdfBlobUrl = URL.createObjectURL(pdfBlob);
     const viewer = document.getElementById("pdf-viewer");
@@ -1410,7 +1876,7 @@ async function refreshReportArtifacts() {
   }
 
   try {
-    const chartBlob = await fetchArtifact("/api/artifacts/chart");
+    const chartBlob = await fetchArtifact(`/api/artifacts/chart${historyQuery}`);
     if (chartBlobUrl) URL.revokeObjectURL(chartBlobUrl);
     chartBlobUrl = URL.createObjectURL(chartBlob);
     const image = document.getElementById("report-chart");
@@ -1430,7 +1896,9 @@ async function refreshReportArtifacts() {
     document.getElementById("chart-placeholder").style.display = "grid";
     if (error.status !== 404) appendTerminal(`[relay] Chart: ${error.message}`, "error");
   }
-  const readyLabel = currentResultMode === "example" ? "Example report ready" : "Report ready";
+  const readyLabel = currentResultMode === "example"
+    ? "Example report ready"
+    : currentResultMode === "history" ? "Archived report ready" : "Report ready";
   setReportState(pdfBlobUrl ? "connected" : "failed", pdfBlobUrl ? readyLabel : "Report unavailable");
 }
 
@@ -1498,6 +1966,8 @@ async function connectRunner() {
   setRunnerState("disconnected", "Connecting");
   try {
     const status = await runnerRequest("/api/status");
+    if (status.config && !pendingUniverseConfig) pendingUniverseConfig = status.config;
+    await loadUniverseCatalog();
     runnerConnected = true;
     runnerCapabilities = status.capabilities || {};
     activateProjectLogo(status.api_version);
@@ -1530,7 +2000,7 @@ async function connectRunner() {
 }
 
 document.getElementById("runner-connect").addEventListener("click", connectRunner);
-document.getElementById("refresh-report").addEventListener("click", refreshReportArtifacts);
+document.getElementById("refresh-report").addEventListener("click", () => refreshReportArtifacts());
 document.getElementById("download-report").addEventListener("click", () => {
   if (pdfBlobUrl) window.open(pdfBlobUrl, "_blank", "noopener");
 });
@@ -1544,7 +2014,8 @@ runnerStart.addEventListener("click", async () => {
     maxSectorPercent: Number(sectorCapInput.value),
     regularization: regularizationSelect.value,
     regularizationStrength: Number(regularizationStrength.value),
-    universe: document.getElementById("remote-universe").value,
+    universe: matchingUniversePreset()?.id || "custom",
+    selectedTickers: orderedUniverseSelection(),
     gptViews: remoteGptToggle.checked,
     researchProvider: remoteResearchProvider.value,
     researchModel: remoteGptModel.value,
@@ -1552,6 +2023,7 @@ runnerStart.addEventListener("click", async () => {
     auditProvider: remoteAuditProvider.value,
     auditModel: remoteAuditModel.value,
     refreshCache: document.getElementById("remote-refresh").checked,
+    maxNewsArticles: Math.max(1, Math.min(20, parseInt(document.getElementById("remote-max-news").value) || 5)),
     analystSeedPrompt: document.getElementById("remote-analyst-seed").value.trim(),
     auditorSeedPrompt: document.getElementById("remote-auditor-seed").value.trim()
   };
@@ -1561,6 +2033,7 @@ runnerStart.addEventListener("click", async () => {
     if (config.maxPositionPercent < 1 || config.maxPositionPercent > 100) throw new Error("Maximum position must be between 1% and 100%.");
     if (config.maxSectorPercent < 5 || config.maxSectorPercent > 100) throw new Error("Maximum sector weight must be between 5% and 100%.");
     if (config.regularizationStrength < 0 || config.regularizationStrength > 10) throw new Error("Regularization strength must be between 0 and 10.");
+    if (config.selectedTickers.length < 2) throw new Error("Select at least two securities in the Universe tab before running AlloLabs.");
     if (config.auditViews && !config.gptViews) throw new Error("Global AI audit requires AI-assisted views.");
     if (config.analystSeedPrompt.length > 12000) throw new Error("Analyst seed prompt must be 12,000 characters or fewer.");
     if (config.auditorSeedPrompt.length > 12000) throw new Error("Auditor seed prompt must be 12,000 characters or fewer.");

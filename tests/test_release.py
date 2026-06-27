@@ -62,7 +62,10 @@ def dashboard_config(**overrides):
 class ConfigurationTests(unittest.TestCase):
     def test_repository_uses_only_allolabs_branding(self):
         retired_names = ("wealth" + "gpt", "wealth" + "opt")
-        excluded_directories = {"_local_archive", "__pycache__", ".git"}
+        excluded_directories = {
+            "_local_archive", "__pycache__", ".git", ".desktop-build",
+            "build", "dist", "release", "tmp", "webview-profile",
+        }
         text_suffixes = {
             ".py", ".js", ".html", ".css", ".md", ".json", ".txt",
             ".yml", ".yaml", ".ps1", ".bat", ".example", ".gitignore",
@@ -137,6 +140,35 @@ class ConfigurationTests(unittest.TestCase):
             server.validate_config(
                 dashboard_config(longOnly="false")
             )
+
+    def test_custom_universe_is_validated_and_scopes_the_pipeline(self):
+        selected = ["AAPL", "RY.TO", "AZN.L"]
+        config = server.validate_config(
+            dashboard_config(universe="custom", selectedTickers=selected)
+        )
+        self.assertEqual(config["universe"], "custom")
+        self.assertEqual(config["selectedTickers"], selected)
+        environment = runner.configuration_environment(config)
+        self.assertEqual(json.loads(environment["ALLOLABS_ASSET_UNIVERSE_TICKERS"]), selected)
+        self.assertEqual(json.loads(environment["ALLOLABS_RESEARCH_TICKERS"]), selected)
+
+        with self.assertRaisesRegex(ValueError, "at least two"):
+            server.validate_config(
+                dashboard_config(universe="custom", selectedTickers=["AAPL"])
+            )
+        with self.assertRaisesRegex(ValueError, "unsupported tickers"):
+            server.validate_config(
+                dashboard_config(universe="custom", selectedTickers=["AAPL", "FAKE"])
+            )
+
+    def test_universe_catalog_covers_every_pipeline_asset_once(self):
+        grouped = [
+            ticker
+            for group in server.UNIVERSE_CATALOG["groups"]
+            for ticker in group["tickers"]
+        ]
+        self.assertEqual(grouped, load_asset_universe())
+        self.assertEqual(len(grouped), len(set(grouped)))
 
     def test_server_rejects_fractional_whole_number_fields(self):
         with self.assertRaisesRegex(ValueError, "whole numbers"):
@@ -449,6 +481,10 @@ class ConfigurationTests(unittest.TestCase):
         self.assertIn('id="remote-analyst-seed"', markup)
         self.assertIn('id="remote-auditor-seed"', markup)
         self.assertNotIn('id="remote-long-only" type="checkbox" checked disabled', markup)
+        self.assertIn('id="universe-view"', markup)
+        self.assertIn('id="universe-groups"', markup)
+        self.assertIn('data-shortcut-view="universe"', markup)
+        self.assertNotIn('id="remote-universe"', markup)
         self.assertNotIn('id="settings-view"', markup)
         self.assertIn("auditViews: remoteAuditToggle.checked", script)
         self.assertIn("researchProvider: remoteResearchProvider.value", script)
@@ -461,6 +497,8 @@ class ConfigurationTests(unittest.TestCase):
         self.assertIn("config.refreshCache", script)
         self.assertIn("analystSeedPrompt", script)
         self.assertIn("auditorSeedPrompt", script)
+        self.assertIn("selectedTickers: orderedUniverseSelection()", script)
+        self.assertIn("loadUniverseCatalog", script)
         self.assertIn("Sending .* request for tickers", script)
         self.assertIn("Global AI audit complete", script)
         self.assertIn("finishRunProgress", script)
@@ -472,11 +510,10 @@ class ConfigurationTests(unittest.TestCase):
         logo = REPOSITORY_ROOT / "resources" / "allolabs-logo.png"
         self.assertTrue(logo.is_file())
         self.assertGreater(logo.stat().st_size, 1000)
-        self.assertIn("data-project-logo", markup)
-        self.assertIn("brand-mark-fallback", markup)
+        self.assertIn('class="splash-logo"', markup)
+        self.assertIn('id="brand-logo"', markup)
         self.assertNotIn('<span class="brand-mark">WG</span>', markup)
-        self.assertIn(".brand-mark img", stylesheet)
-        self.assertIn("activateProjectLogo", (REPOSITORY_ROOT / "dashboard" / "app.js").read_text(encoding="utf-8"))
+        self.assertIn(".brand-logo-svg", stylesheet)
         self.assertGreaterEqual(server.API_VERSION, 13)
         self.assertIn('src="resources/allolabs-logo.png"', readme)
         self.assertEqual(server.RESOURCES_DIR, REPOSITORY_ROOT / "resources")
@@ -597,8 +634,9 @@ class ConfigurationTests(unittest.TestCase):
             for model in models
         }
         dropdown_catalog = script.split("const MODEL_GUIDE", 1)[0]
-        self.assertIn('id="models-view"', markup)
-        self.assertIn('data-shortcut-view="models"', markup)
+        self.assertIn('id="report-view"', markup)
+        self.assertIn('id="model-guide"', markup)
+        self.assertIn('data-shortcut-view="reference"', markup)
         self.assertIn("Context", script)
         self.assertIn("Weakness", script)
         for model in selectable_models:

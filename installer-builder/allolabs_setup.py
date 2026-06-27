@@ -9,8 +9,8 @@ import zipfile
 from pathlib import Path
 
 APP_NAME = "AlloLabs"
-VERSION = "1.3.2"
-ZIP_NAME = "AlloLabs-v1.3.2-Windows-x64.zip"
+VERSION = "1.3.1"
+ZIP_NAME = "AlloLabs-v1.3.1-Windows-x64.zip"
 
 
 def resource_path(name: str) -> Path:

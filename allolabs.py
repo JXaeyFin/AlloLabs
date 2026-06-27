@@ -9,7 +9,7 @@ Description: Implements Modern Portfolio Theory (MPT) on a global large-cap
                2. Minimum Volatility (Global Minimum Variance Portfolio)
 
              Both portfolios can be evaluated out of sample against broad
-             Canadian, U.S., U.K., and European market benchmarks.
+             global equity market benchmarks.
 
              A Jobson-Korkie significance test is applied to assess whether
              out-of-sample Sharpe ratio outperformance is statistically
@@ -17,7 +17,7 @@ Description: Implements Modern Portfolio Theory (MPT) on a global large-cap
 
 Methodology: SLSQP via scipy.optimize.minimize
 Data:        yfinance live prices (training + out-of-sample), pulled up to today
-Risk-Free:   2.68% (Canadian 1-Year Treasury, as of model construction)
+Risk-Free:   2.68% (hardcoded placeholder; update to reflect current short-term rate)
 
 Dependencies: numpy, pandas, scipy, matplotlib, yfinance
 ================================================================================
@@ -156,6 +156,19 @@ def env_text(name: str, default: str = "", *, maximum: int = 12000) -> str:
     if len(value) > maximum:
         raise ValueError(f"{name} must be at most {maximum} characters.")
     return value
+
+
+def fetch_market_caps(tickers_list) -> dict:
+    """Return {ticker: float market cap} from yfinance; None for unavailable tickers."""
+    caps = {}
+    for ticker in tickers_list:
+        try:
+            info = yf.Ticker(ticker).get_info() or {}
+            cap = info.get("marketCap")
+            caps[ticker] = float(cap) if cap and float(cap) > 0 else None
+        except Exception:
+            caps[ticker] = None
+    return caps
 
 
 def download_close_prices(tickers_list, start, end, *, label: str) -> pd.DataFrame:
@@ -321,9 +334,22 @@ ASSET_UNIVERSE = [
     # ==========================================================
     "BHP","MUFG","NVO","SONY","TM","TSM"
 ]
-# Benchmarks & tracker funds: keep the TSX ETF, add broad-market trackers
-# including S&P 500, Nasdaq-100, an LSE FTSE tracker, and the Euro Stoxx index.
-# Note: users can customise this list to specific ETF tickers if desired.
+
+ACTIVE_ASSET_UNIVERSE = (
+    env_ticker_subset("ALLOLABS_ASSET_UNIVERSE_TICKERS")
+    or list(ASSET_UNIVERSE)
+)
+unknown_asset_tickers = sorted(set(ACTIVE_ASSET_UNIVERSE) - set(ASSET_UNIVERSE))
+if unknown_asset_tickers:
+    raise ValueError(
+        "ALLOLABS_ASSET_UNIVERSE_TICKERS contains tickers outside ASSET_UNIVERSE: "
+        + ", ".join(unknown_asset_tickers)
+    )
+if len(ACTIVE_ASSET_UNIVERSE) < 2:
+    raise ValueError("The selected asset universe must contain at least two tickers.")
+
+# Benchmarks & tracker funds: broad-market ETFs spanning Canadian, U.S.,
+# U.K., and European indices. Users can customise this list.
 BENCHMARK_TICKERS = ["XIU.TO", "SPY", "QQQ", "ISF.L", "^STOXX50E"]
 
 # =============================================================================
@@ -364,6 +390,10 @@ if oos_years == 0:
     print("Out-of-sample   : DISABLED  (oos_years = 0)")
 else:
     print(f"Out-of-sample   : {oos_start.date()} -> {oos_end.date()}  ({oos_years} yr)")
+print(
+    f"Asset universe  : {len(ACTIVE_ASSET_UNIVERSE)} selected "
+    f"of {len(ASSET_UNIVERSE)} configured assets"
+)
 
 # =============================================================================
 # BLOCK 2: YFINANCE DATA INGESTION - TRAINING
@@ -371,7 +401,7 @@ else:
 print("\nDownloading training prices from yfinance...")
 
 raw_train = download_close_prices(
-    ASSET_UNIVERSE,
+    ACTIVE_ASSET_UNIVERSE,
     training_start,
     training_end + pd.Timedelta(days=1),   # yfinance end is exclusive
     label="training",
@@ -417,7 +447,7 @@ mu_values = mu.values
 Sigma_values = stabilize_covariance(Sigma.values)
 Sigma = pd.DataFrame(Sigma_values, index=Sigma.index, columns=Sigma.columns)
 
-risk_free_rate = 0.0268   # Canadian 1-Year Treasury
+risk_free_rate = 0.0268   # Hardcoded short-term risk-free rate; update as needed
 
 # =============================================================================
 # BLACK-LITTERMAN + GPT CONFIGURATION
@@ -451,6 +481,7 @@ gpt_batch_size = 12
 gpt_max_output_tokens = 7000
 gpt_request_attempts = 3
 gpt_refresh_cache = env_bool("ALLOLABS_REFRESH_CACHE", False)
+gpt_max_news_articles = env_int("ALLOLABS_MAX_NEWS_ARTICLES", 5, minimum=1, maximum=20)
 analyst_seed_prompt = env_text("ALLOLABS_ANALYST_SEED_PROMPT")
 
 # When enabled, the selected provider generates structured equity views for
@@ -850,10 +881,11 @@ def generate_gpt_views(
         return []
 
     # Pre-fetch context for all tickers
-    print("  Fetching fundamentals and news from yfinance...")
+    print(f"  Fetching fundamentals and up to {gpt_max_news_articles} news articles "
+          f"per ticker from yfinance...")
     context_map = {}
     for tkr in tickers_list:
-        context_map[tkr] = fetch_ticker_context(tkr, max_news=5)
+        context_map[tkr] = fetch_ticker_context(tkr, max_news=gpt_max_news_articles)
         print(f"    {tkr} - {len(context_map[tkr]['ratios'])} ratios, "
               f"{len(context_map[tkr]['news'])} news items")
 
@@ -879,8 +911,7 @@ def generate_gpt_views(
                     src  = f"[{n['source']}]" if n["source"] != "Unknown" else ""
                     date = f"({n['date']})" if n["date"] else ""
                     lines.append(f"  - {n['title']} {src} {date}".strip())
-                    if n["summary"]:
-                        lines.append(f"    {n['summary']}")
+                    lines.append(f"    Summary: {n['summary'] or 'No summary available'}")
             else:
                 lines.append("Recent news: unavailable")
 
@@ -907,7 +938,7 @@ def generate_gpt_views(
             f"{start + 1}-{start + len(batch)} of {len(tickers_list)}..."
         )
 
-        prompt = f"""You are a senior equity research analyst covering TSX-listed companies.
+        prompt = f"""You are a senior equity research analyst covering global publicly listed equities.
 
 Your output will be used as alpha inputs in a Black-Litterman portfolio optimization model. Prioritize calibration, realism, and cross-sectional differentiation over persuasive writing.
 For each ticker, estimate the most probable 12-month forward total return using the supplied fundamentals, ratios, and news.
@@ -1213,6 +1244,7 @@ def black_litterman_posterior(
     views,
     tau: float = 0.05,
     delta: float = 2.5,
+    market_caps: dict | None = None,
 ):
     n_assets = len(tickers_list)
     if mu_prior.shape != (n_assets,) or Sigma.shape != (n_assets, n_assets):
@@ -1232,8 +1264,28 @@ def black_litterman_posterior(
         seen.add(view["ticker"])
         valid_views.append(view)
 
-    equal_weight_proxy = np.full(n_assets, 1.0 / n_assets)
-    equilibrium_prior = delta * Sigma.dot(equal_weight_proxy)
+    # Build benchmark weights: cap-weighted where available, equal-weight as fallback.
+    if market_caps:
+        raw_caps = np.array([market_caps.get(t) or 0.0 for t in tickers_list], dtype=float)
+        missing = [t for t, c in zip(tickers_list, raw_caps) if c <= 0]
+        if missing:
+            # Fill missing caps with the mean of available caps so they aren't zeroed out.
+            available_mean = raw_caps[raw_caps > 0].mean() if np.any(raw_caps > 0) else 1.0
+            print(
+                f"  BL prior: market cap unavailable for {missing}; "
+                f"substituting universe mean cap ({available_mean / 1e9:.1f}B)."
+            )
+            raw_caps = np.where(raw_caps > 0, raw_caps, available_mean)
+        benchmark_weights = raw_caps / raw_caps.sum()
+        print(
+            f"  BL prior: cap-weighted benchmark "
+            f"({sum(1 for c in market_caps.values() if c)}/{n_assets} caps fetched)."
+        )
+    else:
+        benchmark_weights = np.full(n_assets, 1.0 / n_assets)
+        print("  BL prior: equal-weight benchmark (no market caps supplied).")
+
+    equilibrium_prior = delta * Sigma.dot(benchmark_weights)
     posterior = equilibrium_prior.copy()
 
     if valid_views:
@@ -1432,10 +1484,14 @@ def apply_black_litterman(mu_prior: np.ndarray, Sigma: np.ndarray, tickers_list)
 
     # ────────────────────────────────────────────────────────────────────────
 
+    print("  Fetching market caps for cap-weighted BL prior...")
+    bl_market_caps = fetch_market_caps(tickers_list)
+
     mu_bl, analysis = black_litterman_posterior(
         mu_prior, Sigma, tickers_list, views,
         tau=black_litterman_tau,
         delta=black_litterman_delta,
+        market_caps=bl_market_caps,
     )
 
     output = {ticker: analysis.get(ticker, {}) for ticker in tickers_list}
@@ -1925,6 +1981,12 @@ else:
     oos_vol_sharpe = master["Max_Sharpe"].std() * np.sqrt(252)
     oos_vol_vol    = master["Min_Vol"].std()    * np.sqrt(252)
 
+    # Annualized Sharpe over the OOS window (exposed to dashboard via namespace)
+    _oos_ann_s = (1 + oos_ret_sharpe) ** (1.0 / oos_years) - 1
+    _oos_ann_v = (1 + oos_ret_vol)    ** (1.0 / oos_years) - 1
+    oos_sr_sharpe = (_oos_ann_s - risk_free_rate) / oos_vol_sharpe if oos_vol_sharpe > 0 else 0.0
+    oos_sr_vol    = (_oos_ann_v - risk_free_rate) / oos_vol_vol    if oos_vol_vol    > 0 else 0.0
+
     # Compute per-benchmark total return and annualised vol
     benchmark_oos_rets = {}
     benchmark_oos_vols = {}
@@ -2134,7 +2196,7 @@ else:
     print(f"Chart saved -> {out_path}")
 
 
-print("\nGenerating portfolio summary PDF...")
+print("\nGenerating portfolio allocation memorandum PDF...")
 create_portfolio_pdf(
     output_path=PORTFOLIO_REPORT_PATH,
     tickers=tickers,
@@ -2154,4 +2216,4 @@ create_portfolio_pdf(
     training_start=training_start.date(),
     training_end=training_end.date(),
 )
-print(f"Portfolio summary saved -> {PORTFOLIO_REPORT_PATH}")
+print(f"Portfolio memorandum saved -> {PORTFOLIO_REPORT_PATH}")

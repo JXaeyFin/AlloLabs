@@ -14,6 +14,7 @@ $portable = [System.IO.Path]::GetFullPath($PortablePath)
 $required = @(
     "AlloLabs.exe",
     "AlloLabsWorker.exe",
+    "README.md",
     "_internal\allolabs.py",
     "_internal\dashboard\index.html",
     "_internal\dashboard\app.js",

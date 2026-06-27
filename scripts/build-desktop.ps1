@@ -47,13 +47,15 @@ if ($LASTEXITCODE -ne 0) {
 if ($LASTEXITCODE -ne 0) {
     throw "PyInstaller could not build the AlloLabs desktop application."
 }
+$portableSource = Join-Path $root "dist\AlloLabs"
+Copy-Item -LiteralPath (Join-Path $root "packaging\PORTABLE_README.md") `
+    -Destination (Join-Path $portableSource "README.md") -Force
 & powershell.exe -NoProfile -ExecutionPolicy Bypass `
     -File (Join-Path $root "scripts\verify-portable.ps1") `
-    -PortablePath (Join-Path $root "dist\AlloLabs")
+    -PortablePath $portableSource
 if ($LASTEXITCODE -ne 0) {
     throw "The AlloLabs portable verification failed."
 }
-$portableSource = Join-Path $root "dist\AlloLabs"
 $portableTarget = Join-Path $root "dist\AlloLabs-Windows-x64"
 if (Test-Path -LiteralPath $portableTarget) {
     Remove-Item -LiteralPath $portableTarget -Recurse -Force

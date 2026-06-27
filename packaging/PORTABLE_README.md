@@ -1,4 +1,4 @@
-# AlloLabs v1.3.2 Portable
+# AlloLabs v1.3.1 Portable
 
 AlloLabs is an AI-assisted global asset-allocation research application.
 

@@ -14,6 +14,8 @@ import pandas as pd
 from matplotlib.backends.backend_pdf import PdfPages
 from matplotlib.patches import FancyBboxPatch, Rectangle
 
+from allolabs_report_memo import create_investment_memo
+
 
 NAVY = "#05070A"
 BLUE = "#4DA3FF"
@@ -993,7 +995,7 @@ def create_portfolio_pdf(
     training_start,
     training_end,
 ):
-    """Create an educational terminal-style portfolio research report."""
+    """Create the AlloLabs editorial portfolio allocation memorandum."""
     output_path = Path(output_path)
     analysis_path = Path(analysis_path)
     try:
@@ -1022,28 +1024,12 @@ def create_portfolio_pdf(
     ).sort_values("max_sharpe_weight", ascending=False)
     allocation_export.to_csv(output_path.with_name("portfolio_allocations.csv"), index=False)
 
-    metadata = {
-        "Title": "AlloLabs Portfolio Research Monitor",
-        "Author": "Jeffrey Xia",
-        "Subject": "Educational global portfolio construction and model-risk report",
-        "Keywords": "portfolio optimization, Black-Litterman, model risk, MPT, global equities",
-    }
-    with PdfPages(output_path, metadata=metadata) as pdf:
-        _overview_page(
-            pdf,
-            max_frame,
-            min_frame,
-            max_metrics,
-            min_metrics,
-            training_start,
-            training_end,
-        )
-        _return_bridge_page(pdf, max_frame, min_frame, max_metrics, min_metrics, 2)
-        _portfolio_breakdown_page(pdf, max_frame, max_metrics, "Maximum Sharpe", BLUE, 3)
-        _rationale_pages(pdf, max_frame, "Maximum Sharpe", BLUE, 4)
-        _portfolio_breakdown_page(pdf, min_frame, min_metrics, "Minimum Volatility", TEAL, 6)
-        _rationale_pages(pdf, min_frame, "Minimum Volatility", TEAL, 7)
-        _methodology_page(pdf, max_frame, min_frame, max_metrics, min_metrics, 9)
-        _allocation_appendix(pdf, max_frame, min_frame, 10)
-
-    return output_path
+    return create_investment_memo(
+        output_path=output_path,
+        max_frame=max_frame,
+        min_frame=min_frame,
+        max_metrics=max_metrics,
+        min_metrics=min_metrics,
+        training_start=training_start,
+        training_end=training_end,
+    )

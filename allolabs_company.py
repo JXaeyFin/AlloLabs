@@ -74,7 +74,14 @@ def fetch_ticker_context(ticker: str, max_news: int = 5) -> dict:
 
     news_items = []
     try:
-        raw_news = company.news or []
+        # get_news(count=N) actually requests N items from Yahoo Finance;
+        # .news is a cached property that returns the API default (~5-8).
+        raw_news = company.get_news(count=max_news) or []
+    except (TypeError, AttributeError):
+        try:
+            raw_news = company.news or []
+        except Exception:
+            raw_news = []
     except Exception:
         raw_news = []
     for item in raw_news[:max_news]:
@@ -102,7 +109,14 @@ def fetch_ticker_context(ticker: str, max_news: int = 5) -> dict:
                 published = ""
         else:
             published = published[:10]
-        summary = str(content.get("summary") or "").strip()
+        # yfinance 1.x news payloads vary: summary may be empty while
+        # description or body holds the actual text.
+        summary = str(
+            content.get("summary")
+            or content.get("description")
+            or content.get("body")
+            or ""
+        ).strip()
         news_items.append({
             "title": title,
             "source": str(source),

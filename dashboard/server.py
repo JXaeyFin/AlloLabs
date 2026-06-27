@@ -21,6 +21,11 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from urllib.parse import parse_qs, unquote, urlparse
 
+try:
+    from dashboard.universe import preset_id_for_selection, universe_catalog
+except ModuleNotFoundError:  # Direct execution: python dashboard/server.py
+    from universe import preset_id_for_selection, universe_catalog
+
 
 ROOT = Path(__file__).resolve().parent
 RESOURCES_DIR = ROOT.parent / "resources"
@@ -32,7 +37,13 @@ EXAMPLES_DIR = ROOT.parent / "examples"
 DEFAULT_RESULTS = EXAMPLES_DIR / "default-run.json"
 DEFAULT_PDF = EXAMPLES_DIR / "default-portfolio-report.pdf"
 DEFAULT_CHART = EXAMPLES_DIR / "default-performance.png"
-ALLOWED_UNIVERSES = {"curated", "canada", "full"}
+UNIVERSE_CATALOG = universe_catalog(DEFAULT_SCRIPT)
+SUPPORTED_TICKERS = frozenset(
+    ticker
+    for group in UNIVERSE_CATALOG["groups"]
+    for ticker in group["tickers"]
+)
+ALLOWED_UNIVERSES = {"curated", "canada", "full", "custom"}
 ALLOWED_REGULARIZATIONS = {"none", "l2", "smooth_l1"}
 AI_PROVIDER_MODELS = {
     "openai": {"gpt-5.5", "gpt-5.4", "gpt-5.4-mini", "gpt-5.4-nano"},
@@ -64,10 +75,11 @@ ALLOWED_AI_MODELS = {
     }
     for stage in ("research", "audit")
 }
-API_VERSION = 19
+API_VERSION = 21
 REQUIRED_ANALYSIS_MODULES = ("matplotlib", "numpy", "pandas", "scipy", "yfinance")
 COMPANY_DETAILS_CACHE_SECONDS = 15 * 60
 TICKER_PATTERN = re.compile(r"^[A-Z0-9][A-Z0-9.\-]{0,19}$")
+HISTORY_ID_PATTERN = re.compile(r"^\d{4}-\d{2}-\d{2}/[a-z0-9][a-z0-9._\-]{0,159}$")
 MAX_SEED_PROMPT_LENGTH = 12000
 
 
@@ -218,6 +230,8 @@ class RunState:
                     "company_details": True,
                     "research_company_details": True,
                     "provider_key_status": True,
+                    "run_history": True,
+                    "custom_universe": True,
                 },
             }
 
@@ -297,7 +311,7 @@ def validate_config(payload: dict) -> dict:
         long_only = payload["longOnly"]
         raw_max_sector = payload["maxSectorPercent"]
         raw_regularization_strength = payload["regularizationStrength"]
-        universe = str(payload["universe"])
+        universe = str(payload.get("universe", "custom"))
         regularization = str(payload["regularization"])
         research_provider = str(payload.get("researchProvider", "openai"))
         research_model = str(payload.get("researchModel", payload.get("gptModel", "")))
@@ -308,6 +322,7 @@ def validate_config(payload: dict) -> dict:
         refresh_cache = payload["refreshCache"]
         analyst_seed_prompt = str(payload.get("analystSeedPrompt", "")).strip()
         auditor_seed_prompt = str(payload.get("auditorSeedPrompt", "")).strip()
+        raw_max_news = payload.get("maxNewsArticles", 5)
     except (KeyError, TypeError, ValueError) as exc:
         raise ValueError("Run configuration is incomplete or invalid.") from exc
 
@@ -364,6 +379,34 @@ def validate_config(payload: dict) -> dict:
         raise ValueError("Regularization strength must be between 0 and 10.")
     if universe not in ALLOWED_UNIVERSES:
         raise ValueError("Research universe is not allowlisted.")
+
+    raw_selected_tickers = payload.get("selectedTickers")
+    if raw_selected_tickers is None:
+        legacy_preset = next(
+            (preset for preset in UNIVERSE_CATALOG["presets"] if preset["id"] == universe),
+            None,
+        )
+        if legacy_preset is None:
+            raise ValueError("Select at least two securities for the research universe.")
+        selected_tickers = list(legacy_preset["tickers"])
+    else:
+        if not isinstance(raw_selected_tickers, list) or not all(
+            isinstance(ticker, str) and TICKER_PATTERN.fullmatch(ticker.strip().upper())
+            for ticker in raw_selected_tickers
+        ):
+            raise ValueError("Selected tickers must be a list of valid ticker symbols.")
+        selected_tickers = list(dict.fromkeys(
+            ticker.strip().upper() for ticker in raw_selected_tickers
+        ))
+    if len(selected_tickers) < 2:
+        raise ValueError("Select at least two securities for the research universe.")
+    unsupported_tickers = sorted(set(selected_tickers) - SUPPORTED_TICKERS)
+    if unsupported_tickers:
+        raise ValueError(
+            "Research universe contains unsupported tickers: "
+            + ", ".join(unsupported_tickers)
+        )
+    universe = preset_id_for_selection(selected_tickers, UNIVERSE_CATALOG)
     if regularization not in ALLOWED_REGULARIZATIONS:
         raise ValueError("Regularization method is not allowlisted.")
     if research_provider not in ALLOWED_AI_MODELS["research"]:
@@ -378,6 +421,12 @@ def validate_config(payload: dict) -> dict:
         raise ValueError("Analyst seed prompt is too long.")
     if len(auditor_seed_prompt) > MAX_SEED_PROMPT_LENGTH:
         raise ValueError("Auditor seed prompt is too long.")
+    try:
+        max_news_articles = int(float(raw_max_news))
+    except (TypeError, ValueError) as exc:
+        raise ValueError("News articles per ticker must be a number.") from exc
+    if not 1 <= max_news_articles <= 20:
+        raise ValueError("News articles per ticker must be between 1 and 20.")
 
     return {
         "trainingYears": training_years,
@@ -390,6 +439,7 @@ def validate_config(payload: dict) -> dict:
             regularization_strength if regularization != "none" else 0.0
         ),
         "universe": universe,
+        "selectedTickers": selected_tickers,
         "gptViews": gpt_views,
         "researchProvider": research_provider,
         "researchModel": research_model,
@@ -399,6 +449,7 @@ def validate_config(payload: dict) -> dict:
         "refreshCache": refresh_cache,
         "analystSeedPrompt": analyst_seed_prompt,
         "auditorSeedPrompt": auditor_seed_prompt,
+        "maxNewsArticles": max_news_articles,
     }
 
 
@@ -555,12 +606,14 @@ class Handler(BaseHTTPRequestHandler):
             self.app.state.data_dir.resolve(),
             EXAMPLES_DIR.resolve(),
         }
+        allowed_trees = {self.app.state.data_dir.resolve() / "run-history"}
         try:
             resolved = path.resolve(strict=True)
         except FileNotFoundError:
             self.send_json({"error": f"Artifact is not available yet: {path.name}"}, HTTPStatus.NOT_FOUND)
             return
-        if resolved.parent not in allowed_directories or not resolved.is_file():
+        inside_allowed_tree = any(resolved.is_relative_to(root) for root in allowed_trees)
+        if (resolved.parent not in allowed_directories and not inside_allowed_tree) or not resolved.is_file():
             self.send_json({"error": "Artifact path is outside the AlloLabs project."}, HTTPStatus.FORBIDDEN)
             return
         body = resolved.read_bytes()
@@ -571,7 +624,33 @@ class Handler(BaseHTTPRequestHandler):
         self.end_headers()
         self.wfile.write(body)
 
-    def results_path(self) -> tuple[Path | None, str | None]:
+    def history_run_dir(self, history_id: str) -> Path:
+        if not HISTORY_ID_PATTERN.fullmatch(history_id):
+            raise ValueError("Invalid run history identifier.")
+        history_root = (self.app.state.data_dir / "run-history").resolve()
+        candidate = (history_root / Path(*history_id.split("/"))).resolve()
+        if not candidate.is_relative_to(history_root) or not candidate.is_dir():
+            raise FileNotFoundError("Archived run was not found.")
+        return candidate
+
+    def history_catalog(self) -> list[dict]:
+        history_root = self.app.state.data_dir / "run-history"
+        if not history_root.is_dir():
+            return []
+        runs = []
+        for manifest_path in history_root.glob("????-??-??/*/manifest.json"):
+            try:
+                payload = json.loads(manifest_path.read_text(encoding="utf-8"))
+            except (json.JSONDecodeError, OSError):
+                continue
+            if isinstance(payload, dict) and HISTORY_ID_PATTERN.fullmatch(str(payload.get("id", ""))):
+                runs.append(payload)
+        runs.sort(key=lambda item: str(item.get("generatedAt", "")), reverse=True)
+        return runs
+
+    def results_path(self, history_id: str | None = None) -> tuple[Path | None, str | None]:
+        if history_id:
+            return self.history_run_dir(history_id) / "run-results.json", "history"
         live_path = self.app.state.data_dir / "latest_run.json"
         if live_path.is_file():
             return live_path, "live"
@@ -579,8 +658,8 @@ class Handler(BaseHTTPRequestHandler):
             return DEFAULT_RESULTS, "example"
         return None, None
 
-    def read_results(self) -> tuple[dict, str]:
-        results_path, source = self.results_path()
+    def read_results(self, history_id: str | None = None) -> tuple[dict, str]:
+        results_path, source = self.results_path(history_id)
         if results_path is None or source is None:
             raise FileNotFoundError("No live or bundled dashboard results are available.")
         payload = json.loads(results_path.read_text(encoding="utf-8"))
@@ -589,6 +668,8 @@ class Handler(BaseHTTPRequestHandler):
         payload["dataMode"] = source
         if source == "example":
             payload.setdefault("snapshotLabel", "Bundled example")
+        elif source == "history":
+            payload.setdefault("snapshotLabel", "Archived run")
         return payload, source
 
     def fetch_company_details(self, ticker: str) -> dict:
@@ -666,6 +747,10 @@ class Handler(BaseHTTPRequestHandler):
             if self.require_auth():
                 self.send_json(self.app.state.snapshot())
             return
+        if parsed.path == "/api/universe":
+            if self.require_auth():
+                self.send_json(UNIVERSE_CATALOG)
+            return
         if parsed.path == "/api/logs":
             if not self.require_auth():
                 return
@@ -680,11 +765,12 @@ class Handler(BaseHTTPRequestHandler):
         if parsed.path == "/api/results":
             if not self.require_auth():
                 return
+            history_id = parse_qs(parsed.query).get("run", [""])[0].strip() or None
             try:
-                payload, _ = self.read_results()
-            except FileNotFoundError:
+                payload, _ = self.read_results(history_id)
+            except (FileNotFoundError, ValueError) as exc:
                 self.send_json(
-                    {"error": "No completed or bundled dashboard run is available."},
+                    {"error": str(exc) if history_id else "No completed or bundled dashboard run is available."},
                     HTTPStatus.NOT_FOUND,
                 )
                 return
@@ -693,15 +779,24 @@ class Handler(BaseHTTPRequestHandler):
                 return
             self.send_json(payload)
             return
+        if parsed.path == "/api/history":
+            if not self.require_auth():
+                return
+            self.send_json({
+                "runs": self.history_catalog(),
+                "folder": str(self.app.state.data_dir / "run-history"),
+            })
+            return
         if parsed.path == "/api/company":
             if not self.require_auth():
                 return
             ticker = parse_qs(parsed.query).get("ticker", [""])[0].strip().upper()
+            history_id = parse_qs(parsed.query).get("run", [""])[0].strip() or None
             if not TICKER_PATTERN.fullmatch(ticker):
                 self.send_json({"error": "A valid portfolio ticker is required."}, HTTPStatus.BAD_REQUEST)
                 return
             try:
-                results, _ = self.read_results()
+                results, _ = self.read_results(history_id)
                 if ticker not in result_company_tickers(results):
                     self.send_json(
                         {"error": "Ticker is not present in the displayed portfolios or AI research."},
@@ -722,6 +817,15 @@ class Handler(BaseHTTPRequestHandler):
         if parsed.path == "/api/artifacts/pdf":
             if not self.require_auth():
                 return
+            history_id = parse_qs(parsed.query).get("run", [""])[0].strip() or None
+            if history_id:
+                try:
+                    pdf_path = self.history_run_dir(history_id) / "portfolio-report.pdf"
+                except (FileNotFoundError, ValueError) as exc:
+                    self.send_json({"error": str(exc)}, HTTPStatus.NOT_FOUND)
+                    return
+                self.send_artifact(pdf_path, "application/pdf")
+                return
             _, source = self.results_path()
             live_pdf = self.app.state.data_dir / "allolabs_portfolio_report.pdf"
             pdf_path = live_pdf if source == "live" and live_pdf.is_file() else DEFAULT_PDF
@@ -729,6 +833,15 @@ class Handler(BaseHTTPRequestHandler):
             return
         if parsed.path == "/api/artifacts/chart":
             if not self.require_auth():
+                return
+            history_id = parse_qs(parsed.query).get("run", [""])[0].strip() or None
+            if history_id:
+                try:
+                    chart_path = self.history_run_dir(history_id) / "performance-chart.png"
+                except (FileNotFoundError, ValueError) as exc:
+                    self.send_json({"error": str(exc)}, HTTPStatus.NOT_FOUND)
+                    return
+                self.send_artifact(chart_path, "image/png")
                 return
             try:
                 results, source = self.read_results()
@@ -741,6 +854,30 @@ class Handler(BaseHTTPRequestHandler):
             live_chart = self.app.state.data_dir / "portfolio_vs_markets_oos.png"
             chart_path = live_chart if source == "live" and live_chart.is_file() else DEFAULT_CHART
             self.send_artifact(chart_path, "image/png")
+            return
+        if parsed.path == "/api/history/artifact":
+            if not self.require_auth():
+                return
+            query = parse_qs(parsed.query)
+            history_id = query.get("run", [""])[0].strip()
+            kind = query.get("kind", [""])[0].strip()
+            artifact_names = {
+                "all-tickers": "all-tickers.csv",
+                "ai-opinions": "ai-opinions.csv",
+                "config": "run-config.csv",
+                "config-json": "run-config.json",
+            }
+            filename = artifact_names.get(kind)
+            if not filename:
+                self.send_json({"error": "Unknown archived artifact type."}, HTTPStatus.BAD_REQUEST)
+                return
+            try:
+                artifact_path = self.history_run_dir(history_id) / filename
+            except (FileNotFoundError, ValueError) as exc:
+                self.send_json({"error": str(exc)}, HTTPStatus.NOT_FOUND)
+                return
+            content_type = "application/json" if filename.endswith(".json") else "text/csv; charset=utf-8"
+            self.send_artifact(artifact_path, content_type)
             return
         static_files = {
             "/": ROOT / "index.html",

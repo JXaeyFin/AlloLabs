@@ -42,6 +42,7 @@ latest_run.json
 listing_metadata_cache.json
 portfolio_allocations.csv
 sector_cache.json
+run-history/
 
 # Generated reports and charts
 *.pdf
