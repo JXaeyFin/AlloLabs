@@ -285,15 +285,36 @@
             <div class="panel-heading">
               <div><p class="eyebrow">Exposure</p><h3>Market &amp; currency</h3></div>
             </div>
-            <div class="exposure-grid">
-              <div class="exposure-section">
+            <div class="exposure-donuts">
+
+              <div class="exposure-donut-col">
                 <p class="exposure-section-title">Market exposure</p>
-                <div id="market-exposure-bars"></div>
+                <div class="donut-layout" style="position:relative;margin:16px 0">
+                  <div class="donut donut-sm" id="market-donut">
+                    <div><strong>—</strong><span>allocated</span></div>
+                  </div>
+                  <div class="sector-legend" id="market-legend"></div>
+                  <div class="donut-tooltip" id="market-donut-tooltip">
+                    <div class="donut-tooltip-sector" id="market-donut-tooltip-label"></div>
+                    <div class="donut-tooltip-value" id="market-donut-tooltip-value"></div>
+                  </div>
+                </div>
               </div>
-              <div class="exposure-section">
+
+              <div class="exposure-donut-col">
                 <p class="exposure-section-title">Currency exposure</p>
-                <div id="currency-exposure-bars"></div>
+                <div class="donut-layout" style="position:relative;margin:16px 0">
+                  <div class="donut donut-sm" id="currency-donut">
+                    <div><strong>—</strong><span>allocated</span></div>
+                  </div>
+                  <div class="sector-legend" id="currency-legend"></div>
+                  <div class="donut-tooltip" id="currency-donut-tooltip">
+                    <div class="donut-tooltip-sector" id="currency-donut-tooltip-label"></div>
+                    <div class="donut-tooltip-value" id="currency-donut-tooltip-value"></div>
+                  </div>
+                </div>
               </div>
+
             </div>
           </article>
         </div>

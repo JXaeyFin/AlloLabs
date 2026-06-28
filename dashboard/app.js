@@ -329,30 +329,35 @@ const ADR_REFERENCES = {
 };
 
 const MARKET_COLORS = {
-  "U.S.":         "#4f8ff7",
-  "Canada / TSX": "#f87171",
-  "UK / LSE":     "#8b5cf6",
-  "Europe":       "#10b981",
-  "Global ADR":   "#f59e0b",
+  "Nasdaq-100":    "#4f8ff7",
+  "S&P 500":       "#2563eb",
+  "S&P/TSX":       "#f87171",
+  "FTSE 100":      "#8b5cf6",
+  "LSE":           "#a78bfa",
+  "Euro STOXX 50": "#10b981",
+  "Europe":        "#059669",
+  "Global ADR":    "#f59e0b",
+  "NYSE / Other":  "#64748b",
 };
 const CURRENCY_COLORS = {
-  USD: "#4f8ff7",
-  CAD: "#f87171",
-  GBP: "#8b5cf6",
-  EUR: "#10b981",
-  CHF: "#f59e0b",
+  USD:   "#4f8ff7",
+  CAD:   "#f87171",
+  GBP:   "#8b5cf6",
+  EUR:   "#10b981",
+  CHF:   "#f59e0b",
   Other: "#64748b",
 };
 
 function classifyTicker(ticker) {
   const t = String(ticker).toUpperCase();
-  if (t.endsWith(".TO")) return { market: "Canada / TSX", currency: "CAD" };
-  if (t.endsWith(".L"))  return { market: "UK / LSE",     currency: "GBP" };
-  if (/\.(DE|PA|AS|MC|BR|IT)$/.test(t)) return { market: "Europe", currency: "EUR" };
-  if (t.endsWith(".SW")) return { market: "Europe",       currency: "CHF" };
-  if (t.endsWith(".CO")) return { market: "Europe",       currency: "EUR" };
-  if (ADR_REFERENCES[t]) return { market: "Global ADR",  currency: "USD" };
-  return                  { market: "U.S.",              currency: "USD" };
+  if (t.endsWith(".TO")) return { market: "S&P/TSX",      currency: "CAD" };
+  if (t.endsWith(".L"))  return { market: FTSE_100_MEMBERS.has(t) ? "FTSE 100" : "LSE", currency: "GBP" };
+  if (/\.(DE|PA|AS|MC|BR|IT|CO)$/.test(t)) return { market: EURO_STOXX_50_MEMBERS.has(t) ? "Euro STOXX 50" : "Europe", currency: "EUR" };
+  if (t.endsWith(".SW")) return { market: EURO_STOXX_50_MEMBERS.has(t) ? "Euro STOXX 50" : "Europe", currency: "CHF" };
+  if (ADR_REFERENCES[t]) return { market: "Global ADR",   currency: "USD" };
+  if (NASDAQ_100_MEMBERS.has(t)) return { market: "Nasdaq-100", currency: "USD" };
+  if (SP_500_MEMBERS.has(t))     return { market: "S&P 500",    currency: "USD" };
+  return                          { market: "NYSE / Other", currency: "USD" };
 }
 
 function marketMetadata(ticker, listing = {}) {
@@ -523,19 +528,32 @@ function showView(viewName) {
   if (resolved === "history" && runnerConnected) loadHistoryCatalog();
 }
 
-function renderExposureBars(containerId, items) {
-  const el = document.getElementById(containerId);
-  if (!el) return;
-  el.innerHTML = items.length
-    ? items.map(([label, value, color]) => `
-        <div class="exposure-row">
-          <span class="exposure-label">${escapeHtml(label)}</span>
-          <div class="exposure-track">
-            <div class="exposure-fill" style="width:${value.toFixed(1)}%;background:${color}"></div>
-          </div>
-          <span class="exposure-value">${value.toFixed(1)}%</span>
-        </div>`).join("")
-    : '<span class="terminal-muted">Awaiting run</span>';
+const donutSegments = {};
+
+function renderDonut(donutId, legendId, segments) {
+  donutSegments[donutId] = segments;
+  const donut = document.getElementById(donutId);
+  const legend = document.getElementById(legendId);
+  if (!donut) return;
+  let runningTotal = 0;
+  const stops = segments.map(([, value, color]) => {
+    const start = runningTotal;
+    runningTotal += value;
+    return `${color} ${start}% ${runningTotal}%`;
+  });
+  donut.style.background = stops.length
+    ? `conic-gradient(${stops.join(",")})`
+    : "rgba(255,255,255,0.04)";
+  if (legend) {
+    legend.innerHTML = segments.length
+      ? segments.map(([label, value, color]) => `
+          <div class="sector-item">
+            <i class="sector-swatch" style="background:${color}"></i>
+            <span>${escapeHtml(label)}</span>
+            <strong class="finance-neutral">${value.toFixed(1)}%</strong>
+          </div>`).join("")
+      : '<span class="terminal-muted">Awaiting run</span>';
+  }
 }
 
 function renderPortfolio(key) {
@@ -558,25 +576,9 @@ function renderPortfolio(key) {
     </div>
   `).join("") : '<div class="empty-state">No completed allocation is available.</div>';
 
-  let runningTotal = 0;
-  const gradientStops = data.sectors.map(([, value, color]) => {
-    const start = runningTotal;
-    runningTotal += value;
-    return `${color} ${start}% ${runningTotal}%`;
-  });
-  document.getElementById("sector-donut").style.background = gradientStops.length
-    ? `conic-gradient(${gradientStops.join(",")})`
-    : "#edf2f5";
-  document.getElementById("sector-legend").innerHTML = data.sectors.length ? data.sectors.map(([sector, value, color]) => `
-    <div class="sector-item">
-      <i class="sector-swatch" style="background:${color}"></i>
-      <span>${sector}</span>
-      <strong class="finance-neutral">${value.toFixed(1)}%</strong>
-    </div>
-  `).join("") : '<span class="terminal-muted">Awaiting run</span>';
-
-  renderExposureBars("market-exposure-bars", data.markets);
-  renderExposureBars("currency-exposure-bars", data.currencies);
+  renderDonut("sector-donut", "sector-legend", data.sectors);
+  renderDonut("market-donut", "market-legend", data.markets);
+  renderDonut("currency-donut", "currency-legend", data.currencies);
 }
 
 // Tiered search: 0=exact, 1=prefix, 2=ticker-contains, 3=secondary-contains, 4=fuzzy
@@ -2237,12 +2239,13 @@ document.getElementById("terminal-copy").addEventListener("click", async () => {
 })();
 
 /* === Interactive donut tooltip ================================= */
-(function initDonutTooltip() {
-  const donut = document.getElementById("sector-donut");
-  const tooltip = document.getElementById("donut-tooltip");
+function initDonutInteraction(donutId, tooltipId, labelId, valueId) {
+  const donut = document.getElementById(donutId);
+  const tooltip = document.getElementById(tooltipId);
   if (!donut || !tooltip) return;
 
   donut.addEventListener("mousemove", (event) => {
+    const segments = donutSegments[donutId] || [];
     const rect = donut.getBoundingClientRect();
     const cx = rect.left + rect.width / 2;
     const cy = rect.top + rect.height / 2;
@@ -2260,24 +2263,22 @@ document.getElementById("terminal-copy").addEventListener("click", async () => {
     let angle = Math.atan2(dx, -dy) * (180 / Math.PI);
     if (angle < 0) angle += 360;
 
-    const key = document.querySelector("[data-portfolio].active")?.dataset.portfolio || "max";
-    const sectors = portfolioData[key].sectors;
     let cumulative = 0;
     let found = null;
-    for (const [sector, value, color] of sectors) {
-      const sectorAngle = (value / 100) * 360;
-      if (angle >= cumulative && angle < cumulative + sectorAngle) {
-        found = { sector, value, color };
+    for (const [label, value, color] of segments) {
+      const segAngle = (value / 100) * 360;
+      if (angle >= cumulative && angle < cumulative + segAngle) {
+        found = { label, value, color };
         break;
       }
-      cumulative += sectorAngle;
+      cumulative += segAngle;
     }
 
     if (!found) { tooltip.classList.remove("visible"); return; }
 
-    document.getElementById("donut-tooltip-sector").textContent = found.sector;
-    document.getElementById("donut-tooltip-sector").style.color = found.color;
-    document.getElementById("donut-tooltip-value").textContent = `${found.value.toFixed(1)}%`;
+    document.getElementById(labelId).textContent = found.label;
+    document.getElementById(labelId).style.color = found.color;
+    document.getElementById(valueId).textContent = `${found.value.toFixed(1)}%`;
 
     const layout = donut.closest(".donut-layout");
     const layoutRect = layout.getBoundingClientRect();
@@ -2286,10 +2287,12 @@ document.getElementById("terminal-copy").addEventListener("click", async () => {
     tooltip.classList.add("visible");
   });
 
-  donut.addEventListener("mouseleave", () => {
-    tooltip.classList.remove("visible");
-  });
-})();
+  donut.addEventListener("mouseleave", () => tooltip.classList.remove("visible"));
+}
+
+initDonutInteraction("sector-donut",   "donut-tooltip",          "donut-tooltip-sector",          "donut-tooltip-value");
+initDonutInteraction("market-donut",   "market-donut-tooltip",   "market-donut-tooltip-label",    "market-donut-tooltip-value");
+initDonutInteraction("currency-donut", "currency-donut-tooltip", "currency-donut-tooltip-label",  "currency-donut-tooltip-value");
 
 /* === Splash screen with preloading ============================= */
 (function initSplash() {

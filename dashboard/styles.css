@@ -161,10 +161,9 @@ button, a { -webkit-tap-highlight-color: transparent; }
 .bar-fill { height: 100%; }
 
 .exposure-panel { grid-column: 1 / -1; }
-.exposure-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 28px; margin-top: 14px; }
-.exposure-row { display: grid; grid-template-columns: 120px 1fr 46px; align-items: center; gap: 10px; }
-.exposure-track { overflow: hidden; border-radius: 100px; }
-.exposure-fill { height: 6px; border-radius: 100px; transition: width 0.6s cubic-bezier(0.16,1,0.3,1); }
+.exposure-donuts { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.donut.donut-sm { flex: 0 0 120px; width: 120px; height: 120px; }
+.donut.donut-sm::before { width: 78px; height: 78px; }
 
 .donut-layout { display: flex; align-items: center; justify-content: center; gap: 24px; position: relative; }
 .donut { display: grid; flex: 0 0 150px; width: 150px; height: 150px; place-items: center; border-radius: 50%; }
