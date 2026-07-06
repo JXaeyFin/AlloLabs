@@ -23,6 +23,10 @@ META_PATTERN = re.compile(
     re.DOTALL,
 )
 
+ALLOWED_GUIDE_TARGET_VIEWS = {
+    "overview", "research", "universe", "console", "history", "reference", "guide"
+}
+
 KNOWN_PROVIDERS = {"anthropic", "openai", "gemini", "deepseek", "nvidia-nim"}
 
 PROVIDER_DEFAULTS = {
@@ -246,6 +250,14 @@ highlight interface elements to show them where things are. Act like a patient c
 giving a hands-on tour — explain what each control does and why it matters, not just \
 where it is.
 
+To move the user to a tab, include "targetView" in your metadata block. Allowed \
+targetView values are: "overview", "research", "universe", "console", "history", \
+"reference", and "guide". Use targetView when the answer would be clearer if the user \
+could see the relevant interface. Example: if the user asks what regularization means, \
+set targetView to "console" and highlight "regularization". If the user asks how to \
+build a ticker universe, set targetView to "universe" and highlight "universe-search" \
+or "universe-presets".
+
 To highlight elements, include a "highlights" array of element keys in your metadata \
 block. Use highlights whenever you reference a specific control, tab, or button — \
 especially for "where do I…", "how do I…", onboarding questions, and immediately after \
@@ -283,14 +295,14 @@ per reply, and only keys from this catalog:
     universe-presets Preset selection buttons (index leaders, curated, …)
     continue-to-run  Continue to Run button — sends selection to Console
 
-If a key's element lives in another tab, the platform automatically highlights that \
-tab too, so tell the user which tab to click first. Never invent keys not in this \
-catalog; outside guide mode, omit the highlights field entirely.
+If a key's element lives in another tab, prefer setting targetView to that tab so the \
+platform can take the user there and then highlight the control. Never invent keys not \
+in this catalog; outside guide mode, omit targetView and highlights entirely.
 
 ═══ OUTPUT MODE PROTOCOL ═══
 Append a metadata block at the very end of every response:
 <<<ALLO_META>>>
-{"mode": "<mode>", "runConfig": <null or config object>, "highlights": ["<key>", …] or omitted}
+{"mode": "<mode>", "runConfig": <null or config object>, "targetView": "<tab>" or omitted, "highlights": ["<key>", …] or omitted}
 <<<END_META>>>
 
 Available modes:
@@ -667,13 +679,13 @@ def parse_guide_response_full(raw: str) -> dict:
     """Parse a raw LLM response into its visible and structured parts.
 
     Returns {"text": str, "mode": str, "runConfig": dict|None,
-    "highlights": list[str]}. Uses the LAST meta block found so trailing
+    "targetView": str|None, "highlights": list[str]}. Uses the LAST meta block found so trailing
     courtesy text from open-source models (e.g. "Let me know if you need
     changes!") doesn't prevent detection. Falls back to _repair_json on
     JSONDecodeError before giving up.
     """
     result = {"text": raw.strip(), "mode": "normal",
-              "runConfig": None, "highlights": []}
+              "runConfig": None, "targetView": None, "highlights": []}
     matches = list(META_PATTERN.finditer(raw))
     if not matches:
         return result
@@ -694,6 +706,9 @@ def parse_guide_response_full(raw: str) -> dict:
     if run_config is not None and not isinstance(run_config, dict):
         run_config = None
     result["runConfig"] = run_config
+    target_view = str(meta.get("targetView") or "").strip()
+    if target_view in ALLOWED_GUIDE_TARGET_VIEWS:
+        result["targetView"] = target_view
     highlights = meta.get("highlights")
     if isinstance(highlights, list):
         result["highlights"] = [

@@ -694,9 +694,12 @@ class ConfigurationTests(unittest.TestCase):
         self.assertIn("function alloDockRestore", script)
         self.assertIn("function alloApplyHighlights", script)
         self.assertIn("function alloDismissHighlights", script)
+        self.assertIn("function alloApplyGuideDirection", script)
+        self.assertIn("const ALLO_GUIDE_TARGET_VIEWS", script)
         self.assertIn("guideMode: guideModeEnabled", script)
         self.assertIn('guideModeEnabled && viewName !== "guide"', script)
         self.assertIn('data-view="${entry.view}"', script)
+        self.assertIn("showView(requestedView)", script)
         self.assertIn('document.addEventListener("pointerdown", alloDismissHighlights', script)
         self.assertNotIn("14000", script)
         self.assertIn(".guide-mode-toggle", stylesheet)
@@ -916,13 +919,15 @@ class GuideTests(unittest.TestCase):
         raw = (
             "Click the Console tab.\n"
             "<<<ALLO_META>>>"
-            '{"mode":"normal","runConfig":null,"highlights":["tab-console","run-button"]}'
+            '{"mode":"normal","runConfig":null,"targetView":"console",'
+            '"highlights":["tab-console","run-button"]}'
             "<<<END_META>>>"
         )
         parsed = allolabs_guide.parse_guide_response_full(raw)
         self.assertEqual(parsed["text"], "Click the Console tab.")
         self.assertEqual(parsed["mode"], "normal")
         self.assertIsNone(parsed["runConfig"])
+        self.assertEqual(parsed["targetView"], "console")
         self.assertEqual(parsed["highlights"], ["tab-console", "run-button"])
         # The legacy tuple wrapper stays intact for existing callers.
         reply, mode, config = allolabs_guide.parse_guide_response(raw)
@@ -931,13 +936,16 @@ class GuideTests(unittest.TestCase):
         )
         # Malformed highlight payloads degrade to an empty list.
         no_highlights = allolabs_guide.parse_guide_response_full(
-            '<<<ALLO_META>>>{"mode":"normal","highlights":"tab-console"}<<<END_META>>>'
+            '<<<ALLO_META>>>{"mode":"normal","targetView":"shell","highlights":"tab-console"}<<<END_META>>>'
         )
         self.assertEqual(no_highlights["highlights"], [])
+        self.assertIsNone(no_highlights["targetView"])
 
     def test_guide_highlight_catalog_matches_frontend_registry(self):
         prompt = allolabs_guide.ALLO_SYSTEM_PROMPT
         script = (REPOSITORY_ROOT / "dashboard" / "app.js").read_text(encoding="utf-8")
+        self.assertIn("targetView", prompt)
+        self.assertIn('set targetView to "console" and highlight "regularization"', prompt)
         registry_keys = set(
             re.findall(r'^\s*"([a-z][a-z0-9\-]+)":\s*\{ selector:', script, re.MULTILINE)
         )
@@ -1004,7 +1012,7 @@ class GuideTests(unittest.TestCase):
                 raw_reply = (
                     "Use a broad Canadian energy basket.\n"
                     "<<<ALLO_META>>>"
-                    '{"mode":"normal","runConfig":null,"highlights":["tab-universe"]}'
+                    '{"mode":"normal","runConfig":null,"targetView":"universe","highlights":["tab-universe"]}'
                     "<<<END_META>>>"
                 )
                 with patch.object(server, "call_guide_ai", return_value=raw_reply) as guide_call:
@@ -1019,6 +1027,7 @@ class GuideTests(unittest.TestCase):
                     })
                 self.assertEqual(result["reply"], "Use a broad Canadian energy basket.")
                 self.assertEqual(result["mode"], "normal")
+                self.assertEqual(result["targetView"], "universe")
                 self.assertEqual(result["highlights"], ["tab-universe"])
                 llm_messages = guide_call.call_args.args[1]
                 self.assertIn("FULL AVAILABLE TICKER CATALOG", llm_messages[0]["content"])

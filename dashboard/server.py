@@ -1107,6 +1107,7 @@ class Handler(BaseHTTPRequestHandler):
                     "reply": parsed["text"],
                     "mode": parsed["mode"],
                     "runConfig": parsed["runConfig"],
+                    "targetView": parsed["targetView"],
                     "highlights": parsed["highlights"],
                 })
             except ValueError as exc:

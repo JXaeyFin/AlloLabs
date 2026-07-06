@@ -17,6 +17,8 @@ thesis-alignment behavior, and makes the desktop workflow more resilient.
 - Added Guide mode infrastructure: a persistent mode toggle, bottom-right mode
   indicator updates, draggable follow-me Allo dock, and UI highlight hooks for
   guided tours across tabs.
+- Added Guide mode tab steering so Allo can switch to a relevant tab before
+  highlighting controls, such as Console regularization settings.
 - Added server-side guide calls for Anthropic, OpenAI, Google Gemini, DeepSeek,
   and Nvidia NIM. API credentials remain outside the browser.
 - Injects the current universe, Console settings, latest portfolio results, and

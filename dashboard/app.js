@@ -3296,8 +3296,8 @@ async function guideSendMessage(text) {
       guideAppendConfigCard(runConfig);
     }
 
-    if (guideModeEnabled && Array.isArray(data.highlights) && data.highlights.length) {
-      alloApplyHighlights(data.highlights);
+    if (guideModeEnabled) {
+      alloApplyGuideDirection(data.targetView, data.highlights);
     }
 
     if (guideHistory.length >= GUIDE_COMPACT_THRESHOLD) {
@@ -3405,8 +3405,13 @@ const ALLO_HIGHLIGHT_TARGETS = {
   "continue-to-run":   { selector: '#universe-view [data-shortcut-view="console"]', view: "universe" },
 };
 
+const ALLO_GUIDE_TARGET_VIEWS = new Set([
+  "overview", "research", "universe", "console", "history", "reference", "guide"
+]);
+
 let guideModeEnabled = localStorage.getItem(GUIDE_MODE_KEY) === "1";
 let alloDockCollapsed = false;
+let alloHighlightDismissController = null;
 
 function currentViewName() {
   return document.querySelector(".nav-item.active[data-view]")?.dataset?.view || "overview";
@@ -3556,6 +3561,10 @@ document.getElementById("guide-mode-toggle")?.addEventListener("change", (event)
 // ── Highlights: slow pulsing glow on registry elements Allo points at. ──
 
 function alloClearHighlights() {
+  if (alloHighlightDismissController) {
+    alloHighlightDismissController.abort();
+    alloHighlightDismissController = null;
+  }
   document.querySelectorAll(".allo-glow, .allo-glow-fading").forEach((el) => {
     el.classList.remove("allo-glow", "allo-glow-fading");
   });
@@ -3564,6 +3573,7 @@ function alloClearHighlights() {
 function alloDismissHighlights() {
   const highlighted = [...document.querySelectorAll(".allo-glow")];
   if (!highlighted.length) return;
+  alloHighlightDismissController = null;
   highlighted.forEach((el) => {
     el.classList.remove("allo-glow");
     el.classList.add("allo-glow-fading");
@@ -3593,7 +3603,22 @@ function alloApplyHighlights(keys) {
     el.classList.add("allo-glow");
   });
   if (targets.size) {
-    document.addEventListener("pointerdown", alloDismissHighlights, { once: true, capture: true });
+    alloHighlightDismissController = new AbortController();
+    document.addEventListener("pointerdown", alloDismissHighlights, {
+      once: true,
+      capture: true,
+      signal: alloHighlightDismissController.signal,
+    });
+  }
+}
+
+function alloApplyGuideDirection(targetView, highlights) {
+  const requestedView = typeof targetView === "string" ? targetView.trim() : "";
+  if (ALLO_GUIDE_TARGET_VIEWS.has(requestedView) && requestedView !== currentViewName()) {
+    showView(requestedView);
+  }
+  if (Array.isArray(highlights) && highlights.length) {
+    alloApplyHighlights(highlights);
   }
 }
 
