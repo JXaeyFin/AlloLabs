@@ -458,14 +458,17 @@ class ConfigurationTests(unittest.TestCase):
     def test_global_audit_prompt_requires_detailed_longer_rationales(self):
         source = (REPOSITORY_ROOT / "allolabs.py").read_text(encoding="utf-8")
         tree = ast.parse(source)
-        function = next(
+        functions = [
             node for node in tree.body
             if isinstance(node, ast.FunctionDef)
-            and node.name == "build_global_audit_prompt"
-        )
+            and node.name in {
+                "build_audit_calibration_context",
+                "build_global_audit_prompt",
+            }
+        ]
         namespace = {"json": json}
         exec(
-            compile(ast.Module(body=[function], type_ignores=[]), "allolabs.py", "exec"),
+            compile(ast.Module(body=functions, type_ignores=[]), "allolabs.py", "exec"),
             namespace,
         )
         prompt = namespace["build_global_audit_prompt"]([
@@ -481,7 +484,89 @@ class ConfigurationTests(unittest.TestCase):
         self.assertIn("probability-weighted 12-month total-return", prompt)
         self.assertIn("systematic optimism or pessimism", prompt)
         self.assertIn("primary downside risk", prompt)
+        self.assertIn("GLOBAL CALIBRATION CONTEXT", prompt)
+        self.assertIn('"universe_count":1', prompt)
         self.assertIn('"ticker":"AAA"', prompt)
+
+    def test_global_audit_batches_large_universes_and_retries_empty_output(self):
+        source = (REPOSITORY_ROOT / "allolabs.py").read_text(encoding="utf-8")
+        tree = ast.parse(source)
+        function = next(
+            node for node in tree.body
+            if isinstance(node, ast.FunctionDef) and node.name == "audit_gpt_views"
+        )
+        tickers = [f"T{index:03d}" for index in range(678)]
+        originals = {
+            ticker: {
+                "ticker": ticker,
+                "industry": "Software",
+                "view": f"Original rationale for {ticker}.",
+                "expected_return": 0.05,
+                "confidence": 0.65,
+            }
+            for ticker in tickers
+        }
+        calls = []
+
+        def validate_batch(payload, expected_tickers):
+            views = payload.get("views") if isinstance(payload, dict) else None
+            views = views if isinstance(views, list) else []
+            found = [view.get("ticker") for view in views if isinstance(view, dict)]
+            if found != list(expected_tickers):
+                missing = sorted(set(expected_tickers) - set(found))
+                raise ValueError(f"Incomplete view batch; missing={missing}, duplicates=none.")
+            return views
+
+        def request_stub(prompt, api_key, batch_tickers, **kwargs):
+            calls.append({"tickers": list(batch_tickers), "prompt": prompt, **kwargs})
+            if len(calls) == 1:
+                return '{"views":[]}'
+            return json.dumps({"views": [originals[ticker] for ticker in batch_tickers]})
+
+        summary = {
+            "inputCount": len(tickers),
+            "adjustedCount": 0,
+            "meanRationaleWords": 4,
+            "minRationaleWords": 4,
+            "maxRationaleWords": 4,
+        }
+        namespace = {
+            "AI_API_KEY_ENV": {"openai": "OPENAI_API_KEY"},
+            "ai_views_request": request_stub,
+            "auditor_seed_prompt": "",
+            "build_audit_calibration_context": lambda views: {"universe_count": len(views)},
+            "build_global_audit_prompt": lambda views, seed, **kwargs: "audit prompt",
+            "compare_audited_views": lambda original, audited: summary,
+            "np": np,
+            "parse_json_from_text": json.loads,
+            "print": lambda *args, **kwargs: None,
+            "validate_view_batch": validate_batch,
+        }
+        exec(
+            compile(ast.Module(body=[function], type_ignores=[]), "allolabs.py", "exec"),
+            namespace,
+        )
+        audited, result_summary = namespace["audit_gpt_views"](
+            list(originals.values()),
+            tickers,
+            "test-key",
+            batch_size=40,
+        )
+        self.assertEqual([view["ticker"] for view in audited], tickers)
+        self.assertEqual(result_summary, summary)
+        self.assertEqual([len(call["tickers"]) for call in calls], [40] * 17 + [38])
+        self.assertIn("RETRY CORRECTION", calls[1]["prompt"])
+        self.assertEqual(calls[-1]["schema_name"], "allolabs_global_view_audit_17")
+
+        for invalid_batch_size in (True, 40.5, float("inf"), "forty"):
+            with self.subTest(batch_size=invalid_batch_size):
+                with self.assertRaisesRegex(ValueError, "whole number"):
+                    namespace["audit_gpt_views"](
+                        list(originals.values()),
+                        tickers,
+                        "test-key",
+                        batch_size=invalid_batch_size,
+                    )
 
     def test_view_schema_can_describe_audit_rationale_quality(self):
         source = (REPOSITORY_ROOT / "allolabs.py").read_text(encoding="utf-8")
@@ -502,6 +587,8 @@ class ConfigurationTests(unittest.TestCase):
         )
         view_schema = schema["properties"]["views"]["items"]["properties"]["view"]
         self.assertEqual(view_schema["description"], "Detailed audit rationale.")
+        self.assertEqual(schema["properties"]["views"]["minItems"], 1)
+        self.assertEqual(schema["properties"]["views"]["maxItems"], 1)
 
     def test_default_model_path_is_repository_local(self):
         self.assertEqual(server.DEFAULT_SCRIPT, REPOSITORY_ROOT / "allolabs.py")
@@ -590,7 +677,7 @@ class ConfigurationTests(unittest.TestCase):
         self.assertIn("Global AI audit complete", script)
         self.assertIn("finishRunProgress", script)
 
-    def test_project_logo_is_used_for_dashboard_and_readme(self):
+    def test_project_logo_is_used_by_dashboard_assets(self):
         markup = (REPOSITORY_ROOT / "dashboard" / "index.html").read_text(encoding="utf-8")
         stylesheet = (REPOSITORY_ROOT / "dashboard" / "terminal-theme.css").read_text(encoding="utf-8")
         readme = (REPOSITORY_ROOT / "README.md").read_text(encoding="utf-8")
@@ -602,7 +689,7 @@ class ConfigurationTests(unittest.TestCase):
         self.assertNotIn('<span class="brand-mark">WG</span>', markup)
         self.assertIn(".brand-logo-svg", stylesheet)
         self.assertGreaterEqual(server.API_VERSION, 13)
-        self.assertIn('src="resources/allolabs-logo.png"', readme)
+        self.assertNotIn('src="resources/allolabs-logo.png"', readme)
         self.assertEqual(server.RESOURCES_DIR, REPOSITORY_ROOT / "resources")
 
     def test_model_guide_reports_only_masked_provider_key_status(self):

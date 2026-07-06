@@ -30,6 +30,9 @@ thesis-alignment behavior, and makes the desktop workflow more resilient.
   server allowlists, key detection, documentation, and the model reference.
 - Added DeepSeek JSON-mode request handling with provider-specific output-token
   limits and response validation.
+- Split global audits into bounded batches with shared portfolio-wide
+  calibration statistics, exact schema item counts, semantic retry, and final
+  merged-universe validation.
 - Reframed analyst and auditor seed prompts as investment mandates, strengthened
   mandate-alignment instructions, and included mandate hashes in cache
   invalidation.
@@ -71,7 +74,7 @@ thesis-alignment behavior, and makes the desktop workflow more resilient.
   worker error reporting, shutdown/reaping, and top-level HTTP error responses.
 - Updated Windows, macOS, and Linux package metadata and artifact names to
   v1.4.0.
-- Expanded the release suite to 44 tests, including authenticated Guide endpoint
+- Expanded the release suite to 45 tests, including authenticated Guide endpoint
   tests, catalog coverage, DeepSeek request construction, provider masking, and
   configuration wiring.
 
@@ -88,7 +91,7 @@ thesis-alignment behavior, and makes the desktop workflow more resilient.
 
 ## Validation
 
-- `python -m unittest discover -s tests -v`: 44 passed, 6 dependency-based
+- `python -m unittest discover -s tests -v`: 45 passed, 6 dependency-based
   report tests skipped when scientific reporting packages are unavailable.
 - Python compilation checks pass for the pipeline, guide, relay, runner, and
   test suite.
