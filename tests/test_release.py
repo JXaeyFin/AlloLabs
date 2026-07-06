@@ -693,12 +693,16 @@ class ConfigurationTests(unittest.TestCase):
         self.assertIn("function alloDockMount", script)
         self.assertIn("function alloDockRestore", script)
         self.assertIn("function alloApplyHighlights", script)
+        self.assertIn("function alloDismissHighlights", script)
         self.assertIn("guideMode: guideModeEnabled", script)
         self.assertIn('guideModeEnabled && viewName !== "guide"', script)
         self.assertIn('data-view="${entry.view}"', script)
+        self.assertIn('document.addEventListener("pointerdown", alloDismissHighlights', script)
+        self.assertNotIn("14000", script)
         self.assertIn(".guide-mode-toggle", stylesheet)
         self.assertIn(".allo-dock", stylesheet)
         self.assertIn(".allo-glow", stylesheet)
+        self.assertIn(".allo-glow-fading", stylesheet)
         self.assertIn("@keyframes allo-glow-pulse", stylesheet)
 
     def test_project_logo_is_used_by_dashboard_assets(self):

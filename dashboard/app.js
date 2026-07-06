@@ -3556,7 +3556,21 @@ document.getElementById("guide-mode-toggle")?.addEventListener("change", (event)
 // ── Highlights: slow pulsing glow on registry elements Allo points at. ──
 
 function alloClearHighlights() {
-  document.querySelectorAll(".allo-glow").forEach((el) => el.classList.remove("allo-glow"));
+  document.querySelectorAll(".allo-glow, .allo-glow-fading").forEach((el) => {
+    el.classList.remove("allo-glow", "allo-glow-fading");
+  });
+}
+
+function alloDismissHighlights() {
+  const highlighted = [...document.querySelectorAll(".allo-glow")];
+  if (!highlighted.length) return;
+  highlighted.forEach((el) => {
+    el.classList.remove("allo-glow");
+    el.classList.add("allo-glow-fading");
+  });
+  window.setTimeout(() => {
+    highlighted.forEach((el) => el.classList.remove("allo-glow-fading"));
+  }, 360);
 }
 
 function alloApplyHighlights(keys) {
@@ -3577,10 +3591,9 @@ function alloApplyHighlights(keys) {
   });
   targets.forEach((el) => {
     el.classList.add("allo-glow");
-    el.addEventListener("click", () => el.classList.remove("allo-glow"), { once: true });
   });
   if (targets.size) {
-    window.setTimeout(() => alloClearHighlights(), 14000);
+    document.addEventListener("pointerdown", alloDismissHighlights, { once: true, capture: true });
   }
 }
 
