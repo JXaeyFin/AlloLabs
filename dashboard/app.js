@@ -3471,6 +3471,13 @@ function alloDockRestore() {
       previous = node;
     });
   }
+  alloDockCollapsed = false;
+  dock.classList.remove("collapsed");
+  const btn = document.getElementById("allo-dock-collapse");
+  if (btn) {
+    btn.textContent = "–";
+    btn.title = "Collapse";
+  }
   dock.hidden = true;
 }
 
@@ -3599,6 +3606,10 @@ function alloApplyHighlights(keys) {
       if (tab) targets.add(tab);
     }
   });
+  const firstTarget = targets.values().next().value;
+  if (firstTarget?.scrollIntoView) {
+    firstTarget.scrollIntoView({ behavior: "smooth", block: "center", inline: "center" });
+  }
   targets.forEach((el) => {
     el.classList.add("allo-glow");
   });

@@ -2622,6 +2622,8 @@ body.modal-open { overflow: hidden; }
   z-index: 950;
 }
 
+.allo-dock[hidden] { display: none; }
+
 .allo-dock-header {
   align-items: center;
   border-bottom: 1px solid rgba(255,255,255,0.08);
