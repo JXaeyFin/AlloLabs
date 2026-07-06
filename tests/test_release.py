@@ -677,6 +677,30 @@ class ConfigurationTests(unittest.TestCase):
         self.assertIn("Global AI audit complete", script)
         self.assertIn("finishRunProgress", script)
 
+    def test_guide_mode_toggle_dock_and_highlight_infrastructure(self):
+        markup = (REPOSITORY_ROOT / "dashboard" / "index.html").read_text(encoding="utf-8")
+        script = (REPOSITORY_ROOT / "dashboard" / "app.js").read_text(encoding="utf-8")
+        stylesheet = (REPOSITORY_ROOT / "dashboard" / "terminal-theme.css").read_text(encoding="utf-8")
+
+        self.assertIn('id="guide-mode-toggle"', markup)
+        self.assertIn('id="tape-mode"', markup)
+        self.assertIn('id="guide-inline-anchor"', markup)
+        self.assertIn('id="allo-dock"', markup)
+        self.assertIn('id="allo-dock-header"', markup)
+        self.assertIn('id="allo-dock-body"', markup)
+        self.assertIn("const GUIDE_MODE_KEY", script)
+        self.assertIn("function setGuideMode", script)
+        self.assertIn("function alloDockMount", script)
+        self.assertIn("function alloDockRestore", script)
+        self.assertIn("function alloApplyHighlights", script)
+        self.assertIn("guideMode: guideModeEnabled", script)
+        self.assertIn('guideModeEnabled && viewName !== "guide"', script)
+        self.assertIn('data-view="${entry.view}"', script)
+        self.assertIn(".guide-mode-toggle", stylesheet)
+        self.assertIn(".allo-dock", stylesheet)
+        self.assertIn(".allo-glow", stylesheet)
+        self.assertIn("@keyframes allo-glow-pulse", stylesheet)
+
     def test_project_logo_is_used_by_dashboard_assets(self):
         markup = (REPOSITORY_ROOT / "dashboard" / "index.html").read_text(encoding="utf-8")
         stylesheet = (REPOSITORY_ROOT / "dashboard" / "terminal-theme.css").read_text(encoding="utf-8")
@@ -884,6 +908,39 @@ class GuideTests(unittest.TestCase):
         self.assertEqual(mode, "run_config")
         self.assertEqual(config, {"long_only": True})
 
+    def test_guide_response_parser_extracts_highlights(self):
+        raw = (
+            "Click the Console tab.\n"
+            "<<<ALLO_META>>>"
+            '{"mode":"normal","runConfig":null,"highlights":["tab-console","run-button"]}'
+            "<<<END_META>>>"
+        )
+        parsed = allolabs_guide.parse_guide_response_full(raw)
+        self.assertEqual(parsed["text"], "Click the Console tab.")
+        self.assertEqual(parsed["mode"], "normal")
+        self.assertIsNone(parsed["runConfig"])
+        self.assertEqual(parsed["highlights"], ["tab-console", "run-button"])
+        # The legacy tuple wrapper stays intact for existing callers.
+        reply, mode, config = allolabs_guide.parse_guide_response(raw)
+        self.assertEqual(
+            (reply, mode, config), ("Click the Console tab.", "normal", None)
+        )
+        # Malformed highlight payloads degrade to an empty list.
+        no_highlights = allolabs_guide.parse_guide_response_full(
+            '<<<ALLO_META>>>{"mode":"normal","highlights":"tab-console"}<<<END_META>>>'
+        )
+        self.assertEqual(no_highlights["highlights"], [])
+
+    def test_guide_highlight_catalog_matches_frontend_registry(self):
+        prompt = allolabs_guide.ALLO_SYSTEM_PROMPT
+        script = (REPOSITORY_ROOT / "dashboard" / "app.js").read_text(encoding="utf-8")
+        registry_keys = set(
+            re.findall(r'^\s*"([a-z][a-z0-9\-]+)":\s*\{ selector:', script, re.MULTILINE)
+        )
+        self.assertGreaterEqual(len(registry_keys), 20)
+        for key in registry_keys:
+            self.assertIn(key, prompt, f"highlight key {key} missing from prompt catalog")
+
     def test_deepseek_guide_request_and_provider_selection(self):
         response = json.dumps({
             "choices": [{"message": {"content": "DeepSeek reply"}}],
@@ -943,7 +1000,7 @@ class GuideTests(unittest.TestCase):
                 raw_reply = (
                     "Use a broad Canadian energy basket.\n"
                     "<<<ALLO_META>>>"
-                    '{"mode":"normal","runConfig":null}'
+                    '{"mode":"normal","runConfig":null,"highlights":["tab-universe"]}'
                     "<<<END_META>>>"
                 )
                 with patch.object(server, "call_guide_ai", return_value=raw_reply) as guide_call:
@@ -958,6 +1015,7 @@ class GuideTests(unittest.TestCase):
                     })
                 self.assertEqual(result["reply"], "Use a broad Canadian energy basket.")
                 self.assertEqual(result["mode"], "normal")
+                self.assertEqual(result["highlights"], ["tab-universe"])
                 llm_messages = guide_call.call_args.args[1]
                 self.assertIn("FULL AVAILABLE TICKER CATALOG", llm_messages[0]["content"])
                 self.assertEqual(guide_call.call_args.kwargs["provider"], "deepseek")

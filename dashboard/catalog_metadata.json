@@ -4879,1753 +4879,1753 @@
   "cap": "large"
  },
  "MNDI.L": {
-  "name": "",
-  "sector": "",
-  "industry": "",
-  "country": "",
-  "cap": ""
+  "name": "Mondi plc",
+  "sector": "Basic Materials",
+  "industry": "Paper & Paper Products",
+  "country": "United Kingdom",
+  "cap": "mid"
  },
  "HSBA.L": {
-  "name": "",
-  "sector": "",
-  "industry": "",
-  "country": "",
-  "cap": ""
+  "name": "HSBC Holdings plc",
+  "sector": "Financial Services",
+  "industry": "Banks - Diversified",
+  "country": "United Kingdom",
+  "cap": "mega"
  },
  "LLOY.L": {
-  "name": "",
-  "sector": "",
-  "industry": "",
-  "country": "",
-  "cap": ""
+  "name": "Lloyds Banking Group plc",
+  "sector": "Financial Services",
+  "industry": "Banks - Regional",
+  "country": "United Kingdom",
+  "cap": "large"
  },
  "BARC.L": {
-  "name": "",
-  "sector": "",
-  "industry": "",
-  "country": "",
-  "cap": ""
+  "name": "Barclays PLC",
+  "sector": "Financial Services",
+  "industry": "Banks - Diversified",
+  "country": "United Kingdom",
+  "cap": "large"
  },
  "NWG.L": {
-  "name": "",
-  "sector": "",
-  "industry": "",
-  "country": "",
-  "cap": ""
+  "name": "NatWest Group plc",
+  "sector": "Financial Services",
+  "industry": "Banks - Regional",
+  "country": "United Kingdom",
+  "cap": "large"
  },
  "STAN.L": {
-  "name": "",
-  "sector": "",
-  "industry": "",
-  "country": "",
-  "cap": ""
+  "name": "Standard Chartered PLC",
+  "sector": "Financial Services",
+  "industry": "Banks - Diversified",
+  "country": "United Kingdom",
+  "cap": "large"
  },
  "LSEG.L": {
-  "name": "",
-  "sector": "",
-  "industry": "",
-  "country": "",
-  "cap": ""
+  "name": "London Stock Exchange Group plc",
+  "sector": "Financial Services",
+  "industry": "Financial Data & Stock Exchanges",
+  "country": "United Kingdom",
+  "cap": "large"
  },
  "MNG.L": {
-  "name": "",
-  "sector": "",
-  "industry": "",
-  "country": "",
-  "cap": ""
+  "name": "M&G plc",
+  "sector": "Financial Services",
+  "industry": "Asset Management",
+  "country": "United Kingdom",
+  "cap": "mid"
  },
  "ADM.L": {
-  "name": "",
-  "sector": "",
-  "industry": "",
-  "country": "",
-  "cap": ""
+  "name": "Admiral Group plc",
+  "sector": "Financial Services",
+  "industry": "Insurance - Property & Casualty",
+  "country": "United Kingdom",
+  "cap": "large"
  },
  "PRU.L": {
-  "name": "",
-  "sector": "",
-  "industry": "",
-  "country": "",
-  "cap": ""
+  "name": "Prudential plc",
+  "sector": "Financial Services",
+  "industry": "Insurance - Life",
+  "country": "Hong Kong",
+  "cap": "large"
  },
  "III.L": {
-  "name": "",
+  "name": "3i Group Ord",
   "sector": "",
   "industry": "",
   "country": "",
-  "cap": ""
+  "cap": "large"
  },
  "BA.L": {
-  "name": "",
-  "sector": "",
-  "industry": "",
-  "country": "",
-  "cap": ""
+  "name": "BAE Systems plc",
+  "sector": "Industrials",
+  "industry": "Aerospace & Defense",
+  "country": "United Kingdom",
+  "cap": "large"
  },
  "RR.L": {
-  "name": "",
-  "sector": "",
-  "industry": "",
-  "country": "",
-  "cap": ""
+  "name": "Rolls-Royce Holdings plc",
+  "sector": "Industrials",
+  "industry": "Aerospace & Defense",
+  "country": "United Kingdom",
+  "cap": "large"
  },
  "SMIN.L": {
-  "name": "",
-  "sector": "",
-  "industry": "",
-  "country": "",
-  "cap": ""
+  "name": "Smiths Group plc",
+  "sector": "Industrials",
+  "industry": "Specialty Industrial Machinery",
+  "country": "United Kingdom",
+  "cap": "mid"
  },
  "EXPN.L": {
-  "name": "",
-  "sector": "",
-  "industry": "",
-  "country": "",
-  "cap": ""
+  "name": "Experian plc",
+  "sector": "Industrials",
+  "industry": "Consulting Services",
+  "country": "Ireland",
+  "cap": "large"
  },
  "ITRK.L": {
-  "name": "",
-  "sector": "",
-  "industry": "",
-  "country": "",
-  "cap": ""
+  "name": "Intertek Group plc",
+  "sector": "Industrials",
+  "industry": "Specialty Business Services",
+  "country": "United Kingdom",
+  "cap": "mid"
  },
  "HLMA.L": {
-  "name": "",
-  "sector": "",
-  "industry": "",
-  "country": "",
-  "cap": ""
+  "name": "Halma plc",
+  "sector": "Industrials",
+  "industry": "Conglomerates",
+  "country": "United Kingdom",
+  "cap": "large"
  },
  "VOD.L": {
-  "name": "",
-  "sector": "",
-  "industry": "",
-  "country": "",
-  "cap": ""
+  "name": "Vodafone Group Public Limited Company",
+  "sector": "Communication Services",
+  "industry": "Telecom Services",
+  "country": "United Kingdom",
+  "cap": "large"
  },
  "BT-A.L": {
-  "name": "",
-  "sector": "",
-  "industry": "",
-  "country": "",
-  "cap": ""
+  "name": "BT Group plc",
+  "sector": "Communication Services",
+  "industry": "Telecom Services",
+  "country": "United Kingdom",
+  "cap": "large"
  },
  "WPP.L": {
-  "name": "",
-  "sector": "",
-  "industry": "",
-  "country": "",
-  "cap": ""
+  "name": "WPP plc",
+  "sector": "Communication Services",
+  "industry": "Advertising Agencies",
+  "country": "United Kingdom",
+  "cap": "mid"
  },
  "NG.L": {
-  "name": "",
-  "sector": "",
-  "industry": "",
-  "country": "",
-  "cap": ""
+  "name": "National Grid plc",
+  "sector": "Utilities",
+  "industry": "Utilities - Regulated Electric",
+  "country": "United Kingdom",
+  "cap": "large"
  },
  "SSE.L": {
-  "name": "",
-  "sector": "",
-  "industry": "",
-  "country": "",
-  "cap": ""
+  "name": "SSE plc",
+  "sector": "Utilities",
+  "industry": "Utilities - Diversified",
+  "country": "United Kingdom",
+  "cap": "large"
  },
  "UU.L": {
-  "name": "",
-  "sector": "",
-  "industry": "",
-  "country": "",
-  "cap": ""
+  "name": "United Utilities Group PLC",
+  "sector": "Utilities",
+  "industry": "Utilities - Regulated Water",
+  "country": "United Kingdom",
+  "cap": "large"
  },
  "SVT.L": {
-  "name": "",
-  "sector": "",
-  "industry": "",
-  "country": "",
-  "cap": ""
+  "name": "Severn Trent PLC",
+  "sector": "Utilities",
+  "industry": "Utilities - Regulated Water",
+  "country": "United Kingdom",
+  "cap": "mid"
  },
  "CNA.L": {
-  "name": "",
-  "sector": "",
-  "industry": "",
-  "country": "",
-  "cap": ""
+  "name": "Centrica plc",
+  "sector": "Utilities",
+  "industry": "Utilities - Independent Power Producers",
+  "country": "United Kingdom",
+  "cap": "mid"
  },
  "LAND.L": {
-  "name": "",
-  "sector": "",
-  "industry": "",
-  "country": "",
-  "cap": ""
+  "name": "Land Securities Group Plc",
+  "sector": "Real Estate",
+  "industry": "REIT - Diversified",
+  "country": "United Kingdom",
+  "cap": "mid"
  },
  "BLND.L": {
-  "name": "",
-  "sector": "",
-  "industry": "",
-  "country": "",
-  "cap": ""
+  "name": "British Land Company PLC",
+  "sector": "Real Estate",
+  "industry": "REIT - Diversified",
+  "country": "United Kingdom",
+  "cap": "mid"
  },
  "SGRO.L": {
-  "name": "",
-  "sector": "",
-  "industry": "",
-  "country": "",
-  "cap": ""
+  "name": "SEGRO Plc",
+  "sector": "Real Estate",
+  "industry": "REIT - Industrial",
+  "country": "United Kingdom",
+  "cap": "large"
  },
  "HMSO.L": {
-  "name": "",
-  "sector": "",
-  "industry": "",
-  "country": "",
-  "cap": ""
+  "name": "Hammerson Plc",
+  "sector": "Real Estate",
+  "industry": "REIT - Retail",
+  "country": "United Kingdom",
+  "cap": "small"
  },
  "CPG.L": {
-  "name": "",
-  "sector": "",
-  "industry": "",
-  "country": "",
-  "cap": ""
+  "name": "Compass Group PLC",
+  "sector": "Consumer Cyclical",
+  "industry": "Restaurants",
+  "country": "United Kingdom",
+  "cap": "large"
  },
  "JD.L": {
-  "name": "",
-  "sector": "",
-  "industry": "",
-  "country": "",
-  "cap": ""
+  "name": "JD Sports Fashion Plc",
+  "sector": "Consumer Cyclical",
+  "industry": "Apparel Retail",
+  "country": "United Kingdom",
+  "cap": "mid"
  },
  "BME.L": {
-  "name": "",
-  "sector": "",
-  "industry": "",
-  "country": "",
-  "cap": ""
+  "name": "B&M European Value Retail plc",
+  "sector": "Consumer Defensive",
+  "industry": "Discount Stores",
+  "country": "Jersey",
+  "cap": "small"
  },
  "OCDO.L": {
-  "name": "",
-  "sector": "",
-  "industry": "",
-  "country": "",
-  "cap": ""
+  "name": "Ocado Group plc",
+  "sector": "Consumer Defensive",
+  "industry": "Grocery Stores",
+  "country": "United Kingdom",
+  "cap": "small"
  },
  "EZJ.L": {
-  "name": "",
-  "sector": "",
-  "industry": "",
-  "country": "",
-  "cap": ""
+  "name": "easyJet plc",
+  "sector": "Industrials",
+  "industry": "Airlines",
+  "country": "United Kingdom",
+  "cap": "mid"
  },
  "IAG.L": {
-  "name": "",
-  "sector": "",
-  "industry": "",
-  "country": "",
-  "cap": ""
+  "name": "International Consolidated Airlines Group S.A.",
+  "sector": "Industrials",
+  "industry": "Airlines",
+  "country": "United Kingdom",
+  "cap": "large"
  },
  "AUTO.L": {
-  "name": "",
-  "sector": "",
-  "industry": "",
-  "country": "",
-  "cap": ""
+  "name": "Autotrader Group plc",
+  "sector": "Communication Services",
+  "industry": "Internet Content & Information",
+  "country": "United Kingdom",
+  "cap": "mid"
  },
  "FLTR.L": {
-  "name": "",
-  "sector": "",
-  "industry": "",
-  "country": "",
-  "cap": ""
+  "name": "Flutter Entertainment plc",
+  "sector": "Consumer Cyclical",
+  "industry": "Gambling",
+  "country": "United States",
+  "cap": "large"
  },
  "REL.L": {
-  "name": "",
-  "sector": "",
-  "industry": "",
-  "country": "",
-  "cap": ""
+  "name": "RELX PLC",
+  "sector": "Industrials",
+  "industry": "Specialty Business Services",
+  "country": "United Kingdom",
+  "cap": "large"
  },
  "SDR.L": {
-  "name": "",
-  "sector": "",
-  "industry": "",
-  "country": "",
-  "cap": ""
+  "name": "Schroders plc",
+  "sector": "Financial Services",
+  "industry": "Asset Management",
+  "country": "United Kingdom",
+  "cap": "mid"
  },
  "WISE.L": {
-  "name": "",
-  "sector": "",
-  "industry": "",
-  "country": "",
-  "cap": ""
+  "name": "Wise Group plc",
+  "sector": "Technology",
+  "industry": "Information Technology Services",
+  "country": "United Kingdom",
+  "cap": "mid"
  },
  "DPLM.L": {
-  "name": "",
-  "sector": "",
-  "industry": "",
-  "country": "",
-  "cap": ""
+  "name": "Diploma PLC",
+  "sector": "Industrials",
+  "industry": "Industrial Distribution",
+  "country": "United Kingdom",
+  "cap": "mid"
  },
  "HIK.L": {
-  "name": "",
-  "sector": "",
-  "industry": "",
-  "country": "",
-  "cap": ""
+  "name": "Hikma Pharmaceuticals PLC",
+  "sector": "Healthcare",
+  "industry": "Drug Manufacturers - Specialty & Generic",
+  "country": "United Kingdom",
+  "cap": "mid"
  },
  "WIZZ.L": {
-  "name": "",
-  "sector": "",
-  "industry": "",
-  "country": "",
-  "cap": ""
+  "name": "Wizz Air Holdings Plc",
+  "sector": "Industrials",
+  "industry": "Airlines",
+  "country": "Hungary",
+  "cap": "small"
  },
  "ATG.L": {
-  "name": "",
-  "sector": "",
-  "industry": "",
-  "country": "",
-  "cap": ""
+  "name": "Auction Technology Group plc",
+  "sector": "Technology",
+  "industry": "Software - Application",
+  "country": "United Kingdom",
+  "cap": "small"
  },
  "HTG.L": {
-  "name": "",
-  "sector": "",
-  "industry": "",
-  "country": "",
-  "cap": ""
+  "name": "Hunting PLC",
+  "sector": "Energy",
+  "industry": "Oil & Gas Equipment & Services",
+  "country": "United Kingdom",
+  "cap": "small"
  },
  "SPX.L": {
-  "name": "",
-  "sector": "",
-  "industry": "",
-  "country": "",
-  "cap": ""
+  "name": "Spirax Group plc",
+  "sector": "Industrials",
+  "industry": "Specialty Industrial Machinery",
+  "country": "United Kingdom",
+  "cap": "mid"
  },
  "BKG.L": {
-  "name": "",
-  "sector": "",
-  "industry": "",
-  "country": "",
-  "cap": ""
+  "name": "The Berkeley Group Holdings plc",
+  "sector": "Consumer Cyclical",
+  "industry": "Residential Construction",
+  "country": "United Kingdom",
+  "cap": "mid"
  },
  "PSN.L": {
-  "name": "",
-  "sector": "",
-  "industry": "",
-  "country": "",
-  "cap": ""
+  "name": "Persimmon Plc",
+  "sector": "Consumer Cyclical",
+  "industry": "Residential Construction",
+  "country": "United Kingdom",
+  "cap": "mid"
  },
  "TW.L": {
-  "name": "",
-  "sector": "",
-  "industry": "",
-  "country": "",
-  "cap": ""
+  "name": "Taylor Wimpey plc",
+  "sector": "Consumer Cyclical",
+  "industry": "Residential Construction",
+  "country": "United Kingdom",
+  "cap": "mid"
  },
  "RTO.L": {
-  "name": "",
-  "sector": "",
-  "industry": "",
-  "country": "",
-  "cap": ""
+  "name": "Rentokil Initial plc",
+  "sector": "Industrials",
+  "industry": "Specialty Business Services",
+  "country": "United Kingdom",
+  "cap": "large"
  },
  "BTRW.L": {
-  "name": "",
-  "sector": "",
-  "industry": "",
-  "country": "",
-  "cap": ""
+  "name": "Barratt Redrow plc",
+  "sector": "Consumer Cyclical",
+  "industry": "Residential Construction",
+  "country": "United Kingdom",
+  "cap": "mid"
  },
  "VTY.L": {
-  "name": "",
-  "sector": "",
-  "industry": "",
-  "country": "",
-  "cap": ""
+  "name": "Vistry Group PLC",
+  "sector": "Consumer Cyclical",
+  "industry": "Residential Construction",
+  "country": "United Kingdom",
+  "cap": "small"
  },
  "BBOX.L": {
-  "name": "",
+  "name": "Tritax Big Box Ord",
   "sector": "",
   "industry": "",
   "country": "",
-  "cap": ""
+  "cap": "mid"
  },
  "PHP.L": {
-  "name": "",
-  "sector": "",
-  "industry": "",
-  "country": "",
-  "cap": ""
+  "name": "Primary Health Properties Plc",
+  "sector": "Real Estate",
+  "industry": "REIT - Healthcare Facilities",
+  "country": "United Kingdom",
+  "cap": "mid"
  },
  "IHG.L": {
-  "name": "",
-  "sector": "",
-  "industry": "",
-  "country": "",
-  "cap": ""
+  "name": "InterContinental Hotels Group PLC",
+  "sector": "Consumer Cyclical",
+  "industry": "Lodging",
+  "country": "United Kingdom",
+  "cap": "large"
  },
  "CKN.L": {
-  "name": "",
-  "sector": "",
-  "industry": "",
-  "country": "",
-  "cap": ""
+  "name": "Clarkson PLC",
+  "sector": "Industrials",
+  "industry": "Marine Shipping",
+  "country": "United Kingdom",
+  "cap": "small"
  },
  "WEIR.L": {
-  "name": "",
-  "sector": "",
-  "industry": "",
-  "country": "",
-  "cap": ""
+  "name": "The Weir Group PLC",
+  "sector": "Industrials",
+  "industry": "Specialty Industrial Machinery",
+  "country": "United Kingdom",
+  "cap": "mid"
  },
  "DFS.L": {
-  "name": "",
-  "sector": "",
-  "industry": "",
-  "country": "",
-  "cap": ""
+  "name": "DFS Furniture plc",
+  "sector": "Consumer Cyclical",
+  "industry": "Specialty Retail",
+  "country": "United Kingdom",
+  "cap": "small"
  },
  "GNS.L": {
-  "name": "",
-  "sector": "",
-  "industry": "",
-  "country": "",
-  "cap": ""
+  "name": "Genus plc",
+  "sector": "Healthcare",
+  "industry": "Biotechnology",
+  "country": "United Kingdom",
+  "cap": "small"
  },
  "INCH.L": {
-  "name": "",
-  "sector": "",
-  "industry": "",
-  "country": "",
-  "cap": ""
+  "name": "Inchcape plc",
+  "sector": "Consumer Cyclical",
+  "industry": "Auto & Truck Dealerships",
+  "country": "United Kingdom",
+  "cap": "mid"
  },
  "MTO.L": {
-  "name": "",
-  "sector": "",
-  "industry": "",
-  "country": "",
-  "cap": ""
+  "name": "Mitie Group plc",
+  "sector": "Industrials",
+  "industry": "Specialty Business Services",
+  "country": "United Kingdom",
+  "cap": "small"
  },
  "CHG.L": {
-  "name": "",
-  "sector": "",
-  "industry": "",
-  "country": "",
-  "cap": ""
+  "name": "Chemring Group PLC",
+  "sector": "Industrials",
+  "industry": "Aerospace & Defense",
+  "country": "United Kingdom",
+  "cap": "small"
  },
  "CLDN.L": {
-  "name": "",
+  "name": "Caledonia Investments Ord",
   "sector": "",
   "industry": "",
   "country": "",
-  "cap": ""
+  "cap": "small"
  },
  "NXT.L": {
-  "name": "",
-  "sector": "",
-  "industry": "",
-  "country": "",
-  "cap": ""
+  "name": "NEXT plc",
+  "sector": "Consumer Cyclical",
+  "industry": "Apparel Retail",
+  "country": "United Kingdom",
+  "cap": "large"
  },
  "PETS.L": {
-  "name": "",
-  "sector": "",
-  "industry": "",
-  "country": "",
-  "cap": ""
+  "name": "Pets at Home Group Plc",
+  "sector": "Consumer Cyclical",
+  "industry": "Specialty Retail",
+  "country": "United Kingdom",
+  "cap": "small"
  },
  "AAF.L": {
-  "name": "",
-  "sector": "",
-  "industry": "",
-  "country": "",
-  "cap": ""
+  "name": "Airtel Africa Plc",
+  "sector": "Communication Services",
+  "industry": "Telecom Services",
+  "country": "United Kingdom",
+  "cap": "large"
  },
  "SBRE.L": {
-  "name": "",
-  "sector": "",
-  "industry": "",
-  "country": "",
-  "cap": ""
+  "name": "Sabre Insurance Group plc",
+  "sector": "Financial Services",
+  "industry": "Insurance Brokers",
+  "country": "United Kingdom",
+  "cap": "small"
  },
  "SAP.DE": {
-  "name": "",
-  "sector": "",
-  "industry": "",
-  "country": "",
-  "cap": ""
+  "name": "SAP SE",
+  "sector": "Technology",
+  "industry": "Software - Application",
+  "country": "Germany",
+  "cap": "large"
  },
  "ALV.DE": {
-  "name": "",
-  "sector": "",
-  "industry": "",
-  "country": "",
-  "cap": ""
+  "name": "Allianz SE",
+  "sector": "Financial Services",
+  "industry": "Insurance - Diversified",
+  "country": "Germany",
+  "cap": "large"
  },
  "SIE.DE": {
-  "name": "",
-  "sector": "",
-  "industry": "",
-  "country": "",
-  "cap": ""
+  "name": "Siemens Aktiengesellschaft",
+  "sector": "Industrials",
+  "industry": "Specialty Industrial Machinery",
+  "country": "Germany",
+  "cap": "mega"
  },
  "MUV2.DE": {
-  "name": "",
-  "sector": "",
-  "industry": "",
-  "country": "",
-  "cap": ""
+  "name": "Münchener Rückversicherungs-Gesellschaft Aktiengesellschaft in München",
+  "sector": "Financial Services",
+  "industry": "Insurance - Reinsurance",
+  "country": "Germany",
+  "cap": "large"
  },
  "DTE.DE": {
-  "name": "",
-  "sector": "",
-  "industry": "",
-  "country": "",
-  "cap": ""
+  "name": "Deutsche Telekom AG",
+  "sector": "Communication Services",
+  "industry": "Telecom Services",
+  "country": "Germany",
+  "cap": "large"
  },
  "RHM.DE": {
-  "name": "",
-  "sector": "",
-  "industry": "",
-  "country": "",
-  "cap": ""
+  "name": "Rheinmetall AG",
+  "sector": "Industrials",
+  "industry": "Aerospace & Defense",
+  "country": "Germany",
+  "cap": "large"
  },
  "BAYN.DE": {
-  "name": "",
-  "sector": "",
-  "industry": "",
-  "country": "",
-  "cap": ""
+  "name": "Bayer Aktiengesellschaft",
+  "sector": "Healthcare",
+  "industry": "Drug Manufacturers - General",
+  "country": "Germany",
+  "cap": "large"
  },
  "MBG.DE": {
-  "name": "",
-  "sector": "",
-  "industry": "",
-  "country": "",
-  "cap": ""
+  "name": "Mercedes-Benz Group AG",
+  "sector": "Consumer Cyclical",
+  "industry": "Auto Manufacturers",
+  "country": "Germany",
+  "cap": "large"
  },
  "BMW.DE": {
-  "name": "",
-  "sector": "",
-  "industry": "",
-  "country": "",
-  "cap": ""
+  "name": "Bayerische Motoren Werke Aktiengesellschaft",
+  "sector": "Consumer Cyclical",
+  "industry": "Auto Manufacturers",
+  "country": "Germany",
+  "cap": "large"
  },
  "IFX.DE": {
-  "name": "",
-  "sector": "",
-  "industry": "",
-  "country": "",
-  "cap": ""
+  "name": "Infineon Technologies AG",
+  "sector": "Technology",
+  "industry": "Semiconductors",
+  "country": "Germany",
+  "cap": "large"
  },
  "DB1.DE": {
-  "name": "",
-  "sector": "",
-  "industry": "",
-  "country": "",
-  "cap": ""
+  "name": "Deutsche Börse AG",
+  "sector": "Financial Services",
+  "industry": "Financial Data & Stock Exchanges",
+  "country": "Germany",
+  "cap": "large"
  },
  "BEI.DE": {
-  "name": "",
-  "sector": "",
-  "industry": "",
-  "country": "",
-  "cap": ""
+  "name": "Beiersdorf Aktiengesellschaft",
+  "sector": "Consumer Defensive",
+  "industry": "Household & Personal Products",
+  "country": "Germany",
+  "cap": "large"
  },
  "AIR.PA": {
-  "name": "",
-  "sector": "",
-  "industry": "",
-  "country": "",
-  "cap": ""
+  "name": "Airbus SE",
+  "sector": "Industrials",
+  "industry": "Aerospace & Defense",
+  "country": "Netherlands",
+  "cap": "large"
  },
  "OR.PA": {
-  "name": "",
-  "sector": "",
-  "industry": "",
-  "country": "",
-  "cap": ""
+  "name": "L'Oréal S.A.",
+  "sector": "Consumer Defensive",
+  "industry": "Household & Personal Products",
+  "country": "France",
+  "cap": "mega"
  },
  "MC.PA": {
-  "name": "",
-  "sector": "",
-  "industry": "",
-  "country": "",
-  "cap": ""
+  "name": "LVMH Moët Hennessy - Louis Vuitton, Société Européenne",
+  "sector": "Consumer Cyclical",
+  "industry": "Luxury Goods",
+  "country": "France",
+  "cap": "mega"
  },
  "SAN.PA": {
-  "name": "",
-  "sector": "",
-  "industry": "",
-  "country": "",
-  "cap": ""
+  "name": "Sanofi",
+  "sector": "Healthcare",
+  "industry": "Drug Manufacturers - General",
+  "country": "France",
+  "cap": "large"
  },
  "BNP.PA": {
-  "name": "",
-  "sector": "",
-  "industry": "",
-  "country": "",
-  "cap": ""
+  "name": "BNP Paribas SA",
+  "sector": "Financial Services",
+  "industry": "Banks - Regional",
+  "country": "France",
+  "cap": "large"
  },
  "ENGI.PA": {
-  "name": "",
-  "sector": "",
-  "industry": "",
-  "country": "",
-  "cap": ""
+  "name": "Engie SA",
+  "sector": "Utilities",
+  "industry": "Utilities - Diversified",
+  "country": "France",
+  "cap": "large"
  },
  "TTE.PA": {
-  "name": "",
-  "sector": "",
-  "industry": "",
-  "country": "",
-  "cap": ""
+  "name": "TotalEnergies SE",
+  "sector": "Energy",
+  "industry": "Oil & Gas Integrated",
+  "country": "France",
+  "cap": "large"
  },
  "EL.PA": {
-  "name": "",
-  "sector": "",
-  "industry": "",
-  "country": "",
-  "cap": ""
+  "name": "EssilorLuxottica Société anonyme",
+  "sector": "Healthcare",
+  "industry": "Medical Instruments & Supplies",
+  "country": "France",
+  "cap": "large"
  },
  "RMS.PA": {
-  "name": "",
-  "sector": "",
-  "industry": "",
-  "country": "",
-  "cap": ""
+  "name": "Hermès International Société en commandite par actions",
+  "sector": "Consumer Cyclical",
+  "industry": "Luxury Goods",
+  "country": "France",
+  "cap": "large"
  },
  "SU.PA": {
-  "name": "",
-  "sector": "",
-  "industry": "",
-  "country": "",
-  "cap": ""
+  "name": "Schneider Electric S.E.",
+  "sector": "Industrials",
+  "industry": "Specialty Industrial Machinery",
+  "country": "France",
+  "cap": "large"
  },
  "AI.PA": {
-  "name": "",
-  "sector": "",
-  "industry": "",
-  "country": "",
-  "cap": ""
+  "name": "L'Air Liquide S.A.",
+  "sector": "Basic Materials",
+  "industry": "Specialty Chemicals",
+  "country": "France",
+  "cap": "large"
  },
  "DG.PA": {
-  "name": "",
-  "sector": "",
-  "industry": "",
-  "country": "",
-  "cap": ""
+  "name": "Vinci SA",
+  "sector": "Industrials",
+  "industry": "Engineering & Construction",
+  "country": "France",
+  "cap": "large"
  },
  "SAF.PA": {
-  "name": "",
-  "sector": "",
-  "industry": "",
-  "country": "",
-  "cap": ""
+  "name": "Safran SA",
+  "sector": "Industrials",
+  "industry": "Aerospace & Defense",
+  "country": "France",
+  "cap": "large"
  },
  "CS.PA": {
-  "name": "",
-  "sector": "",
-  "industry": "",
-  "country": "",
-  "cap": ""
+  "name": "AXA SA",
+  "sector": "Financial Services",
+  "industry": "Insurance - Diversified",
+  "country": "France",
+  "cap": "large"
  },
  "ACA.PA": {
-  "name": "",
-  "sector": "",
-  "industry": "",
-  "country": "",
-  "cap": ""
+  "name": "Crédit Agricole S.A.",
+  "sector": "Financial Services",
+  "industry": "Banks - Regional",
+  "country": "France",
+  "cap": "large"
  },
  "ASML.AS": {
-  "name": "",
-  "sector": "",
-  "industry": "",
-  "country": "",
-  "cap": ""
+  "name": "ASML Holding N.V.",
+  "sector": "Technology",
+  "industry": "Semiconductor Equipment & Materials",
+  "country": "Netherlands",
+  "cap": "mega"
  },
  "INGA.AS": {
-  "name": "",
-  "sector": "",
-  "industry": "",
-  "country": "",
-  "cap": ""
+  "name": "ING Groep N.V.",
+  "sector": "Financial Services",
+  "industry": "Banks - Diversified",
+  "country": "Netherlands",
+  "cap": "large"
  },
  "AD.AS": {
-  "name": "",
-  "sector": "",
-  "industry": "",
-  "country": "",
-  "cap": ""
+  "name": "Koninklijke Ahold Delhaize N.V.",
+  "sector": "Consumer Defensive",
+  "industry": "Grocery Stores",
+  "country": "Netherlands",
+  "cap": "large"
  },
  "ENEL.MI": {
-  "name": "",
-  "sector": "",
-  "industry": "",
-  "country": "",
-  "cap": ""
+  "name": "Enel SpA",
+  "sector": "Utilities",
+  "industry": "Utilities - Diversified",
+  "country": "Italy",
+  "cap": "large"
  },
  "ISP.MI": {
-  "name": "",
-  "sector": "",
-  "industry": "",
-  "country": "",
-  "cap": ""
+  "name": "Intesa Sanpaolo S.p.A.",
+  "sector": "Financial Services",
+  "industry": "Banks - Regional",
+  "country": "Italy",
+  "cap": "large"
  },
  "ENI.MI": {
-  "name": "",
-  "sector": "",
-  "industry": "",
-  "country": "",
-  "cap": ""
+  "name": "Eni S.p.A.",
+  "sector": "Energy",
+  "industry": "Oil & Gas Integrated",
+  "country": "Italy",
+  "cap": "large"
  },
  "UCG.MI": {
-  "name": "",
-  "sector": "",
-  "industry": "",
-  "country": "",
-  "cap": ""
+  "name": "UniCredit S.p.A.",
+  "sector": "Financial Services",
+  "industry": "Banks - Regional",
+  "country": "Italy",
+  "cap": "large"
  },
  "G.MI": {
-  "name": "",
-  "sector": "",
-  "industry": "",
-  "country": "",
-  "cap": ""
+  "name": "Assicurazioni Generali S.p.A.",
+  "sector": "Financial Services",
+  "industry": "Insurance - Diversified",
+  "country": "Italy",
+  "cap": "large"
  },
  "SAN.MC": {
-  "name": "",
-  "sector": "",
-  "industry": "",
-  "country": "",
-  "cap": ""
+  "name": "Banco Santander, S.A.",
+  "sector": "Financial Services",
+  "industry": "Banks - Diversified",
+  "country": "Spain",
+  "cap": "large"
  },
  "IBE.MC": {
-  "name": "",
-  "sector": "",
-  "industry": "",
-  "country": "",
-  "cap": ""
+  "name": "Iberdrola, S.A.",
+  "sector": "Utilities",
+  "industry": "Utilities - Diversified",
+  "country": "Spain",
+  "cap": "large"
  },
  "BBVA.MC": {
-  "name": "",
-  "sector": "",
-  "industry": "",
-  "country": "",
-  "cap": ""
+  "name": "Banco Bilbao Vizcaya Argentaria, S.A.",
+  "sector": "Financial Services",
+  "industry": "Banks - Diversified",
+  "country": "Spain",
+  "cap": "large"
  },
  "ITX.MC": {
-  "name": "",
-  "sector": "",
-  "industry": "",
-  "country": "",
-  "cap": ""
+  "name": "Industria de Diseño Textil, S.A.",
+  "sector": "Consumer Cyclical",
+  "industry": "Apparel Retail",
+  "country": "Spain",
+  "cap": "large"
  },
  "ABI.BR": {
-  "name": "",
-  "sector": "",
-  "industry": "",
-  "country": "",
-  "cap": ""
+  "name": "Anheuser-Busch InBev SA/NV",
+  "sector": "Consumer Defensive",
+  "industry": "Beverages - Brewers",
+  "country": "Belgium",
+  "cap": "large"
  },
  "NESN.SW": {
-  "name": "",
-  "sector": "",
-  "industry": "",
-  "country": "",
-  "cap": ""
+  "name": "Nestlé S.A.",
+  "sector": "Consumer Defensive",
+  "industry": "Packaged Foods",
+  "country": "Switzerland",
+  "cap": "mega"
  },
  "NOVN.SW": {
-  "name": "",
-  "sector": "",
-  "industry": "",
-  "country": "",
-  "cap": ""
+  "name": "Novartis AG",
+  "sector": "Healthcare",
+  "industry": "Drug Manufacturers - General",
+  "country": "Switzerland",
+  "cap": "mega"
  },
  "RO.SW": {
-  "name": "",
-  "sector": "",
-  "industry": "",
-  "country": "",
-  "cap": ""
+  "name": "Roche Holding AG",
+  "sector": "Healthcare",
+  "industry": "Drug Manufacturers - General",
+  "country": "Switzerland",
+  "cap": "mega"
  },
  "UBSG.SW": {
-  "name": "",
-  "sector": "",
-  "industry": "",
-  "country": "",
-  "cap": ""
+  "name": "UBS Group AG",
+  "sector": "Financial Services",
+  "industry": "Banks - Diversified",
+  "country": "Switzerland",
+  "cap": "large"
  },
  "VOW3.DE": {
-  "name": "",
-  "sector": "",
-  "industry": "",
-  "country": "",
-  "cap": ""
+  "name": "Volkswagen AG",
+  "sector": "Consumer Cyclical",
+  "industry": "Auto Manufacturers",
+  "country": "Germany",
+  "cap": "large"
  },
  "HEN3.DE": {
-  "name": "",
-  "sector": "",
-  "industry": "",
-  "country": "",
-  "cap": ""
+  "name": "Henkel AG & Co. KGaA",
+  "sector": "Consumer Defensive",
+  "industry": "Household & Personal Products",
+  "country": "Germany",
+  "cap": "large"
  },
  "CON.DE": {
-  "name": "",
-  "sector": "",
-  "industry": "",
-  "country": "",
-  "cap": ""
+  "name": "Continental Aktiengesellschaft",
+  "sector": "Consumer Cyclical",
+  "industry": "Auto Parts",
+  "country": "Germany",
+  "cap": "large"
  },
  "MTX.DE": {
-  "name": "",
-  "sector": "",
-  "industry": "",
-  "country": "",
-  "cap": ""
+  "name": "MTU Aero Engines AG",
+  "sector": "Industrials",
+  "industry": "Aerospace & Defense",
+  "country": "Germany",
+  "cap": "large"
  },
  "FRE.DE": {
-  "name": "",
-  "sector": "",
-  "industry": "",
-  "country": "",
-  "cap": ""
+  "name": "Fresenius SE & Co. KGaA",
+  "sector": "Healthcare",
+  "industry": "Medical Care Facilities",
+  "country": "Germany",
+  "cap": "large"
  },
  "ZAL.DE": {
-  "name": "",
-  "sector": "",
-  "industry": "",
-  "country": "",
-  "cap": ""
+  "name": "Zalando SE",
+  "sector": "Consumer Cyclical",
+  "industry": "Internet Retail",
+  "country": "Germany",
+  "cap": "mid"
  },
  "DHER.DE": {
-  "name": "",
-  "sector": "",
-  "industry": "",
-  "country": "",
-  "cap": ""
+  "name": "Delivery Hero SE",
+  "sector": "Consumer Cyclical",
+  "industry": "Internet Retail",
+  "country": "Germany",
+  "cap": "large"
  },
  "AFX.DE": {
-  "name": "",
-  "sector": "",
-  "industry": "",
-  "country": "",
-  "cap": ""
+  "name": "Carl Zeiss Meditec AG",
+  "sector": "Healthcare",
+  "industry": "Medical Instruments & Supplies",
+  "country": "Germany",
+  "cap": "mid"
  },
  "BOSS.DE": {
-  "name": "",
-  "sector": "",
-  "industry": "",
-  "country": "",
-  "cap": ""
+  "name": "Hugo Boss AG",
+  "sector": "Consumer Cyclical",
+  "industry": "Apparel Manufacturing",
+  "country": "Germany",
+  "cap": "mid"
  },
  "MRK.DE": {
-  "name": "",
-  "sector": "",
-  "industry": "",
-  "country": "",
-  "cap": ""
+  "name": "Merck KGaA",
+  "sector": "Healthcare",
+  "industry": "Drug Manufacturers - Specialty & Generic",
+  "country": "Germany",
+  "cap": "large"
  },
  "FME.DE": {
-  "name": "",
-  "sector": "",
-  "industry": "",
-  "country": "",
-  "cap": ""
+  "name": "Fresenius Medical Care AG",
+  "sector": "Healthcare",
+  "industry": "Medical Care Facilities",
+  "country": "Germany",
+  "cap": "large"
  },
  "EVT.DE": {
-  "name": "",
-  "sector": "",
-  "industry": "",
-  "country": "",
-  "cap": ""
+  "name": "Evotec SE",
+  "sector": "Healthcare",
+  "industry": "Drug Manufacturers - Specialty & Generic",
+  "country": "Germany",
+  "cap": "small"
  },
  "HEI.DE": {
-  "name": "",
-  "sector": "",
-  "industry": "",
-  "country": "",
-  "cap": ""
+  "name": "Heidelberg Materials AG",
+  "sector": "Basic Materials",
+  "industry": "Building Materials",
+  "country": "Germany",
+  "cap": "large"
  },
  "SHL.DE": {
-  "name": "",
-  "sector": "",
-  "industry": "",
-  "country": "",
-  "cap": ""
+  "name": "Siemens Healthineers AG",
+  "sector": "Healthcare",
+  "industry": "Medical Devices",
+  "country": "Germany",
+  "cap": "large"
  },
  "VNA.DE": {
-  "name": "",
-  "sector": "",
-  "industry": "",
-  "country": "",
-  "cap": ""
+  "name": "Vonovia SE",
+  "sector": "Real Estate",
+  "industry": "Real Estate Services",
+  "country": "Germany",
+  "cap": "large"
  },
  "TEG.DE": {
-  "name": "",
-  "sector": "",
-  "industry": "",
-  "country": "",
-  "cap": ""
+  "name": "TAG Immobilien AG",
+  "sector": "Real Estate",
+  "industry": "Real Estate - Diversified",
+  "country": "Germany",
+  "cap": "mid"
  },
  "TUI1.DE": {
-  "name": "",
-  "sector": "",
-  "industry": "",
-  "country": "",
-  "cap": ""
+  "name": "TUI AG",
+  "sector": "Consumer Cyclical",
+  "industry": "Travel Services",
+  "country": "Germany",
+  "cap": "mid"
  },
  "KER.PA": {
-  "name": "",
-  "sector": "",
-  "industry": "",
-  "country": "",
-  "cap": ""
+  "name": "Kering SA",
+  "sector": "Consumer Cyclical",
+  "industry": "Luxury Goods",
+  "country": "France",
+  "cap": "large"
  },
  "DSY.PA": {
-  "name": "",
-  "sector": "",
-  "industry": "",
-  "country": "",
-  "cap": ""
+  "name": "Dassault Systèmes SE",
+  "sector": "Technology",
+  "industry": "Software - Application",
+  "country": "France",
+  "cap": "large"
  },
  "HO.PA": {
-  "name": "",
-  "sector": "",
-  "industry": "",
-  "country": "",
-  "cap": ""
+  "name": "Thales S.A.",
+  "sector": "Industrials",
+  "industry": "Aerospace & Defense",
+  "country": "France",
+  "cap": "large"
  },
  "SGO.PA": {
-  "name": "",
-  "sector": "",
-  "industry": "",
-  "country": "",
-  "cap": ""
+  "name": "Compagnie de Saint-Gobain S.A.",
+  "sector": "Industrials",
+  "industry": "Building Products & Equipment",
+  "country": "France",
+  "cap": "large"
  },
  "ML.PA": {
-  "name": "",
+  "name": "Compagnie Générale des Établissements Michelin Société en commandite par actions",
   "sector": "",
   "industry": "",
   "country": "",
   "cap": ""
  },
  "RI.PA": {
-  "name": "",
-  "sector": "",
-  "industry": "",
-  "country": "",
-  "cap": ""
+  "name": "Pernod Ricard SA",
+  "sector": "Consumer Defensive",
+  "industry": "Beverages - Wineries & Distilleries",
+  "country": "France",
+  "cap": "large"
  },
  "CAP.PA": {
-  "name": "",
-  "sector": "",
-  "industry": "",
-  "country": "",
-  "cap": ""
+  "name": "Capgemini SE",
+  "sector": "Technology",
+  "industry": "Information Technology Services",
+  "country": "France",
+  "cap": "large"
  },
  "PUB.PA": {
-  "name": "",
-  "sector": "",
-  "industry": "",
-  "country": "",
-  "cap": ""
+  "name": "Publicis Groupe S.A.",
+  "sector": "Communication Services",
+  "industry": "Advertising Agencies",
+  "country": "France",
+  "cap": "large"
  },
  "CA.PA": {
-  "name": "",
-  "sector": "",
-  "industry": "",
-  "country": "",
-  "cap": ""
+  "name": "Carrefour SA",
+  "sector": "Consumer Defensive",
+  "industry": "Grocery Stores",
+  "country": "France",
+  "cap": "large"
  },
  "VIE.PA": {
-  "name": "",
-  "sector": "",
-  "industry": "",
-  "country": "",
-  "cap": ""
+  "name": "Veolia Environnement SA",
+  "sector": "Industrials",
+  "industry": "Waste Management",
+  "country": "France",
+  "cap": "large"
  },
  "WLN.PA": {
-  "name": "",
-  "sector": "",
-  "industry": "",
-  "country": "",
-  "cap": ""
+  "name": "Worldline SA",
+  "sector": "Technology",
+  "industry": "Software - Infrastructure",
+  "country": "France",
+  "cap": "small"
  },
  "GLE.PA": {
-  "name": "",
-  "sector": "",
-  "industry": "",
-  "country": "",
-  "cap": ""
+  "name": "Société Générale Société anonyme",
+  "sector": "Financial Services",
+  "industry": "Banks - Regional",
+  "country": "France",
+  "cap": "large"
  },
  "SW.PA": {
-  "name": "",
-  "sector": "",
-  "industry": "",
-  "country": "",
-  "cap": ""
+  "name": "Sodexo S.A.",
+  "sector": "Industrials",
+  "industry": "Specialty Business Services",
+  "country": "France",
+  "cap": "mid"
  },
  "LR.PA": {
-  "name": "",
-  "sector": "",
-  "industry": "",
-  "country": "",
-  "cap": ""
+  "name": "Legrand SA",
+  "sector": "Industrials",
+  "industry": "Electrical Equipment & Parts",
+  "country": "France",
+  "cap": "large"
  },
  "BN.PA": {
-  "name": "",
-  "sector": "",
-  "industry": "",
-  "country": "",
-  "cap": ""
+  "name": "Danone S.A.",
+  "sector": "Consumer Defensive",
+  "industry": "Packaged Foods",
+  "country": "France",
+  "cap": "large"
  },
  "MT.AS": {
-  "name": "",
-  "sector": "",
-  "industry": "",
-  "country": "",
-  "cap": ""
+  "name": "ArcelorMittal S.A.",
+  "sector": "Basic Materials",
+  "industry": "Steel",
+  "country": "Luxembourg",
+  "cap": "large"
  },
  "PHIA.AS": {
-  "name": "",
-  "sector": "",
-  "industry": "",
-  "country": "",
-  "cap": ""
+  "name": "Koninklijke Philips N.V.",
+  "sector": "Healthcare",
+  "industry": "Medical Devices",
+  "country": "Netherlands",
+  "cap": "large"
  },
  "ABN.AS": {
-  "name": "",
-  "sector": "",
-  "industry": "",
-  "country": "",
-  "cap": ""
+  "name": "ABN AMRO Bank N.V.",
+  "sector": "Financial Services",
+  "industry": "Banks - Diversified",
+  "country": "Netherlands",
+  "cap": "large"
  },
  "NN.AS": {
-  "name": "",
-  "sector": "",
-  "industry": "",
-  "country": "",
-  "cap": ""
+  "name": "NN Group N.V.",
+  "sector": "Financial Services",
+  "industry": "Insurance - Diversified",
+  "country": "Netherlands",
+  "cap": "large"
  },
  "AKZA.AS": {
-  "name": "",
-  "sector": "",
-  "industry": "",
-  "country": "",
-  "cap": ""
+  "name": "Akzo Nobel N.V.",
+  "sector": "Basic Materials",
+  "industry": "Specialty Chemicals",
+  "country": "Netherlands",
+  "cap": "large"
  },
  "WKL.AS": {
-  "name": "",
-  "sector": "",
-  "industry": "",
-  "country": "",
-  "cap": ""
+  "name": "Wolters Kluwer N.V.",
+  "sector": "Industrials",
+  "industry": "Specialty Business Services",
+  "country": "Netherlands",
+  "cap": "large"
  },
  "HEIA.AS": {
-  "name": "",
-  "sector": "",
-  "industry": "",
-  "country": "",
-  "cap": ""
+  "name": "Heineken N.V.",
+  "sector": "Consumer Defensive",
+  "industry": "Beverages - Brewers",
+  "country": "Netherlands",
+  "cap": "large"
  },
  "URW.PA": {
-  "name": "",
-  "sector": "",
-  "industry": "",
-  "country": "",
-  "cap": ""
+  "name": "Unibail-Rodamco-Westfield SE",
+  "sector": "Real Estate",
+  "industry": "REIT - Retail",
+  "country": "France",
+  "cap": "large"
  },
  "RAND.AS": {
-  "name": "",
-  "sector": "",
-  "industry": "",
-  "country": "",
-  "cap": ""
+  "name": "Randstad N.V.",
+  "sector": "Industrials",
+  "industry": "Staffing & Employment Services",
+  "country": "Netherlands",
+  "cap": "mid"
  },
  "IMCD.AS": {
-  "name": "",
-  "sector": "",
-  "industry": "",
-  "country": "",
-  "cap": ""
+  "name": "IMCD N.V.",
+  "sector": "Basic Materials",
+  "industry": "Specialty Chemicals",
+  "country": "Netherlands",
+  "cap": "mid"
  },
  "BESI.AS": {
-  "name": "",
-  "sector": "",
-  "industry": "",
-  "country": "",
-  "cap": ""
+  "name": "BE Semiconductor Industries N.V.",
+  "sector": "Technology",
+  "industry": "Semiconductor Equipment & Materials",
+  "country": "Netherlands",
+  "cap": "large"
  },
  "UCB.BR": {
-  "name": "",
-  "sector": "",
-  "industry": "",
-  "country": "",
-  "cap": ""
+  "name": "UCB SA",
+  "sector": "Healthcare",
+  "industry": "Biotechnology",
+  "country": "Belgium",
+  "cap": "large"
  },
  "COLR.BR": {
-  "name": "",
-  "sector": "",
-  "industry": "",
-  "country": "",
-  "cap": ""
+  "name": "Colruyt Group N.V.",
+  "sector": "Consumer Defensive",
+  "industry": "Grocery Stores",
+  "country": "Belgium",
+  "cap": "mid"
  },
  "KBC.BR": {
-  "name": "",
-  "sector": "",
-  "industry": "",
-  "country": "",
-  "cap": ""
+  "name": "KBC Group NV",
+  "sector": "Financial Services",
+  "industry": "Banks - Regional",
+  "country": "Belgium",
+  "cap": "large"
  },
  "AGS.BR": {
-  "name": "",
-  "sector": "",
-  "industry": "",
-  "country": "",
-  "cap": ""
+  "name": "ageas SA/NV",
+  "sector": "Financial Services",
+  "industry": "Insurance - Diversified",
+  "country": "Belgium",
+  "cap": "large"
  },
  "SOLB.BR": {
-  "name": "",
-  "sector": "",
-  "industry": "",
-  "country": "",
-  "cap": ""
+  "name": "Solvay SA",
+  "sector": "Basic Materials",
+  "industry": "Chemicals",
+  "country": "Belgium",
+  "cap": "mid"
  },
  "WDP.BR": {
-  "name": "",
-  "sector": "",
-  "industry": "",
-  "country": "",
-  "cap": ""
+  "name": "Warehouses De Pauw SA",
+  "sector": "Real Estate",
+  "industry": "REIT - Industrial",
+  "country": "Belgium",
+  "cap": "mid"
  },
  "ZURN.SW": {
-  "name": "",
-  "sector": "",
-  "industry": "",
-  "country": "",
-  "cap": ""
+  "name": "Zurich Insurance Group AG",
+  "sector": "Financial Services",
+  "industry": "Insurance - Diversified",
+  "country": "Switzerland",
+  "cap": "large"
  },
  "ABBN.SW": {
-  "name": "",
-  "sector": "",
-  "industry": "",
-  "country": "",
-  "cap": ""
+  "name": "ABB Ltd",
+  "sector": "Industrials",
+  "industry": "Electrical Equipment & Parts",
+  "country": "Switzerland",
+  "cap": "large"
  },
  "CFR.SW": {
-  "name": "",
-  "sector": "",
-  "industry": "",
-  "country": "",
-  "cap": ""
+  "name": "Compagnie Financière Richemont SA",
+  "sector": "Consumer Cyclical",
+  "industry": "Luxury Goods",
+  "country": "Switzerland",
+  "cap": "large"
  },
  "ALC.SW": {
-  "name": "",
-  "sector": "",
-  "industry": "",
-  "country": "",
-  "cap": ""
+  "name": "Alcon Inc.",
+  "sector": "Healthcare",
+  "industry": "Medical Instruments & Supplies",
+  "country": "Switzerland",
+  "cap": "large"
  },
  "GEBN.SW": {
-  "name": "",
-  "sector": "",
-  "industry": "",
-  "country": "",
-  "cap": ""
+  "name": "Geberit AG",
+  "sector": "Industrials",
+  "industry": "Building Products & Equipment",
+  "country": "Switzerland",
+  "cap": "large"
  },
  "LONN.SW": {
-  "name": "",
-  "sector": "",
-  "industry": "",
-  "country": "",
-  "cap": ""
+  "name": "Lonza Group AG",
+  "sector": "Healthcare",
+  "industry": "Diagnostics & Research",
+  "country": "Switzerland",
+  "cap": "large"
  },
  "SREN.SW": {
-  "name": "",
-  "sector": "",
-  "industry": "",
-  "country": "",
-  "cap": ""
+  "name": "Swiss Re AG",
+  "sector": "Financial Services",
+  "industry": "Insurance - Reinsurance",
+  "country": "Switzerland",
+  "cap": "large"
  },
  "SLHN.SW": {
-  "name": "",
-  "sector": "",
-  "industry": "",
-  "country": "",
-  "cap": ""
+  "name": "Swiss Life Holding AG",
+  "sector": "Financial Services",
+  "industry": "Insurance - Diversified",
+  "country": "Switzerland",
+  "cap": "large"
  },
  "ADEN.SW": {
-  "name": "",
-  "sector": "",
-  "industry": "",
-  "country": "",
-  "cap": ""
+  "name": "Adecco Group AG",
+  "sector": "Industrials",
+  "industry": "Staffing & Employment Services",
+  "country": "Switzerland",
+  "cap": "mid"
  },
  "SGKN.SW": {
-  "name": "",
-  "sector": "",
-  "industry": "",
-  "country": "",
-  "cap": ""
+  "name": "St. Galler Kantonalbank AG",
+  "sector": "Financial Services",
+  "industry": "Banks - Regional",
+  "country": "Switzerland",
+  "cap": "mid"
  },
  "RACE.MI": {
-  "name": "",
-  "sector": "",
-  "industry": "",
-  "country": "",
-  "cap": ""
+  "name": "Ferrari N.V.",
+  "sector": "Consumer Cyclical",
+  "industry": "Auto Manufacturers",
+  "country": "Italy",
+  "cap": "large"
  },
  "STLAM.MI": {
-  "name": "",
-  "sector": "",
-  "industry": "",
-  "country": "",
-  "cap": ""
+  "name": "Stellantis N.V.",
+  "sector": "Consumer Cyclical",
+  "industry": "Auto Manufacturers",
+  "country": "Netherlands",
+  "cap": "large"
  },
  "LDO.MI": {
-  "name": "",
-  "sector": "",
-  "industry": "",
-  "country": "",
-  "cap": ""
+  "name": "Leonardo S.p.a.",
+  "sector": "Industrials",
+  "industry": "Aerospace & Defense",
+  "country": "Italy",
+  "cap": "large"
  },
  "TIT.MI": {
-  "name": "",
-  "sector": "",
-  "industry": "",
-  "country": "",
-  "cap": ""
+  "name": "Telecom Italia S.p.A.",
+  "sector": "Communication Services",
+  "industry": "Telecom Services",
+  "country": "Italy",
+  "cap": "large"
  },
  "PST.MI": {
-  "name": "",
-  "sector": "",
-  "industry": "",
-  "country": "",
-  "cap": ""
+  "name": "Poste Italiane S.p.A.",
+  "sector": "Industrials",
+  "industry": "Conglomerates",
+  "country": "Italy",
+  "cap": "large"
  },
  "BMED.MI": {
-  "name": "",
-  "sector": "",
-  "industry": "",
-  "country": "",
-  "cap": ""
+  "name": "Banca Mediolanum S.p.A.",
+  "sector": "Financial Services",
+  "industry": "Banks - Regional",
+  "country": "Italy",
+  "cap": "large"
  },
  "PRY.MI": {
-  "name": "",
-  "sector": "",
-  "industry": "",
-  "country": "",
-  "cap": ""
+  "name": "Prysmian S.p.A.",
+  "sector": "Industrials",
+  "industry": "Electrical Equipment & Parts",
+  "country": "Italy",
+  "cap": "large"
  },
  "CPR.MI": {
-  "name": "",
-  "sector": "",
-  "industry": "",
-  "country": "",
-  "cap": ""
+  "name": "Davide Campari-Milano N.V.",
+  "sector": "Consumer Defensive",
+  "industry": "Beverages - Wineries & Distilleries",
+  "country": "Italy",
+  "cap": "mid"
  },
  "MONC.MI": {
-  "name": "",
-  "sector": "",
-  "industry": "",
-  "country": "",
-  "cap": ""
+  "name": "Moncler S.p.A.",
+  "sector": "Consumer Cyclical",
+  "industry": "Apparel Manufacturing",
+  "country": "Italy",
+  "cap": "large"
  },
  "REP.MC": {
-  "name": "",
-  "sector": "",
-  "industry": "",
-  "country": "",
-  "cap": ""
+  "name": "Repsol, S.A.",
+  "sector": "Energy",
+  "industry": "Oil & Gas Integrated",
+  "country": "Spain",
+  "cap": "large"
  },
  "ELE.MC": {
-  "name": "",
-  "sector": "",
-  "industry": "",
-  "country": "",
-  "cap": ""
+  "name": "Endesa, S.A.",
+  "sector": "Utilities",
+  "industry": "Utilities - Regulated Electric",
+  "country": "Spain",
+  "cap": "large"
  },
  "TEF.MC": {
-  "name": "",
-  "sector": "",
-  "industry": "",
-  "country": "",
-  "cap": ""
+  "name": "Telefónica, S.A.",
+  "sector": "Communication Services",
+  "industry": "Telecom Services",
+  "country": "Spain",
+  "cap": "large"
  },
  "FER.MC": {
-  "name": "",
-  "sector": "",
-  "industry": "",
-  "country": "",
-  "cap": ""
+  "name": "Ferrovial N.V.",
+  "sector": "Industrials",
+  "industry": "Engineering & Construction",
+  "country": "Netherlands",
+  "cap": "large"
  },
  "AMS.MC": {
-  "name": "",
-  "sector": "",
-  "industry": "",
-  "country": "",
-  "cap": ""
+  "name": "Amadeus IT Group, S.A.",
+  "sector": "Technology",
+  "industry": "Information Technology Services",
+  "country": "Spain",
+  "cap": "large"
  },
  "MAP.MC": {
-  "name": "",
-  "sector": "",
-  "industry": "",
-  "country": "",
-  "cap": ""
+  "name": "Mapfre, S.A.",
+  "sector": "Financial Services",
+  "industry": "Insurance - Diversified",
+  "country": "Spain",
+  "cap": "large"
  },
  "NOKIA.HE": {
-  "name": "",
-  "sector": "",
-  "industry": "",
-  "country": "",
-  "cap": ""
+  "name": "Nokia Oyj",
+  "sector": "Technology",
+  "industry": "Communication Equipment",
+  "country": "Finland",
+  "cap": "large"
  },
  "NESTE.HE": {
-  "name": "",
-  "sector": "",
-  "industry": "",
-  "country": "",
-  "cap": ""
+  "name": "Neste Oyj",
+  "sector": "Energy",
+  "industry": "Oil & Gas Refining & Marketing",
+  "country": "Finland",
+  "cap": "large"
  },
  "SAMPO.HE": {
-  "name": "",
-  "sector": "",
-  "industry": "",
-  "country": "",
-  "cap": ""
+  "name": "Sampo Oyj",
+  "sector": "Financial Services",
+  "industry": "Insurance - Diversified",
+  "country": "Finland",
+  "cap": "large"
  },
  "FORTUM.HE": {
-  "name": "",
-  "sector": "",
-  "industry": "",
-  "country": "",
-  "cap": ""
+  "name": "Fortum Oyj",
+  "sector": "Utilities",
+  "industry": "Utilities - Renewable",
+  "country": "Finland",
+  "cap": "large"
  },
  "ERIC-B.ST": {
-  "name": "",
-  "sector": "",
-  "industry": "",
-  "country": "",
-  "cap": ""
+  "name": "Telefonaktiebolaget LM Ericsson (publ)",
+  "sector": "Technology",
+  "industry": "Communication Equipment",
+  "country": "Sweden",
+  "cap": "mega"
  },
  "VOLV-B.ST": {
-  "name": "",
-  "sector": "",
-  "industry": "",
-  "country": "",
-  "cap": ""
+  "name": "AB Volvo (publ)",
+  "sector": "Industrials",
+  "industry": "Farm & Heavy Construction Machinery",
+  "country": "Sweden",
+  "cap": "mega"
  },
  "ATCO-A.ST": {
-  "name": "",
-  "sector": "",
-  "industry": "",
-  "country": "",
-  "cap": ""
+  "name": "Atlas Copco AB (publ)",
+  "sector": "Industrials",
+  "industry": "Specialty Industrial Machinery",
+  "country": "Sweden",
+  "cap": "mega"
  },
  "SAND.ST": {
-  "name": "",
-  "sector": "",
-  "industry": "",
-  "country": "",
-  "cap": ""
+  "name": "Sandvik AB (publ)",
+  "sector": "Industrials",
+  "industry": "Specialty Industrial Machinery",
+  "country": "Sweden",
+  "cap": "mega"
  },
  "ESSITY-B.ST": {
-  "name": "",
-  "sector": "",
-  "industry": "",
-  "country": "",
-  "cap": ""
+  "name": "Essity AB (publ)",
+  "sector": "Consumer Defensive",
+  "industry": "Household & Personal Products",
+  "country": "Sweden",
+  "cap": "large"
  },
  "NHY.OL": {
-  "name": "",
-  "sector": "",
-  "industry": "",
-  "country": "",
-  "cap": ""
+  "name": "Norsk Hydro ASA",
+  "sector": "Basic Materials",
+  "industry": "Aluminum",
+  "country": "Norway",
+  "cap": "large"
  },
  "DNB.OL": {
-  "name": "",
-  "sector": "",
-  "industry": "",
-  "country": "",
-  "cap": ""
+  "name": "DNB Bank ASA",
+  "sector": "Financial Services",
+  "industry": "Banks - Regional",
+  "country": "Norway",
+  "cap": "mega"
  },
  "TEL.OL": {
-  "name": "",
-  "sector": "",
-  "industry": "",
-  "country": "",
-  "cap": ""
+  "name": "Telenor ASA",
+  "sector": "Communication Services",
+  "industry": "Telecom Services",
+  "country": "Norway",
+  "cap": "large"
  },
  "EQNR.OL": {
-  "name": "",
-  "sector": "",
-  "industry": "",
-  "country": "",
-  "cap": ""
+  "name": "Equinor ASA",
+  "sector": "Energy",
+  "industry": "Oil & Gas Integrated",
+  "country": "Norway",
+  "cap": "mega"
  },
  "ORK.OL": {
-  "name": "",
-  "sector": "",
-  "industry": "",
-  "country": "",
-  "cap": ""
+  "name": "Orkla ASA",
+  "sector": "Consumer Defensive",
+  "industry": "Packaged Foods",
+  "country": "Norway",
+  "cap": "large"
  },
  "NOVO-B.CO": {
-  "name": "",
-  "sector": "",
-  "industry": "",
-  "country": "",
-  "cap": ""
+  "name": "Novo Nordisk A/S",
+  "sector": "Healthcare",
+  "industry": "Drug Manufacturers - General",
+  "country": "Denmark",
+  "cap": "mega"
  },
  "DSV.CO": {
-  "name": "",
-  "sector": "",
-  "industry": "",
-  "country": "",
-  "cap": ""
+  "name": "DSV A/S",
+  "sector": "Industrials",
+  "industry": "Integrated Freight & Logistics",
+  "country": "Denmark",
+  "cap": "mega"
  },
  "CARL-B.CO": {
-  "name": "",
-  "sector": "",
-  "industry": "",
-  "country": "",
-  "cap": ""
+  "name": "Carlsberg A/S",
+  "sector": "Consumer Defensive",
+  "industry": "Beverages - Brewers",
+  "country": "Denmark",
+  "cap": "large"
  },
  "MAERSK-B.CO": {
-  "name": "",
-  "sector": "",
-  "industry": "",
-  "country": "",
-  "cap": ""
+  "name": "A.P. Møller - Mærsk A/S",
+  "sector": "Industrials",
+  "industry": "Marine Shipping",
+  "country": "Denmark",
+  "cap": "mega"
  },
  "TM": {
-  "name": "",
-  "sector": "",
-  "industry": "",
-  "country": "",
-  "cap": ""
+  "name": "Toyota Motor Corporation",
+  "sector": "Consumer Cyclical",
+  "industry": "Auto Manufacturers",
+  "country": "Japan",
+  "cap": "mega"
  },
  "SONY": {
-  "name": "",
-  "sector": "",
-  "industry": "",
-  "country": "",
-  "cap": ""
+  "name": "Sony Group Corporation",
+  "sector": "Technology",
+  "industry": "Consumer Electronics",
+  "country": "Japan",
+  "cap": "large"
  },
  "MUFG": {
-  "name": "",
-  "sector": "",
-  "industry": "",
-  "country": "",
-  "cap": ""
+  "name": "Mitsubishi UFJ Financial Group, Inc.",
+  "sector": "Financial Services",
+  "industry": "Banks - Diversified",
+  "country": "Japan",
+  "cap": "mega"
  },
  "HMC": {
-  "name": "",
-  "sector": "",
-  "industry": "",
-  "country": "",
-  "cap": ""
+  "name": "Honda Motor Co., Ltd.",
+  "sector": "Consumer Cyclical",
+  "industry": "Auto Manufacturers",
+  "country": "Japan",
+  "cap": "large"
  },
  "SMFG": {
-  "name": "",
-  "sector": "",
-  "industry": "",
-  "country": "",
-  "cap": ""
+  "name": "Sumitomo Mitsui Financial Group, Inc.",
+  "sector": "Financial Services",
+  "industry": "Banks - Diversified",
+  "country": "Japan",
+  "cap": "large"
  },
  "MFG": {
-  "name": "",
-  "sector": "",
-  "industry": "",
-  "country": "",
-  "cap": ""
+  "name": "Mizuho Financial Group, Inc.",
+  "sector": "Financial Services",
+  "industry": "Banks - Regional",
+  "country": "Japan",
+  "cap": "large"
  },
  "NTTYY": {
-  "name": "",
-  "sector": "",
-  "industry": "",
-  "country": "",
-  "cap": ""
+  "name": "NTT, Inc.",
+  "sector": "Communication Services",
+  "industry": "Telecom Services",
+  "country": "Japan",
+  "cap": "large"
  },
  "NTDOY": {
-  "name": "",
-  "sector": "",
-  "industry": "",
-  "country": "",
-  "cap": ""
+  "name": "Nintendo Co., Ltd.",
+  "sector": "Communication Services",
+  "industry": "Electronic Gaming & Multimedia",
+  "country": "Japan",
+  "cap": "large"
  },
  "FANUY": {
-  "name": "",
-  "sector": "",
-  "industry": "",
-  "country": "",
-  "cap": ""
+  "name": "Fanuc Corporation",
+  "sector": "Industrials",
+  "industry": "Specialty Industrial Machinery",
+  "country": "Japan",
+  "cap": "large"
  },
  "KYOCY": {
-  "name": "",
-  "sector": "",
-  "industry": "",
-  "country": "",
-  "cap": ""
+  "name": "Kyocera Corporation",
+  "sector": "Industrials",
+  "industry": "Conglomerates",
+  "country": "Japan",
+  "cap": "large"
  },
  "HTHIY": {
-  "name": "",
-  "sector": "",
-  "industry": "",
-  "country": "",
-  "cap": ""
+  "name": "Hitachi, Ltd.",
+  "sector": "Industrials",
+  "industry": "Conglomerates",
+  "country": "Japan",
+  "cap": "large"
  },
  "KB": {
-  "name": "",
-  "sector": "",
-  "industry": "",
-  "country": "",
-  "cap": ""
+  "name": "KB Financial Group Inc.",
+  "sector": "Financial Services",
+  "industry": "Banks - Regional",
+  "country": "South Korea",
+  "cap": "large"
  },
  "SHG": {
-  "name": "",
-  "sector": "",
-  "industry": "",
-  "country": "",
-  "cap": ""
+  "name": "Shinhan Financial Group Co., Ltd.",
+  "sector": "Financial Services",
+  "industry": "Banks - Regional",
+  "country": "South Korea",
+  "cap": "large"
  },
  "KEP": {
-  "name": "",
-  "sector": "",
-  "industry": "",
-  "country": "",
-  "cap": ""
+  "name": "Korea Electric Power Corporation",
+  "sector": "Utilities",
+  "industry": "Utilities - Regulated Electric",
+  "country": "South Korea",
+  "cap": "large"
  },
  "PKX": {
-  "name": "",
-  "sector": "",
-  "industry": "",
-  "country": "",
-  "cap": ""
+  "name": "POSCO Holdings Inc.",
+  "sector": "Basic Materials",
+  "industry": "Steel",
+  "country": "South Korea",
+  "cap": "large"
  },
  "UMC": {
-  "name": "",
-  "sector": "",
-  "industry": "",
-  "country": "",
-  "cap": ""
+  "name": "United Microelectronics Corporation",
+  "sector": "Technology",
+  "industry": "Semiconductors",
+  "country": "Taiwan",
+  "cap": "large"
  },
  "ASX": {
-  "name": "",
-  "sector": "",
-  "industry": "",
-  "country": "",
-  "cap": ""
+  "name": "ASE Technology Holding Co., Ltd.",
+  "sector": "Technology",
+  "industry": "Semiconductors",
+  "country": "Taiwan",
+  "cap": "large"
  },
  "HIMX": {
-  "name": "",
-  "sector": "",
-  "industry": "",
-  "country": "",
-  "cap": ""
+  "name": "Himax Technologies, Inc.",
+  "sector": "Technology",
+  "industry": "Semiconductors",
+  "country": "Taiwan",
+  "cap": "mid"
  },
  "BABA": {
-  "name": "",
-  "sector": "",
-  "industry": "",
-  "country": "",
-  "cap": ""
+  "name": "Alibaba Group Holding Limited",
+  "sector": "Consumer Cyclical",
+  "industry": "Internet Retail",
+  "country": "China",
+  "cap": "mega"
  },
  "NIO": {
-  "name": "",
-  "sector": "",
-  "industry": "",
-  "country": "",
-  "cap": ""
+  "name": "NIO Inc.",
+  "sector": "Consumer Cyclical",
+  "industry": "Auto Manufacturers",
+  "country": "China",
+  "cap": "large"
  },
  "LI": {
-  "name": "",
-  "sector": "",
-  "industry": "",
-  "country": "",
-  "cap": ""
+  "name": "Li Auto Inc.",
+  "sector": "Consumer Cyclical",
+  "industry": "Auto Manufacturers",
+  "country": "China",
+  "cap": "large"
  },
  "XPEV": {
-  "name": "",
-  "sector": "",
-  "industry": "",
-  "country": "",
-  "cap": ""
+  "name": "XPeng Inc.",
+  "sector": "Consumer Cyclical",
+  "industry": "Auto Manufacturers",
+  "country": "China",
+  "cap": "large"
  },
  "TME": {
-  "name": "",
-  "sector": "",
-  "industry": "",
-  "country": "",
-  "cap": ""
+  "name": "Tencent Music Entertainment Group",
+  "sector": "Communication Services",
+  "industry": "Internet Content & Information",
+  "country": "China",
+  "cap": "large"
  },
  "NTES": {
-  "name": "",
-  "sector": "",
-  "industry": "",
-  "country": "",
-  "cap": ""
+  "name": "NetEase, Inc.",
+  "sector": "Communication Services",
+  "industry": "Electronic Gaming & Multimedia",
+  "country": "China",
+  "cap": "large"
  },
  "INFY": {
-  "name": "",
-  "sector": "",
-  "industry": "",
-  "country": "",
-  "cap": ""
+  "name": "Infosys Limited",
+  "sector": "Technology",
+  "industry": "Information Technology Services",
+  "country": "India",
+  "cap": "large"
  },
  "WIT": {
-  "name": "",
-  "sector": "",
-  "industry": "",
-  "country": "",
-  "cap": ""
+  "name": "Wipro Limited",
+  "sector": "Technology",
+  "industry": "Information Technology Services",
+  "country": "India",
+  "cap": "large"
  },
  "HDB": {
-  "name": "",
-  "sector": "",
-  "industry": "",
-  "country": "",
-  "cap": ""
+  "name": "HDFC Bank Limited",
+  "sector": "Financial Services",
+  "industry": "Banks - Regional",
+  "country": "India",
+  "cap": "large"
  },
  "IBN": {
-  "name": "",
-  "sector": "",
-  "industry": "",
-  "country": "",
-  "cap": ""
+  "name": "ICICI Bank Limited",
+  "sector": "Financial Services",
+  "industry": "Banks - Regional",
+  "country": "India",
+  "cap": "large"
  },
  "SIFY": {
-  "name": "",
-  "sector": "",
-  "industry": "",
-  "country": "",
-  "cap": ""
+  "name": "Sify Technologies Limited",
+  "sector": "Communication Services",
+  "industry": "Telecom Services",
+  "country": "India",
+  "cap": "small"
  },
  "VALE": {
-  "name": "",
-  "sector": "",
-  "industry": "",
-  "country": "",
-  "cap": ""
+  "name": "Vale S.A.",
+  "sector": "Basic Materials",
+  "industry": "Other Industrial Metals & Mining",
+  "country": "Brazil",
+  "cap": "large"
  },
  "PBR": {
-  "name": "",
-  "sector": "",
-  "industry": "",
-  "country": "",
-  "cap": ""
+  "name": "Petróleo Brasileiro S.A. - Petrobras",
+  "sector": "Energy",
+  "industry": "Oil & Gas Integrated",
+  "country": "Brazil",
+  "cap": "large"
  },
  "PBR-A": {
-  "name": "",
-  "sector": "",
-  "industry": "",
-  "country": "",
-  "cap": ""
+  "name": "Petróleo Brasileiro S.A. - Petrobras",
+  "sector": "Energy",
+  "industry": "Oil & Gas Integrated",
+  "country": "Brazil",
+  "cap": "large"
  },
  "ITUB": {
-  "name": "",
-  "sector": "",
-  "industry": "",
-  "country": "",
-  "cap": ""
+  "name": "Itaú Unibanco Holding S.A.",
+  "sector": "Financial Services",
+  "industry": "Banks - Regional",
+  "country": "Brazil",
+  "cap": "large"
  },
  "BBD": {
-  "name": "",
-  "sector": "",
-  "industry": "",
-  "country": "",
-  "cap": ""
+  "name": "Banco Bradesco S.A.",
+  "sector": "Financial Services",
+  "industry": "Banks - Regional",
+  "country": "Brazil",
+  "cap": "large"
  },
  "ABEV": {
-  "name": "",
-  "sector": "",
-  "industry": "",
-  "country": "",
-  "cap": ""
+  "name": "Ambev S.A.",
+  "sector": "Consumer Defensive",
+  "industry": "Beverages - Brewers",
+  "country": "Brazil",
+  "cap": "large"
  },
  "BHP": {
-  "name": "",
-  "sector": "",
-  "industry": "",
-  "country": "",
-  "cap": ""
+  "name": "BHP Group Limited",
+  "sector": "Basic Materials",
+  "industry": "Other Industrial Metals & Mining",
+  "country": "Australia",
+  "cap": "mega"
  },
  "RIO": {
-  "name": "",
-  "sector": "",
-  "industry": "",
-  "country": "",
-  "cap": ""
+  "name": "Rio Tinto Group",
+  "sector": "Basic Materials",
+  "industry": "Other Industrial Metals & Mining",
+  "country": "United Kingdom",
+  "cap": "large"
  },
  "BTI": {
-  "name": "",
-  "sector": "",
-  "industry": "",
-  "country": "",
-  "cap": ""
+  "name": "British American Tobacco p.l.c.",
+  "sector": "Consumer Defensive",
+  "industry": "Tobacco",
+  "country": "United Kingdom",
+  "cap": "large"
  },
  "DEO": {
-  "name": "",
-  "sector": "",
-  "industry": "",
-  "country": "",
-  "cap": ""
+  "name": "Diageo plc",
+  "sector": "Consumer Defensive",
+  "industry": "Beverages - Wineries & Distilleries",
+  "country": "United Kingdom",
+  "cap": "large"
  },
  "UL": {
-  "name": "",
-  "sector": "",
-  "industry": "",
-  "country": "",
-  "cap": ""
+  "name": "Unilever PLC",
+  "sector": "Consumer Defensive",
+  "industry": "Household & Personal Products",
+  "country": "United Kingdom",
+  "cap": "large"
  },
  "HSBC": {
-  "name": "",
-  "sector": "",
-  "industry": "",
-  "country": "",
-  "cap": ""
+  "name": "HSBC Holdings plc",
+  "sector": "Financial Services",
+  "industry": "Banks - Diversified",
+  "country": "United Kingdom",
+  "cap": "mega"
  },
  "BCS": {
-  "name": "",
-  "sector": "",
-  "industry": "",
-  "country": "",
-  "cap": ""
+  "name": "Barclays PLC",
+  "sector": "Financial Services",
+  "industry": "Banks - Diversified",
+  "country": "United Kingdom",
+  "cap": "large"
  },
  "LYG": {
-  "name": "",
-  "sector": "",
-  "industry": "",
-  "country": "",
-  "cap": ""
+  "name": "Lloyds Banking Group plc",
+  "sector": "Financial Services",
+  "industry": "Banks - Regional",
+  "country": "United Kingdom",
+  "cap": "large"
  },
  "NGG": {
-  "name": "",
-  "sector": "",
-  "industry": "",
-  "country": "",
-  "cap": ""
+  "name": "National Grid plc",
+  "sector": "Utilities",
+  "industry": "Utilities - Regulated Electric",
+  "country": "United Kingdom",
+  "cap": "large"
  },
  "AZN": {
-  "name": "",
-  "sector": "",
-  "industry": "",
-  "country": "",
-  "cap": ""
+  "name": "AstraZeneca PLC",
+  "sector": "Healthcare",
+  "industry": "Drug Manufacturers - General",
+  "country": "United Kingdom",
+  "cap": "mega"
  },
  "RHHBY": {
-  "name": "",
-  "sector": "",
-  "industry": "",
-  "country": "",
-  "cap": ""
+  "name": "Roche Holding AG",
+  "sector": "Healthcare",
+  "industry": "Drug Manufacturers - General",
+  "country": "Switzerland",
+  "cap": "mega"
  },
  "SAP": {
-  "name": "",
-  "sector": "",
-  "industry": "",
-  "country": "",
-  "cap": ""
+  "name": "SAP SE",
+  "sector": "Technology",
+  "industry": "Software - Application",
+  "country": "Germany",
+  "cap": "large"
  }
 }

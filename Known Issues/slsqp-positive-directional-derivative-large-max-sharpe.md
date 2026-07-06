@@ -1,0 +1,13 @@
+# SLSQP positive directional derivative on large Max Sharpe runs
+
+When a Max Sharpe optimization grows from about 250 assets to 947 assets, SciPy's Sequential Least Squares Programming (SLSQP) solver can fail with `RuntimeError: Positive directional derivative for linesearch`. The hardware is not the main cause. The problem is the shape and scale of the math the solver has to navigate.
+
+Max Sharpe is a fractional objective: maximize return divided by volatility. In solver form, that usually becomes a minimization of negative Sharpe. This surface is non-convex, which means the solver does not see one clean bowl-shaped path downhill. At 250 weights, SLSQP can often find a workable descent direction anyway. At 947 weights, there are far more directions where tiny changes in weights barely improve return, inflate risk, or violate constraints, so the internal line search can decide that every step it tries makes the local approximation worse.
+
+Numerical scaling makes that worse. Expected returns, covariance terms, penalties, bounds, and equality constraints can live on different magnitudes. With 947 variables, covariance noise and near-collinearity between assets create a flatter and more ill-conditioned risk surface. SLSQP builds local quadratic and linear approximations from gradients. If those gradients are poorly scaled or nearly cancel each other, its proposed step can point in a direction that should help on paper but increases the true objective when evaluated.
+
+L2 smoothing can also conflict with the Max Sharpe objective. The Sharpe objective wants concentrated positions when a few assets have attractive return-to-risk trade-offs. L2 regularization wants weights to stay smaller, smoother, or closer to a reference shape. Position caps, full-investment constraints, sector caps, long-only bounds, and L2 pressure can pull the solution in incompatible directions. At high dimension, SLSQP may find a direction that satisfies one part of the approximation while pushing against another part of the real constrained problem.
+
+The specific error means: SLSQP tried to move along its chosen search direction, but the directional derivative was positive, so the move was not a descent step for the minimized objective. After repeated attempts, it could not find a step length that improved the objective while respecting the constraints.
+
+Diagnostic takeaway: the 947-asset failure is likely a large, noisy, non-convex optimization problem overwhelming SLSQP's local line-search assumptions. Reduce the active universe, improve scaling, simplify or rescale the L2 penalty, use a convex reformulation when possible, or switch to an optimizer designed for large constrained nonlinear programs.

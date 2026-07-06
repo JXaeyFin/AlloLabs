@@ -552,6 +552,7 @@ function showView(viewName) {
   window.scrollTo({ top: 0, behavior: "smooth" });
   if (resolved === "history" && runnerConnected) loadHistoryCatalog();
   if (resolved === "guide") guideLoadMemory();
+  alloDockSync(resolved);
 }
 
 const donutSegments = {};
@@ -2910,7 +2911,7 @@ function guideSetLoading(loading) {
   if (status) status.hidden = !loading;
   if (loading) {
     const txt = document.getElementById("guide-status-text");
-    if (txt) txt.textContent = "Allo is thinking…";
+    if (txt) txt.textContent = "Allo is typing…";
   }
   if (sendBtn) sendBtn.disabled = loading;
   if (input) input.disabled = loading;
@@ -3139,14 +3140,14 @@ function gatherLatestResults() {
     portfolios: {
       max: {
         metrics: portfolioData.max.metricValues,
-        topHoldings: portfolioData.max.holdings.slice(0, 8),
+        topHoldings: portfolioData.max.holdings.slice(0, 16),
       },
       min: {
         metrics: portfolioData.min.metricValues,
-        topHoldings: portfolioData.min.holdings.slice(0, 8),
+        topHoldings: portfolioData.min.holdings.slice(0, 16),
       },
     },
-    research: (researchData || []).slice(0, 15).map((r) => ({
+    research: (researchData || []).slice(0, 40).map((r) => ({
       ticker:         r.ticker,
       view:           r.thesis || "",
       confidence:     r.confidence ?? null,
@@ -3177,6 +3178,7 @@ function gatherAppContext() {
     latestResults:  gatherLatestResults(),
     runStatus,
     activeView,
+    guideMode: guideModeEnabled,
   };
 }
 
@@ -3247,7 +3249,7 @@ async function guideSendMessage(text) {
 
   // Retry schedule: [delay before attempt, status label]
   const RETRIES = [
-    [0,    "Allo is thinking…"],
+    [0,    "Allo is typing…"],
     [3000, "Taking a little longer than usual…"],
     [5000, "Still working on it…"],
   ];
@@ -3292,6 +3294,10 @@ async function guideSendMessage(text) {
     if (mode === "run_config" && runConfig) {
       guidePendingConfig = runConfig;
       guideAppendConfigCard(runConfig);
+    }
+
+    if (guideModeEnabled && Array.isArray(data.highlights) && data.highlights.length) {
+      alloApplyHighlights(data.highlights);
     }
 
     if (guideHistory.length >= GUIDE_COMPACT_THRESHOLD) {
@@ -3360,6 +3366,225 @@ document.addEventListener("visibilitychange", () => {
     if (guideHistory.length >= 10) guideCompact();
   }
 });
+
+/* ================================================================ */
+/* Guide Mode — follow-me Allo dock and UI highlights               */
+/* ================================================================ */
+
+const GUIDE_MODE_KEY = "allolabs-guide-mode";
+const ALLO_DOCK_POS_KEY = "allolabs-allo-dock-pos";
+
+// Stable highlight keys Allo may reference. Keep in sync with the
+// GUIDE MODE & UI HIGHLIGHTS catalog in allolabs_guide.py.
+const ALLO_HIGHLIGHT_TARGETS = {
+  "tab-overview":      { selector: '.nav-item[data-view="overview"]' },
+  "tab-research":      { selector: '.nav-item[data-view="research"]' },
+  "tab-universe":      { selector: '.nav-item[data-view="universe"]' },
+  "tab-console":       { selector: '.nav-item[data-view="console"]' },
+  "tab-history":       { selector: '.nav-item[data-view="history"]' },
+  "tab-reference":     { selector: '.nav-item[data-view="reference"]' },
+  "tab-guide":         { selector: '.nav-item[data-view="guide"]' },
+  "open-report":       { selector: "#open-report-button" },
+  "configure":         { selector: "#configure-button" },
+  "training-window":   { selector: "#remote-training",          view: "console" },
+  "oos-window":        { selector: "#remote-oos",               view: "console" },
+  "ai-views":          { selector: "#remote-gpt",               view: "console" },
+  "research-provider": { selector: "#remote-research-provider", view: "console" },
+  "research-model":    { selector: "#remote-gpt-model",         view: "console" },
+  "ai-audit":          { selector: "#remote-audit",             view: "console" },
+  "audit-provider":    { selector: "#remote-audit-provider",    view: "console" },
+  "analyst-mandate":   { selector: "#remote-analyst-seed",      view: "console" },
+  "auditor-mandate":   { selector: "#remote-auditor-seed",      view: "console" },
+  "max-position":      { selector: "#remote-position",          view: "console" },
+  "sector-cap":        { selector: "#remote-sector-cap",        view: "console" },
+  "long-only":         { selector: "#remote-long-only",         view: "console" },
+  "regularization":    { selector: "#remote-regularization",    view: "console" },
+  "run-button":        { selector: "#runner-start",             view: "console" },
+  "universe-search":   { selector: "#universe-search",          view: "universe" },
+  "universe-presets":  { selector: "#universe-presets",         view: "universe" },
+  "continue-to-run":   { selector: '#universe-view [data-shortcut-view="console"]', view: "universe" },
+};
+
+let guideModeEnabled = localStorage.getItem(GUIDE_MODE_KEY) === "1";
+let alloDockCollapsed = false;
+
+function currentViewName() {
+  return document.querySelector(".nav-item.active[data-view]")?.dataset?.view || "overview";
+}
+
+function updateModeIndicators() {
+  const note = document.querySelector(".sidebar-note");
+  const noteLabel = note?.querySelector("strong");
+  if (noteLabel) noteLabel.textContent = guideModeEnabled ? "Guide mode" : "Research mode";
+  note?.classList.toggle("guide-mode-active", guideModeEnabled);
+  const tape = document.getElementById("tape-mode");
+  if (tape) tape.innerHTML = `<b>Mode</b> ${guideModeEnabled ? "Guide" : "Research"}`;
+  const toggle = document.getElementById("guide-mode-toggle");
+  if (toggle) toggle.checked = guideModeEnabled;
+}
+
+function setGuideMode(enabled) {
+  guideModeEnabled = enabled;
+  localStorage.setItem(GUIDE_MODE_KEY, enabled ? "1" : "0");
+  updateModeIndicators();
+  if (!enabled) alloClearHighlights();
+  alloDockSync(currentViewName());
+}
+
+// ── Dock: the live chat nodes are REPARENTED between the Guide tab and the
+// floating dock, so history, listeners, and in-flight requests carry over. ──
+
+function alloChatNodes() {
+  return [
+    document.getElementById("guide-chat"),
+    document.getElementById("guide-status"),
+    document.getElementById("guide-error"),
+    document.querySelector(".guide-input-row"),
+  ].filter(Boolean);
+}
+
+function alloDockMount() {
+  const dock = document.getElementById("allo-dock");
+  const body = document.getElementById("allo-dock-body");
+  if (!dock || !body || body.contains(document.getElementById("guide-chat"))) {
+    if (dock) dock.hidden = false;
+    return;
+  }
+  alloChatNodes().forEach((node) => body.appendChild(node));
+  dock.hidden = false;
+  alloDockRestorePosition();
+}
+
+function alloDockRestore() {
+  const dock = document.getElementById("allo-dock");
+  const anchor = document.getElementById("guide-inline-anchor");
+  if (!dock || !anchor) return;
+  if (dock.contains(document.getElementById("guide-chat"))) {
+    let previous = anchor;
+    alloChatNodes().forEach((node) => {
+      previous.insertAdjacentElement("afterend", node);
+      previous = node;
+    });
+  }
+  dock.hidden = true;
+}
+
+function alloDockSync(viewName) {
+  if (guideModeEnabled && viewName !== "guide") {
+    alloDockMount();
+  } else {
+    alloDockRestore();
+  }
+}
+
+function alloDockRestorePosition() {
+  const dock = document.getElementById("allo-dock");
+  if (!dock) return;
+  let pos = null;
+  try { pos = JSON.parse(localStorage.getItem(ALLO_DOCK_POS_KEY) || "null"); } catch { /* ignore */ }
+  if (pos && Number.isFinite(pos.x) && Number.isFinite(pos.y)) {
+    alloDockPlace(pos.x, pos.y);
+  }
+}
+
+function alloDockPlace(x, y) {
+  const dock = document.getElementById("allo-dock");
+  if (!dock) return;
+  const maxX = Math.max(0, window.innerWidth - dock.offsetWidth - 8);
+  const maxY = Math.max(0, window.innerHeight - 60);
+  const clampedX = Math.min(Math.max(x, 8), maxX);
+  const clampedY = Math.min(Math.max(y, 8), maxY);
+  dock.style.left = `${clampedX}px`;
+  dock.style.top = `${clampedY}px`;
+  dock.style.right = "auto";
+  dock.style.bottom = "auto";
+}
+
+(function wireAlloDockDrag() {
+  const header = document.getElementById("allo-dock-header");
+  const dock = document.getElementById("allo-dock");
+  if (!header || !dock) return;
+  let dragOffsetX = 0;
+  let dragOffsetY = 0;
+  let dragging = false;
+
+  header.addEventListener("pointerdown", (event) => {
+    if (event.target.closest(".allo-dock-btn")) return;
+    dragging = true;
+    const rect = dock.getBoundingClientRect();
+    dragOffsetX = event.clientX - rect.left;
+    dragOffsetY = event.clientY - rect.top;
+    header.setPointerCapture(event.pointerId);
+  });
+  header.addEventListener("pointermove", (event) => {
+    if (!dragging) return;
+    alloDockPlace(event.clientX - dragOffsetX, event.clientY - dragOffsetY);
+  });
+  header.addEventListener("pointerup", (event) => {
+    if (!dragging) return;
+    dragging = false;
+    header.releasePointerCapture(event.pointerId);
+    const rect = dock.getBoundingClientRect();
+    localStorage.setItem(ALLO_DOCK_POS_KEY, JSON.stringify({ x: rect.left, y: rect.top }));
+  });
+  window.addEventListener("resize", () => {
+    if (!dock.hidden && dock.style.left) {
+      const rect = dock.getBoundingClientRect();
+      alloDockPlace(rect.left, rect.top);
+    }
+  });
+})();
+
+document.getElementById("allo-dock-collapse")?.addEventListener("click", () => {
+  alloDockCollapsed = !alloDockCollapsed;
+  document.getElementById("allo-dock")?.classList.toggle("collapsed", alloDockCollapsed);
+  const btn = document.getElementById("allo-dock-collapse");
+  if (btn) {
+    btn.textContent = alloDockCollapsed ? "+" : "–";
+    btn.title = alloDockCollapsed ? "Expand" : "Collapse";
+  }
+});
+
+document.getElementById("allo-dock-goto")?.addEventListener("click", () => {
+  showView("guide");
+});
+
+document.getElementById("guide-mode-toggle")?.addEventListener("change", (event) => {
+  setGuideMode(event.target.checked);
+});
+
+// ── Highlights: slow pulsing glow on registry elements Allo points at. ──
+
+function alloClearHighlights() {
+  document.querySelectorAll(".allo-glow").forEach((el) => el.classList.remove("allo-glow"));
+}
+
+function alloApplyHighlights(keys) {
+  if (!Array.isArray(keys) || !keys.length) return;
+  alloClearHighlights();
+  const activeView = currentViewName();
+  const targets = new Set();
+  keys.slice(0, 6).forEach((key) => {
+    const entry = ALLO_HIGHLIGHT_TARGETS[key];
+    if (!entry) return;
+    const el = document.querySelector(entry.selector);
+    if (el) targets.add(el);
+    // Element lives in another tab: also glow that tab so the user can find it.
+    if (entry.view && entry.view !== activeView) {
+      const tab = document.querySelector(`.nav-item[data-view="${entry.view}"]`);
+      if (tab) targets.add(tab);
+    }
+  });
+  targets.forEach((el) => {
+    el.classList.add("allo-glow");
+    el.addEventListener("click", () => el.classList.remove("allo-glow"), { once: true });
+  });
+  if (targets.size) {
+    window.setTimeout(() => alloClearHighlights(), 14000);
+  }
+}
+
+updateModeIndicators();
 
 /* ================================================================ */
 

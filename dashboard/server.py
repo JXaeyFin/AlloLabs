@@ -36,8 +36,7 @@ try:
         get_compact_system,
         get_guide_system,
         inject_app_context,
-        needs_catalog_context,
-        parse_guide_response,
+        parse_guide_response_full,
     )
     _GUIDE_AVAILABLE = True
 except Exception:
@@ -62,6 +61,21 @@ DEFAULT_PDF = EXAMPLES_DIR / "default-portfolio-report.pdf"
 DEFAULT_CHART = EXAMPLES_DIR / "default-performance.png"
 UNIVERSE_CATALOG = universe_catalog(DEFAULT_SCRIPT)
 SUPPORTED_TICKERS = frozenset(ALL_UNIVERSE_TICKERS)
+
+# Company metadata (name/sector/industry/country/cap) used to enrich the guide's
+# catalog block. Regenerate with scripts/build-catalog-metadata.py; the guide
+# degrades to a symbols-only catalog when the file is absent or unreadable.
+def _load_catalog_metadata() -> dict:
+    try:
+        payload = json.loads(
+            (ROOT / "catalog_metadata.json").read_text(encoding="utf-8")
+        )
+        return payload if isinstance(payload, dict) else {}
+    except (OSError, ValueError):
+        return {}
+
+
+CATALOG_METADATA = _load_catalog_metadata()
 ALLOWED_UNIVERSES = {"index-leaders", "curated", "canada", "full", "custom"}
 ALLOWED_REGULARIZATIONS = {"none", "l2", "smooth_l1"}
 AI_PROVIDER_MODELS = {
@@ -1075,21 +1089,26 @@ class Handler(BaseHTTPRequestHandler):
                     raise ValueError("No valid messages provided.")
                 if sanitized[-1]["role"] != "user":
                     raise ValueError("Conversation must end with a user message.")
-                # Two-stage context: if the query involves tickers/sectors, inject
-                # the full catalog so Allo only suggests symbols that actually exist.
-                last_user_msg = sanitized[-1]["content"]
-                catalog_block: str | None = None
-                if _GUIDE_AVAILABLE and needs_catalog_context(last_user_msg):
-                    catalog_block = format_catalog_block(
-                        UNIVERSE_CATALOG.get("groups", [])
-                    )
+                # Inject the full metadata-enriched catalog on every turn. A
+                # keyword gate used to decide this, but a missed trigger means
+                # hallucinated tickers — always paying the extra prompt tokens
+                # is the safer trade for a desktop app.
+                catalog_block = format_catalog_block(
+                    UNIVERSE_CATALOG.get("groups", []),
+                    metadata=CATALOG_METADATA,
+                )
                 llm_messages = inject_app_context(sanitized, app_context, catalog_block)
                 raw = call_guide_ai(
                     get_guide_system(), llm_messages,
                     provider=provider, guide_model=guide_model,
                 )
-                reply, mode, run_config = parse_guide_response(raw)
-                self.send_json({"reply": reply, "mode": mode, "runConfig": run_config})
+                parsed = parse_guide_response_full(raw)
+                self.send_json({
+                    "reply": parsed["text"],
+                    "mode": parsed["mode"],
+                    "runConfig": parsed["runConfig"],
+                    "highlights": parsed["highlights"],
+                })
             except ValueError as exc:
                 self.send_json({"error": str(exc)}, HTTPStatus.BAD_REQUEST)
             except RuntimeError as exc:

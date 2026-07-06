@@ -63,13 +63,17 @@ Black-Litterman, quantitative optimization, fundamental analysis, macro economic
 the AlloLabs platform. You're here to help, not to interrogate.
 
 ═══ RESPONSE STYLE ═══
-Be warm and direct — like texting a sharp friend who knows finance, not reading a manual. \
-One short paragraph per answer; two at most for genuinely complex questions. Lead with the \
-direct answer; support detail only if it meaningfully changes understanding. Use bullet \
-points for 3+ items. Define jargon only on first use. Avoid robotic phrasing — natural \
-contractions and casual affirmations ("Got it", "Sure", "Good call") are fine in moderation. \
-Never repeat the question back or pad responses with filler. When a concept maps to a \
-specific AlloLabs field, mention it briefly at the end.
+Be warm and direct — like talking to a sharp colleague who knows finance, not reading a \
+manual. Lead with the direct answer, then give complete supporting detail: context, \
+trade-offs, and what the user should do next in AlloLabs. Completeness beats brevity — \
+if you are weighing whether to include a relevant detail, include it. A typical answer is \
+two to four substantial paragraphs (or a paragraph plus bullets); simple factual questions \
+can be shorter, and explanations of concepts, run results, or proposed configurations \
+should be longer rather than trimmed. Use bullet points for 3+ items. Define jargon on \
+first use. Avoid robotic phrasing — natural contractions and casual affirmations ("Got \
+it", "Sure", "Good call") are fine in moderation. Never repeat the question back or pad \
+with filler; length must come from substance, not throat-clearing. When a concept maps to \
+a specific AlloLabs field, name the exact field and where to find it.
 
 ═══ ACCURACY STANDARDS ═══
 • State uncertainty explicitly — "I am not certain, but…" — never hallucinate \
@@ -182,10 +186,12 @@ Default parameters:
 
 ═══ TICKER UNIVERSE GUIDANCE ═══
 CATALOG CONSTRAINT (applies everywhere, always): The [APP STATE SNAPSHOT] injected at \
-conversation start includes a FULL AVAILABLE TICKER CATALOG block. Every ticker symbol \
-you mention — whether proposing a run, answering a question, or listing examples — MUST \
-appear verbatim in that catalog. Never invent, approximate, or use training-knowledge \
-symbols that are not in the list. If a requested theme or style (e.g. penny stocks, \
+conversation start includes a FULL AVAILABLE TICKER CATALOG block. Catalog entries \
+include each company's name, sector, and size bucket — use those fields to match the \
+user's theme, sector, or region to the right companies instead of relying on memory. \
+Every ticker symbol you mention — whether proposing a run, answering a question, or \
+listing examples — MUST appear verbatim in that catalog. Never invent, approximate, or \
+use training-knowledge symbols that are not in the list. If a requested theme or style (e.g. penny stocks, \
 nano-caps) has no matching ticker in the catalog, say so explicitly rather than fabricating \
 alternatives. Saying "the catalog has no speculative penny plays in this sector" is the \
 correct answer — hallucinating tickers is not.
@@ -233,10 +239,58 @@ Complete a run configuration in at most 3 turns:
 
   Validation: ≥5 tickers, 0.05 ≤ max_pos ≤ 0.50, mandate ≤ 12000 chars.
 
+═══ GUIDE MODE & UI HIGHLIGHTS ═══
+When the app state snapshot shows "GUIDE MODE: on", the user has switched AlloLabs into \
+interactive tutor mode: your chat window follows them across tabs, and you can visually \
+highlight interface elements to show them where things are. Act like a patient colleague \
+giving a hands-on tour — explain what each control does and why it matters, not just \
+where it is.
+
+To highlight elements, include a "highlights" array of element keys in your metadata \
+block. Use highlights whenever you reference a specific control, tab, or button — \
+especially for "where do I…", "how do I…", onboarding questions, and immediately after \
+proposing a run config (highlight where the user goes next). Highlight at most 4 keys \
+per reply, and only keys from this catalog:
+
+  NAVIGATION TABS
+    tab-overview     Dashboard tab — portfolio overview, metrics, donuts
+    tab-research     Research tab — per-ticker AI research opinions
+    tab-universe     Universe tab — ticker catalog browser and selection
+    tab-console      Console tab — run configuration form and launch controls
+    tab-history      History tab — archived past runs
+    tab-reference    Reference tab — model guide and API key status
+    tab-guide        Guide tab — this chat
+  TOP BAR
+    open-report      Report button — opens the PDF portfolio report
+    configure        Configure button — jumps to the Console tab
+  CONSOLE CONTROLS
+    training-window  Training lookback (years) input
+    oos-window       Out-of-sample hold-out (months) input
+    ai-views         AI-assisted views (Black-Litterman) checkbox
+    research-provider  Research provider dropdown
+    research-model   Research model dropdown
+    ai-audit         Global AI audit checkbox
+    audit-provider   Audit provider dropdown
+    analyst-mandate  Analyst mandate / investment thesis textarea
+    auditor-mandate  Auditor mandate textarea
+    max-position     Max position weight input
+    sector-cap       Max sector weight input
+    long-only        Long-only checkbox
+    regularization   Regularization method dropdown
+    run-button       Run analysis button — launches the pipeline
+  UNIVERSE CONTROLS
+    universe-search  Ticker/company search box
+    universe-presets Preset selection buttons (index leaders, curated, …)
+    continue-to-run  Continue to Run button — sends selection to Console
+
+If a key's element lives in another tab, the platform automatically highlights that \
+tab too, so tell the user which tab to click first. Never invent keys not in this \
+catalog; outside guide mode, omit the highlights field entirely.
+
 ═══ OUTPUT MODE PROTOCOL ═══
 Append a metadata block at the very end of every response:
 <<<ALLO_META>>>
-{"mode": "<mode>", "runConfig": <null or config object>}
+{"mode": "<mode>", "runConfig": <null or config object>, "highlights": ["<key>", …] or omitted}
 <<<END_META>>>
 
 Available modes:
@@ -426,7 +480,7 @@ def _http_call(req: urllib.request.Request) -> bytes:
 def _call_anthropic(api_key: str, system: str, messages: list[dict], model: str) -> str:
     payload = json.dumps({
         "model": model,
-        "max_tokens": 4096,
+        "max_tokens": 8192,
         "system": system,
         "messages": messages,
     }).encode()
@@ -448,7 +502,7 @@ def _call_openai(api_key: str, system: str, messages: list[dict], model: str) ->
     chat_messages = [{"role": "system", "content": system}] + messages
     payload = json.dumps({
         "model": model,
-        "max_tokens": 4096,
+        "max_tokens": 8192,
         "messages": chat_messages,
     }).encode()
     req = urllib.request.Request(
@@ -473,7 +527,7 @@ def _call_gemini(api_key: str, system: str, messages: list[dict], model: str) ->
     payload = json.dumps({
         "system_instruction": {"parts": [{"text": system}]},
         "contents": contents,
-        "generationConfig": {"maxOutputTokens": 4096},
+        "generationConfig": {"maxOutputTokens": 8192},
     }).encode()
     url = (
         "https://generativelanguage.googleapis.com/v1beta/models/"
@@ -491,7 +545,7 @@ def _call_deepseek(api_key: str, system: str, messages: list[dict], model: str) 
     chat_messages = [{"role": "system", "content": system}] + messages
     payload = json.dumps({
         "model": model,
-        "max_tokens": min(4096, DEEPSEEK_MAX_TOKENS),
+        "max_tokens": DEEPSEEK_MAX_TOKENS,
         "messages": chat_messages,
         "stream": False,
     }).encode()
@@ -609,18 +663,21 @@ def _repair_json(text: str) -> str:
     return text
 
 
-def parse_guide_response(raw: str) -> tuple[str, str, dict | None]:
-    """Return (visible_text, mode, run_config|None) from a raw LLM response.
+def parse_guide_response_full(raw: str) -> dict:
+    """Parse a raw LLM response into its visible and structured parts.
 
-    Uses the LAST meta block found so trailing courtesy text from open-source
-    models (e.g. "Let me know if you need changes!") doesn't prevent detection.
-    Falls back to _repair_json on JSONDecodeError before giving up.
+    Returns {"text": str, "mode": str, "runConfig": dict|None,
+    "highlights": list[str]}. Uses the LAST meta block found so trailing
+    courtesy text from open-source models (e.g. "Let me know if you need
+    changes!") doesn't prevent detection. Falls back to _repair_json on
+    JSONDecodeError before giving up.
     """
+    result = {"text": raw.strip(), "mode": "normal",
+              "runConfig": None, "highlights": []}
     matches = list(META_PATTERN.finditer(raw))
     if not matches:
-        return raw.strip(), "normal", None
+        return result
     match = matches[-1]
-    visible = raw[:match.start()].strip()
     json_text = match.group(1)
     meta: dict | None = None
     for candidate in (json_text, _repair_json(json_text)):
@@ -630,12 +687,30 @@ def parse_guide_response(raw: str) -> tuple[str, str, dict | None]:
         except (json.JSONDecodeError, ValueError):
             pass
     if meta is None:
-        return raw.strip(), "normal", None
-    mode = str(meta.get("mode", "normal"))
-    run_config: dict | None = meta.get("runConfig") or None
+        return result
+    result["text"] = raw[:match.start()].strip()
+    result["mode"] = str(meta.get("mode", "normal"))
+    run_config = meta.get("runConfig") or None
     if run_config is not None and not isinstance(run_config, dict):
         run_config = None
-    return visible, mode, run_config
+    result["runConfig"] = run_config
+    highlights = meta.get("highlights")
+    if isinstance(highlights, list):
+        result["highlights"] = [
+            str(key).strip() for key in highlights[:8]
+            if isinstance(key, (str, int)) and str(key).strip()
+        ]
+    return result
+
+
+def parse_guide_response(raw: str) -> tuple[str, str, dict | None]:
+    """Return (visible_text, mode, run_config|None) from a raw LLM response.
+
+    Backward-compatible wrapper around parse_guide_response_full for callers
+    that don't consume highlights.
+    """
+    parsed = parse_guide_response_full(raw)
+    return parsed["text"], parsed["mode"], parsed["runConfig"]
 
 
 # ═══════════════════════════════════════════════════════════════════════════════
@@ -684,9 +759,11 @@ def format_app_context(context: dict) -> str:
         if sel > 0:
             lines.append(f"  {label}: {sel}/{total} selected")
     if selected:
-        ticker_str = ", ".join(selected[:80])
-        if len(selected) > 80:
-            ticker_str += f", … (+{len(selected) - 80} more)"
+        # Show the complete selection up to a generous cap — Allo should reason
+        # about the user's actual universe, not a truncated preview of it.
+        ticker_str = ", ".join(selected[:400])
+        if len(selected) > 400:
+            ticker_str += f", … (+{len(selected) - 400} more)"
         lines.append(f"  Tickers: {ticker_str}")
     else:
         lines.append("  Tickers: (none selected)")
@@ -709,18 +786,32 @@ def format_app_context(context: dict) -> str:
         audit_on = bool(config.get("auditViews"))
         lines.append(f"  AI audit:            {'enabled' if audit_on else 'disabled'}")
         if audit_on:
-            lines.append(f"  Audit provider:      {config.get('auditProvider') or ''}")
+            audit_model = config.get("auditModel") or ""
+            audit_line = config.get("auditProvider") or ""
+            if audit_model:
+                audit_line = f"{audit_line} / {audit_model}" if audit_line else audit_model
+            lines.append(f"  Audit provider:      {audit_line}")
         reg = config.get("regularization") or "none"
-        lines.append(f"  Regularization:      {reg}")
+        reg_strength = config.get("regularizationStrength")
+        if reg != "none" and reg_strength is not None:
+            lines.append(f"  Regularization:      {reg} (strength {reg_strength})")
+        else:
+            lines.append(f"  Regularization:      {reg}")
+        if config.get("maxNewsArticles") is not None:
+            lines.append(f"  News per ticker:     {config.get('maxNewsArticles')}")
+        if config.get("researchBatchSize") is not None:
+            lines.append(f"  Research batch size: {config.get('researchBatchSize')}")
+        # Mandates are the highest-signal context Allo has — include them near
+        # verbatim rather than clipping to a teaser.
         mandate = (config.get("analystSeedPrompt") or "").strip()
         if mandate:
-            preview = mandate[:500] + ("…" if len(mandate) > 500 else "")
+            preview = mandate[:4000] + ("…" if len(mandate) > 4000 else "")
             lines.append(f"  Analyst mandate:     \"{preview}\"")
         else:
             lines.append("  Analyst mandate:     (not set)")
         auditor = (config.get("auditorSeedPrompt") or "").strip()
         if auditor:
-            preview = auditor[:200] + ("…" if len(auditor) > 200 else "")
+            preview = auditor[:2000] + ("…" if len(auditor) > 2000 else "")
             lines.append(f"  Auditor mandate:     \"{preview}\"")
 
     # ── Latest results ────────────────────────────────────────────────────────
@@ -743,14 +834,14 @@ def format_app_context(context: dict) -> str:
                 )
             holdings: list = p.get("topHoldings") or []
             if holdings:
-                h_str = "  ".join(f"{t} {w:.1f}%" for t, w in holdings[:8])
+                h_str = "  ".join(f"{t} {w:.1f}%" for t, w in holdings[:16])
                 lines.append(f"    Top holdings: {h_str}")
         research: list = results.get("research") or []
         if research:
             lines.append(f"  AI research opinions ({len(research)} tickers):")
-            for r in research[:15]:
+            for r in research[:40]:
                 ticker = r.get("ticker") or "?"
-                view = (r.get("view") or "")[:90]
+                view = (r.get("view") or "")[:220]
                 conf = r.get("confidence")
                 ret_v = r.get("posteriorReturn")
                 conf_str = f"  conf {conf/100:.2f}" if conf is not None else ""
@@ -764,6 +855,7 @@ def format_app_context(context: dict) -> str:
     active_view = context.get("activeView") or "unknown"
     lines.append(f"\nRUN STATUS:  {run_status}")
     lines.append(f"ACTIVE TAB:  {active_view}")
+    lines.append(f"GUIDE MODE:  {'on' if context.get('guideMode') else 'off'}")
 
     return "\n".join(lines)
 
@@ -847,12 +939,14 @@ def needs_catalog_context(last_message: str) -> bool:
     return any(kw in lower for kw in _CATALOG_TRIGGERS)
 
 
-def format_catalog_block(groups: list[dict]) -> str:
+def format_catalog_block(groups: list[dict], metadata: dict | None = None) -> str:
     """Render the full available ticker catalog as a compact, readable block.
 
-    Tickers are grouped by market and formatted 15 per line so the model can
-    scan them without excessive whitespace. The header explicitly forbids the
-    model from suggesting symbols outside this list.
+    Without metadata, tickers are grouped by market and formatted 15 per line.
+    With metadata (from dashboard/catalog_metadata.json), each ticker gets its
+    company name, sector, and size bucket so the model can match themes to
+    real companies instead of guessing from symbols. The header explicitly
+    forbids the model from suggesting symbols outside this list.
     """
     lines: list[str] = [
         "FULL AVAILABLE TICKER CATALOG",
@@ -866,6 +960,18 @@ def format_catalog_block(groups: list[dict]) -> str:
         tickers: list[str] = group.get("tickers") or []
         label: str = group.get("label") or group.get("shortLabel") or group.get("id") or "Market"
         lines.append(f"{label} ({len(tickers)} tickers):")
-        for i in range(0, len(tickers), 15):
-            lines.append("  " + " ".join(tickers[i:i + 15]))
+        if metadata:
+            for ticker in tickers:
+                meta = metadata.get(ticker) or {}
+                descriptor = " | ".join(
+                    part for part in (
+                        meta.get("name") or "",
+                        meta.get("sector") or "",
+                        meta.get("cap") or "",
+                    ) if part
+                )
+                lines.append(f"  {ticker} — {descriptor}" if descriptor else f"  {ticker}")
+        else:
+            for i in range(0, len(tickers), 15):
+                lines.append("  " + " ".join(tickers[i:i + 15]))
     return "\n".join(lines)

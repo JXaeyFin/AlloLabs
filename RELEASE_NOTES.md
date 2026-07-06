@@ -14,6 +14,9 @@ thesis-alignment behavior, and makes the desktop workflow more resilient.
 - Added a dedicated Guide tab (F7) for portfolio theory questions, investment
   mandate drafting, ticker-universe design, run diagnostics, configuration, and
   portfolio explanations.
+- Added Guide mode infrastructure: a persistent mode toggle, bottom-right mode
+  indicator updates, draggable follow-me Allo dock, and UI highlight hooks for
+  guided tours across tabs.
 - Added server-side guide calls for Anthropic, OpenAI, Google Gemini, DeepSeek,
   and Nvidia NIM. API credentials remain outside the browser.
 - Injects the current universe, Console settings, latest portfolio results, and
@@ -74,7 +77,9 @@ thesis-alignment behavior, and makes the desktop workflow more resilient.
   worker error reporting, shutdown/reaping, and top-level HTTP error responses.
 - Updated Windows, macOS, and Linux package metadata and artifact names to
   v1.4.0.
-- Expanded the release suite to 45 tests, including authenticated Guide endpoint
+- Added a `Known Issues` note for large-universe Max Sharpe SLSQP line-search
+  failures.
+- Expanded the release suite to 48 tests, including authenticated Guide endpoint
   tests, catalog coverage, DeepSeek request construction, provider masking, and
   configuration wiring.
 
@@ -91,7 +96,7 @@ thesis-alignment behavior, and makes the desktop workflow more resilient.
 
 ## Validation
 
-- `python -m unittest discover -s tests -v`: 45 tests run; 6 dependency-based
+- `python -m unittest discover -s tests -v`: 48 tests run; 6 dependency-based
   report tests skipped because scientific reporting packages were unavailable.
 - Python compilation checks pass for the pipeline, guide, relay, runner, and
   test suite.

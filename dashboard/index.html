@@ -95,7 +95,7 @@
 
       <div class="market-tape" aria-label="Terminal status">
         <span class="tape-brand" id="data-mode">AlloLabs</span>
-        <span><b>Mode</b> Research</span>
+        <span id="tape-mode"><b>Mode</b> Research</span>
         <span><b>Engine</b> MPT + BL</span>
         <span><b>Data</b> yfinance</span>
         <span><b>Base</b> CAD</span>
@@ -697,6 +697,11 @@
             <p>Allo is your finance and run-configuration assistant. Ask anything about Black-Litterman, portfolio theory, or AlloLabs — or let Allo build a run configuration for you.</p>
           </div>
           <div class="topbar-actions">
+            <label class="guide-mode-toggle" title="Allo follows you across tabs and can highlight controls to guide you">
+              <input type="checkbox" id="guide-mode-toggle">
+              <span class="guide-mode-slider" aria-hidden="true"></span>
+              <span class="guide-mode-text">Guide mode</span>
+            </label>
             <button class="button button-secondary" id="guide-clear">Clear chat</button>
           </div>
         </div>
@@ -730,6 +735,7 @@
             <button class="guide-action-btn" data-action="checklist">Create run checklist</button>
           </div>
 
+          <div id="guide-inline-anchor" hidden></div>
           <div class="guide-chat" id="guide-chat" role="log" aria-live="polite" aria-label="Allo conversation">
             <div class="guide-empty" id="guide-empty">
               <span class="guide-empty-title">Ask Allo anything</span>
@@ -738,8 +744,8 @@
           </div>
 
           <div class="guide-status" id="guide-status" hidden>
-            <span class="guide-spinner"></span>
-            <span id="guide-status-text">Allo is thinking…</span>
+            <span class="guide-typing" aria-hidden="true"><span></span><span></span><span></span></span>
+            <span id="guide-status-text">Allo is typing…</span>
           </div>
 
           <div class="guide-error" id="guide-error" hidden></div>
@@ -781,6 +787,17 @@
     <button data-shortcut-view="reference"><kbd>F6</kbd> REFERENCE</button>
     <button data-shortcut-view="guide"><kbd>F7</kbd> GUIDE</button>
     <span>ALLOLABS // RESEARCH USE ONLY</span>
+  </div>
+
+  <div class="allo-dock" id="allo-dock" hidden>
+    <div class="allo-dock-header" id="allo-dock-header">
+      <span class="allo-dock-title"><span class="allo-dock-dot" aria-hidden="true"></span> Allo</span>
+      <div class="allo-dock-actions">
+        <button class="allo-dock-btn" id="allo-dock-collapse" type="button" title="Collapse" aria-label="Collapse Allo window">–</button>
+        <button class="allo-dock-btn" id="allo-dock-goto" type="button" title="Open Guide tab" aria-label="Open Guide tab">⤢</button>
+      </div>
+    </div>
+    <div class="allo-dock-body" id="allo-dock-body"></div>
   </div>
 
   <script src="app.js"></script>
