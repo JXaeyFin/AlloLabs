@@ -31,11 +31,11 @@ AlloLabs downloads adjusted prices from Yahoo Finance for the selected universe.
 For daily return matrix $R$, the annualized sample estimates are:
 
 $$
-\mu_{hist} = 252 \cdot \operatorname{mean}(R)
+\mu_{hist} = 252 \cdot \mathrm{mean}(R)
 $$
 
 $$
-\Sigma = 252 \cdot \operatorname{cov}(R)
+\Sigma = 252 \cdot \mathrm{cov}(R)
 $$
 
 The covariance stabilizer symmetrizes $\Sigma$, floors small eigenvalues, and rejects non-finite inputs. A run requires at least two usable assets and 20 aligned return observations.
