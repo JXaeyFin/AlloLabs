@@ -44,8 +44,8 @@ jobs:
           esac
       - uses: actions/upload-artifact@v4
         with:
-          name: AlloLabs-v1.3.1-${{ matrix.label }}-${{ steps.platform.outputs.arch }}
+          name: AlloLabs-v1.4.0-${{ matrix.label }}-${{ steps.platform.outputs.arch }}
           if-no-files-found: error
           path: |
             dist/AlloLabs-${{ matrix.label }}-${{ steps.platform.outputs.arch }}
-            dist/AlloLabs-v1.3.1-${{ matrix.label }}-${{ steps.platform.outputs.arch }}.*
+            dist/AlloLabs-v1.4.0-${{ matrix.label }}-${{ steps.platform.outputs.arch }}.*

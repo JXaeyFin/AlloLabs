@@ -1,4 +1,4 @@
-# AlloLabs v1.3.1 Portable
+# AlloLabs v1.4.0 Portable
 
 AlloLabs is an AI-assisted global asset-allocation research application.
 
@@ -16,8 +16,8 @@ automatically and should not normally be opened directly.
 ## Requirements
 
 - Internet access for current market data and optional AI requests.
-- Optional provider keys: `OPENAI_API_KEY`, `ANTHROPIC_API_KEY`, or
-  `GEMINI_API_KEY`.
+- Optional provider keys: `OPENAI_API_KEY`, `ANTHROPIC_API_KEY`,
+  `GEMINI_API_KEY`, `DEEPSEEK_API_KEY`, or `NVIDIA_NIM_API_KEY` (Guide only).
 - Linux desktop environments require working X11 or Wayland graphics support.
 
 ## User Data

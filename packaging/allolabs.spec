@@ -126,8 +126,8 @@ if is_macos:
         bundle_identifier="com.allolabs.desktop",
         info_plist={
             "CFBundleDisplayName": "AlloLabs",
-            "CFBundleShortVersionString": "1.3.1",
-            "CFBundleVersion": "1.3.1",
+            "CFBundleShortVersionString": "1.4.0",
+            "CFBundleVersion": "1.4.0",
             "LSMinimumSystemVersion": "12.0",
             "NSHighResolutionCapable": True,
         },

@@ -7,8 +7,8 @@
 AlloLabs is an AI-assisted global asset-allocation research platform. It
 combines live Yahoo Finance data, Modern Portfolio Theory, Black-Litterman
 expected returns, structured AI research views from OpenAI, Anthropic Claude,
-or Google Gemini, and an interactive dashboard built with a liquid glass
-design language.
+Google Gemini, or DeepSeek, and an interactive desktop dashboard with an
+integrated AI guide.
 
 It constructs and compares:
 
@@ -30,8 +30,8 @@ Download the latest release from
 
 | File | Description |
 |------|-------------|
-| `AlloLabs-Setup-1.3.1.exe` | One-click installer with Start Menu and Desktop shortcuts |
-| `AlloLabs-v1.3.1-Windows-x64.zip` | Portable build — extract anywhere and run `AlloLabs.exe` |
+| `AlloLabs-Setup-1.4.0.exe` | One-click installer with Start Menu and Desktop shortcuts |
+| `AlloLabs-v1.4.0-Windows-x64.zip` | Portable build — extract anywhere and run `AlloLabs.exe` |
 
 The installer places the application in `%LOCALAPPDATA%\Programs\AlloLabs`,
 creates Start Menu and Desktop shortcuts, and launches the app. No admin
@@ -81,6 +81,7 @@ Set one or more provider API keys when AI views are enabled:
 $env:OPENAI_API_KEY="your_key"
 $env:ANTHROPIC_API_KEY="your_key"
 $env:GEMINI_API_KEY="your_key"
+$env:DEEPSEEK_API_KEY="your_key"
 ```
 
 ```bash
@@ -88,6 +89,7 @@ $env:GEMINI_API_KEY="your_key"
 export OPENAI_API_KEY="your_key"
 export ANTHROPIC_API_KEY="your_key"
 export GEMINI_API_KEY="your_key"
+export DEEPSEEK_API_KEY="your_key"
 ```
 
 Only the key for the provider selected at each stage is used. Never commit a
@@ -100,6 +102,8 @@ supported override.
 
 - Large-cap U.S., Canadian, U.K., European, and international ADR universe
 - Dedicated universe customization with presets, market-level selection, and individual ticker checkboxes
+- Allo Guide for portfolio education, mandate drafting, run configuration, and portfolio explanation
+- Catalog-grounded ticker suggestions across 947 supported securities in six market groups
 - Adjusted price and company metadata from `yfinance`
 - Long-only or bounded long/short SLSQP optimization with position and sector caps
 - Optional L2 or smooth-L1 portfolio regularization
@@ -122,20 +126,21 @@ supported override.
 
 ---
 
-## Run the Dashboard
+## Run the Desktop App
 
-On Windows, double-click `start-dashboard.bat`, or run:
+On Windows, double-click `start-allolabs-desktop.bat`, or run:
 
 ```bash
-python dashboard/server.py
+pythonw -m desktop.app
+# falls back to python -m desktop.app if pythonw is unavailable
 ```
 
-Open [http://127.0.0.1:8765](http://127.0.0.1:8765). The dashboard validates
-settings, launches the model in a background process, relays terminal output,
-and refreshes results after completion.
+The desktop app opens a native window embedding the full AlloLabs interface.
+It validates settings, launches the model in a background process, relays
+terminal output, and refreshes results after completion.
 
-The startup splash connects to the runner, checks API keys, and preloads
-portfolio data while the logo animation plays.
+The startup splash connects to the embedded runner, checks API keys, and
+preloads portfolio data while the logo animation plays.
 
 ---
 
@@ -173,6 +178,7 @@ Both dashboard stages expose the complete structured-output catalog:
 - **OpenAI:** GPT-5.5, GPT-5.4, GPT-5.4 mini, GPT-5.4 nano
 - **Anthropic:** Claude Fable 5, Opus 4.8, Sonnet 4.6, Haiku 4.5
 - **Google:** Gemini 3.5 Flash, 3.1 Pro Preview, 3.1 Flash-Lite, 3 Flash Preview, 2.5 Pro, 2.5 Flash, 2.5 Flash-Lite
+- **DeepSeek:** DeepSeek Chat, DeepSeek Reasoner
 
 The optional global audit sends the complete research set in one request and
 can be significantly more expensive than the batched research stage. It is
@@ -186,7 +192,7 @@ audit is enabled but incomplete.
 ### Windows Desktop Application
 
 ```powershell
-pip install -r requirements-desktop.txt
+pip install -r requirements-desktop-win.txt
 powershell -ExecutionPolicy Bypass -File scripts/build-desktop.ps1
 ```
 
@@ -214,31 +220,96 @@ Remove-Item Env:LOGO_DEV_PUBLISHABLE_KEY
 ## Repository Structure
 
 ```text
+╔══════════════════════════════════════════════════════════════╗
+║  SOURCE — core Python modules (run from source or bundled)   ║
+╚══════════════════════════════════════════════════════════════╝
 allolabs.py                  Main research and optimization pipeline
-allolabs_company.py          Company context and market-data helpers
+allolabs_company.py          Yahoo Finance company context and market-data helpers
+allolabs_guide.py            Allo AI assistant — system prompt, context, and LLM proxy
+allolabs_paths.py            Cross-platform application and data paths
 allolabs_report.py           PDF reporting and sector classification
 allolabs_report_memo.py      Editorial memo layout, exhibits, and sensitivity analysis
+
+╔══════════════════════════════════════════════════════════════╗
+║  DESKTOP — native window wrapper (PyWebView)                 ║
+╚══════════════════════════════════════════════════════════════╝
+desktop/
+  app.py                     Native window lifecycle, single-instance lock
+  worker.py                  Bundled analysis and company-data worker entry point
+
+╔══════════════════════════════════════════════════════════════╗
+║  DASHBOARD (UI) — embedded WebView interface layer           ║
+╚══════════════════════════════════════════════════════════════╝
 dashboard/
-  server.py                  Constrained local HTTP runner
-  runner.py                  Model configuration and result adapter
+  server.py                  Authenticated local HTTP relay
+  runner.py                  Model configuration, result adapter, and run history
   universe.py                Shared market groups, presets, and ticker catalog
-  index.html                 Dashboard interface (liquid glass UI)
+  company_details.py         Per-ticker company context helper (subprocess worker)
+  index.html                 Application UI (liquid glass design)
   app.js                     Client-side logic and interactions
   styles.css                 Structural layout skeleton
   terminal-theme.css         Visual theme and animations
-desktop/
-  app.py                     Native window and application lifecycle
-  worker.py                  Hidden analysis and company-data worker
+
+╔══════════════════════════════════════════════════════════════╗
+║  BUILD & PACKAGING — producing installable releases          ║
+╚══════════════════════════════════════════════════════════════╝
 packaging/
-  allolabs.spec              PyInstaller desktop bundle
-  allolabs.iss               Inno Setup installer
+  allolabs.spec              PyInstaller bundle definition (app + worker)
+  allolabs.iss               Inno Setup Windows installer script
+  PORTABLE_README.md         README copied into portable/zip releases
 installer-builder/
-  allolabs_setup.py          Universal self-extracting installer
+  allolabs_setup.py          Universal self-extracting installer (Windows)
+installer-payload/
+  install.cmd / install.ps1  Scripts executed during installation
+  PORTABLE_README.md         End-user portable release README
+
+╔══════════════════════════════════════════════════════════════╗
+║  SCRIPTS — build, verify, and maintenance helpers            ║
+╚══════════════════════════════════════════════════════════════╝
+scripts/
+  build-desktop.ps1          Windows: venv + PyInstaller + Inno Setup
+  build-portable.sh          macOS / Linux: venv + PyInstaller + archive
+  verify-portable.ps1/.py    Sanity-check a portable build directory
+  cache-company-logos.py     Download and cache universe company logos
+
+╔══════════════════════════════════════════════════════════════╗
+║  REQUIREMENTS — dependency lists by target environment       ║
+╚══════════════════════════════════════════════════════════════╝
+requirements.txt             Runtime deps for running from source
+requirements-desktop-win.txt Windows desktop build (adds pywebview + pyinstaller)
+requirements-desktop-macos.txt  macOS desktop build
+requirements-desktop-linux.txt  Linux desktop build
+
+╔══════════════════════════════════════════════════════════════╗
+║  RELEASE — built installers and portable archives            ║
+╚══════════════════════════════════════════════════════════════╝
+release/
+  AlloLabs-Setup-1.4.0.exe      Windows one-click installer
+  AlloLabs-v1.4.0-Windows-x64.zip  Windows portable (extract and run)
+  SHA256SUMS.txt                 Checksums for all release artifacts
+  README-v1.4.0.txt              Release notes in plain text
+
+╔══════════════════════════════════════════════════════════════╗
+║  RESOURCES & EXAMPLES                                        ║
+╚══════════════════════════════════════════════════════════════╝
 resources/
-  company-logos/             Locally cached universe logos and manifest
-  allolabs-logo.png          Application logo
-examples/                    Sanitized transcripts and sample reports
-.github/workflows/           CI and release automation
+  allolabs-logo.png          Application logo (PNG and ICO)
+  company-logos/             Locally cached per-ticker logos and manifest.json
+examples/
+  default-run.json           Bundled example run (shown before first real run)
+  default-portfolio-report.pdf  Example PDF report
+  default-performance.png    Example OOS performance chart
+  terminal-*.txt             Annotated example terminal transcripts
+
+╔══════════════════════════════════════════════════════════════╗
+║  CI/CD                                                       ║
+╚══════════════════════════════════════════════════════════════╝
+.github/workflows/
+  ci.yml                     Syntax, import, and unit-test checks
+  desktop-release.yml        Windows PyInstaller + Inno Setup release
+  portable-unix-release.yml  macOS and Linux portable build and archive
+tests/
+  test_release.py            Comprehensive integration and contract tests
 ```
 
 ---

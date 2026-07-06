@@ -1,71 +1,98 @@
-# AlloLabs v1.3.1
+# AlloLabs v1.4.0
 
-AlloLabs v1.3.1 extends the v1.3 desktop release with user-supplied AI context,
-larger terminal-readable dashboard text, and a refreshed installer-ready build.
+Released July 5, 2026.
 
-AlloLabs v1.3.0 completed the platform's rebrand, introduced a
-Bloomberg-terminal-inspired web interface for
-configuring, running, and reviewing the portfolio research pipeline, and
-reworks the PDF report as an educational portfolio research monitor. It also
-introduces a native Windows application shell and reproducible installer build.
+AlloLabs v1.4 is the largest update since the public v1.3.2 source baseline. It
+adds an integrated AI guide, expands the selectable global equity catalog,
+introduces DeepSeek throughout the research stack, strengthens
+thesis-alignment behavior, and makes the desktop workflow more resilient.
 
 ## Highlights
 
-- New analyst and auditor seed prompts let users inject their own thesis,
-  hypotheses, risk preferences, and scenario assumptions into the AI research
-  and audit stages while preserving evidence and calibration guardrails.
-- Dashboard typography and control sizing were enlarged and balanced for a more
-  readable terminal-style desktop experience.
-- Complete product, module, launcher, environment-variable, report, and
-  artifact rebrand to AlloLabs while retaining the established logo artwork.
-- Unified Run Console with dynamic optimizer, training, out-of-sample, AI
-  provider, model, regularization, position-cap, and sector-cap controls.
-- Live terminal relay with configuration-aware progress estimation.
-- Maximum-Sharpe and minimum-volatility portfolio dashboards with sector
-  exposure, performance metrics, and clickable holding details.
-- Company detail panels with fundamental ratios, linked news headlines, and
-  285 locally bundled company logos.
-- OpenAI, Anthropic Claude, and Google Gemini research support with an optional
-  configurable global AI audit stage.
-- Model guide with provider-key detection, model strengths, limitations, and
-  published context-window information.
-- Integrated PDF report viewer, performance chart, example results, and
-  preloaded AI research views.
-- Improved optimizer stability, long-only and bounded long/short handling,
-  soft regularization, hard limits, metadata resolution, and report generation.
-- Paginated allocation appendix with readable fixed row spacing and coverage
-  down to 0.005% absolute portfolio weight.
-- Refined holding-rationale pages with locally bundled rounded-square company
-  marks and graceful fallback when a logo is unavailable.
-- Native desktop window backed by the existing dashboard and local relay.
-- Self-contained hidden analysis workers, random localhost ports, per-launch
-  authentication, single-instance protection, and graceful shutdown.
-- Writable reports, results, and caches under `%LOCALAPPDATA%\AlloLabs` in
-  installed builds, keeping application assets read-only.
-- PyInstaller one-directory packaging and an Inno Setup installer definition.
-- Native macOS and Linux portable build pipelines with platform-specific
-  webview dependencies, data directories, self-tests, and release archives.
-- Rebuilt the PDF as a Bloomberg-terminal-style research monitor that leads
-  with risk and construction, separates historical returns from equilibrium
-  priors, AI views, and Black-Litterman inputs, flags unstable estimates, and
-  explains model and implementation limitations without presenting optimized
-  returns as promised outcomes.
+### Allo Guide
 
-## Distribution Notes
+- Added a dedicated Guide tab (F7) for portfolio theory questions, investment
+  mandate drafting, ticker-universe design, run diagnostics, configuration, and
+  portfolio explanations.
+- Added server-side guide calls for Anthropic, OpenAI, Google Gemini, DeepSeek,
+  and Nvidia NIM. API credentials remain outside the browser.
+- Injects the current universe, Console settings, latest portfolio results, and
+  run status into each guide turn.
+- Grounds ticker suggestions in the complete supported catalog and rejects
+  out-of-catalog invention through explicit prompt and server context.
+- Supports inline run-configuration cards, one-click loading into Console,
+  automatic conversation compaction, retained session summaries, retries, and
+  human-readable provider errors.
 
-- No API credentials are included.
-- Company logos are served locally; Logo.dev is not contacted during dashboard
-  use.
-- Generated live portfolios, research caches, reports, and local archives are
-  excluded from the release.
-- Sanitized examples remain bundled so the dashboard is populated before the
-  first run.
+### Research providers and thesis alignment
 
-## Requirements
+- Added DeepSeek Chat and DeepSeek Reasoner to research and audit selection,
+  server allowlists, key detection, documentation, and the model reference.
+- Added DeepSeek JSON-mode request handling with provider-specific output-token
+  limits and response validation.
+- Reframed analyst and auditor seed prompts as investment mandates, strengthened
+  mandate-alignment instructions, and included mandate hashes in cache
+  invalidation.
+- Added configurable research batch size and per-ticker news depth.
+- Updated the selectable OpenAI, Anthropic, and Gemini model catalogs.
 
-- Python 3.11 or newer
-- Dependencies listed in `requirements.txt`
-- At least one supported AI-provider API key only when generating new AI views
+### Universe and market data
 
-This project is research software, not financial advice or an automated trading
-system.
+- Expanded the working catalog to 947 unique securities across U.S. large-cap,
+  U.S. growth, Canada, London, Europe, and global ADR groups.
+- Added market-level selection, catalog presets, tiered company/ticker search,
+  and persistent custom universes.
+- Added a generated catalog metadata file and repeatable yfinance metadata
+  sweep script.
+- Parallelized market-cap lookups, quieted noisy yfinance retry logging, added
+  retry backoff, and allowed runs to continue when isolated symbols lack usable
+  price history.
+
+### Dashboard and reports
+
+- Added dynamic Historical, AI Views, and OOS overview metrics.
+- Added market and currency allocation donuts, interactive chart tooltips,
+  stronger run-progress feedback, and local run-history browsing.
+- Added clickable company/research details with fundamentals, news, and locally
+  bundled company logos.
+- Added automatic persistence for Console and Guide settings.
+- Refreshed navigation, responsive Guide layouts, startup/logo animation, and
+  terminal styling.
+- Expanded the PDF and memo reporting paths with allocation exhibits,
+  sensitivity analysis, and safer handling of missing research metadata.
+
+### Desktop, packaging, and reliability
+
+- Consolidated supported use around the native desktop application and removed
+  deprecated dashboard launcher scripts.
+- Renamed the Windows desktop dependency file to
+  `requirements-desktop-win.txt` and updated build automation accordingly.
+- Improved subprocess startup failure handling, hidden Windows process launch,
+  worker error reporting, shutdown/reaping, and top-level HTTP error responses.
+- Updated Windows, macOS, and Linux package metadata and artifact names to
+  v1.4.0.
+- Expanded the release suite to 44 tests, including authenticated Guide endpoint
+  tests, catalog coverage, DeepSeek request construction, provider masking, and
+  configuration wiring.
+
+## Upgrade notes
+
+- Existing data under the AlloLabs user-data directory remains compatible.
+- DeepSeek requires `DEEPSEEK_API_KEY`. Nvidia NIM guide use requires
+  `NVIDIA_NIM_API_KEY`.
+- Source-build users on Windows should install
+  `requirements-desktop-win.txt`; the former `requirements-desktop.txt` name is
+  retired.
+- The removed `start-dashboard*` and `restart-dashboard*` scripts are no longer
+  supported. Launch `start-allolabs-desktop.bat` or run `pythonw -m desktop.app`.
+
+## Validation
+
+- `python -m unittest discover -s tests -v`: 44 passed, 6 dependency-based
+  report tests skipped when scientific reporting packages are unavailable.
+- Python compilation checks pass for the pipeline, guide, relay, runner, and
+  test suite.
+- `node --check dashboard/app.js` passes.
+
+No API credentials or generated private research data are included. AlloLabs
+remains research software, not financial advice or an automated trading system.

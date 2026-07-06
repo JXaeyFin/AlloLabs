@@ -64,6 +64,9 @@ _local_archive/
 outputs/
 work/
 
+# Developer handoff and session notes (never committed)
+handoff*.md
+
 # Claude Code local state
 .claude/
 

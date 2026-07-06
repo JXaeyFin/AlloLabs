@@ -19,14 +19,30 @@ from allolabs_paths import application_root, user_data_dir
 from dashboard.server import RunState, RunnerServer, discover_analysis_python
 
 
+# ═══════════════════════════════════════════════════════════════════════════════
+# SECTION: Application Constants
+# ═══════════════════════════════════════════════════════════════════════════════
+
 APP_TITLE = "AlloLabs"
 MUTEX_NAME = "Local\\AlloLabs.Desktop.Singleton"
 ERROR_ALREADY_EXISTS = 183
 
 
+# ═══════════════════════════════════════════════════════════════════════════════
+# SECTION: Runtime Helpers
+# Utilities for detecting the frozen (PyInstaller) environment and locating the
+# bundled worker executable.
+# ═══════════════════════════════════════════════════════════════════════════════
+
 def is_frozen() -> bool:
     return bool(getattr(sys, "frozen", False))
 
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# SECTION: Single-Instance Lock
+# Windows-only named mutex prevents more than one desktop window from opening.
+# On non-Windows platforms the lock is a no-op (returns None).
+# ═══════════════════════════════════════════════════════════════════════════════
 
 def acquire_single_instance():
     """Hold a Windows mutex for the lifetime of the desktop process."""
@@ -57,6 +73,12 @@ def release_single_instance(handle) -> None:
         ctypes.windll.kernel32.CloseHandle(handle)
 
 
+# ═══════════════════════════════════════════════════════════════════════════════
+# SECTION: WebView Launch
+# Helpers for opening the app URL — either via pywebview (preferred, native
+# WebView2 on Windows) or via Microsoft Edge in app mode as a dev fallback.
+# ═══════════════════════════════════════════════════════════════════════════════
+
 def edge_app_command(url: str, profile_dir: Path) -> list[str] | None:
     """Return a dependency-free Windows development fallback."""
     if os.name != "nt":
@@ -82,12 +104,23 @@ def stop_active_run(state: RunState) -> None:
         process = state.process
         if process is not None and process.poll() is None:
             state.status = "stopping"
-            process.terminate()
+            try:
+                process.terminate()
+            except OSError:
+                pass
     if process is not None:
         try:
             process.wait(timeout=8)
         except subprocess.TimeoutExpired:
+            # Graceful terminate did not take; force-kill and reap so the child
+            # is not left as a zombie/orphan during application shutdown.
             process.kill()
+            try:
+                process.wait(timeout=5)
+            except (subprocess.TimeoutExpired, OSError):
+                pass
+        except OSError:
+            pass
 
 
 def bundled_worker_path() -> Path:
@@ -101,6 +134,12 @@ def desktop_icon(root: Path) -> Path:
         "allolabs.ico" if os.name == "nt" else "allolabs-logo.png"
     )
 
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# SECTION: Main Application Lifecycle
+# Acquires the single-instance lock, starts the local HTTP relay on a random
+# port with a one-time token, opens the WebView window, and cleans up on exit.
+# ═══════════════════════════════════════════════════════════════════════════════
 
 def run_desktop() -> int:
     lock = acquire_single_instance()

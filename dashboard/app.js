@@ -18,6 +18,9 @@ let universeCatalogData = null;
 let selectedUniverseTickers = new Set();
 let pendingUniverseConfig = null;
 let activeUniverseMarket = "all";
+// Groups collapsed in the accordion. "all markets" view starts all collapsed;
+// a specific market filter auto-expands that group.
+let collapsedGroups = new Set();
 
 const AI_MODELS = {
   openai: [
@@ -40,6 +43,10 @@ const AI_MODELS = {
     ["gemini-2.5-pro", "Gemini 2.5 Pro", "audit"],
     ["gemini-2.5-flash", "Gemini 2.5 Flash", "research"],
     ["gemini-2.5-flash-lite", "Gemini 2.5 Flash-Lite", "research"]
+  ],
+  deepseek: [
+    ["deepseek-chat", "DeepSeek Chat", "research"],
+    ["deepseek-reasoner", "DeepSeek Reasoner", "audit"]
   ]
 };
 
@@ -148,13 +155,29 @@ const MODEL_GUIDE = [
     inputs: "Multimodal",
     strength: "Lowest-cost mature Gemini option for large batches of simple views.",
     weakness: "Less suitable for subtle forecasts or final cross-universe calibration."
+  },
+  {
+    provider: "DeepSeek", model: "DeepSeek Chat", id: "deepseek-chat", role: "research",
+    context: "128K", output: "8K", status: "Current",
+    inputs: "Text",
+    strength: "Economical JSON-mode model for high-volume equity research batches.",
+    weakness: "Shorter output ceiling makes it a weaker fit for full-universe audits."
+  },
+  {
+    provider: "DeepSeek", model: "DeepSeek Reasoner", id: "deepseek-reasoner", role: "audit",
+    context: "128K", output: "64K", status: "Current",
+    inputs: "Text",
+    strength: "Deliberate reasoning and long output capacity for portfolio-wide audits.",
+    weakness: "Reasoning tokens increase latency and consume part of the output allowance."
   }
 ];
 
 const PROVIDER_KEY_SETUP = {
-  openai: { label: "OpenAI", environment: "OPENAI_API_KEY" },
-  anthropic: { label: "Anthropic", environment: "ANTHROPIC_API_KEY" },
-  gemini: { label: "Google Gemini", environment: "GEMINI_API_KEY" }
+  openai:       { label: "OpenAI",       environment: "OPENAI_API_KEY" },
+  anthropic:    { label: "Anthropic",    environment: "ANTHROPIC_API_KEY" },
+  gemini:       { label: "Google Gemini", environment: "GEMINI_API_KEY" },
+  deepseek:     { label: "DeepSeek",     environment: "DEEPSEEK_API_KEY" },
+  "nvidia-nim": { label: "Nvidia NIM",   environment: "NVIDIA_NIM_API_KEY", note: "Allo (Guide tab) only — not available for research or audit pipeline" },
 };
 let providerKeyStatusSignature = "";
 const operatingSystem = /Mac/i.test(navigator.platform)
@@ -200,6 +223,7 @@ function renderProviderKeyStatus(providerKeys = null, apiVersion = 0) {
           </div>
           <span class="provider-key-state ${stateClass}"><i></i>${stateLabel}</span>
         </div>
+        ${setup.note ? `<p class="provider-key-scope-note">${escapeHtml(setup.note)}</p>` : ""}
         <div class="provider-key-preview">
           <small>Censored preview</small>
           <code>${escapeHtml(preview || "No key detected")}</code>
@@ -228,7 +252,7 @@ function renderProviderKeyStatus(providerKeys = null, apiVersion = 0) {
 function renderModelGuide() {
   const container = document.getElementById("model-guide");
   if (!container) return;
-  const providers = ["OpenAI", "Anthropic", "Google"];
+  const providers = ["OpenAI", "Anthropic", "Google", "DeepSeek"];
   container.innerHTML = providers.map((provider) => `
     <section class="model-provider">
       <div class="model-provider-heading">
@@ -499,7 +523,8 @@ const pageTitles = {
   universe: "Universe",
   console: "Console",
   history: "History",
-  reference: "Reference"
+  reference: "Reference",
+  guide: "Guide"
 };
 
 const viewAliases = {
@@ -526,6 +551,7 @@ function showView(viewName) {
   history.replaceState(null, "", `#${resolved}`);
   window.scrollTo({ top: 0, behavior: "smooth" });
   if (resolved === "history" && runnerConnected) loadHistoryCatalog();
+  if (resolved === "guide") guideLoadMemory();
 }
 
 const donutSegments = {};
@@ -629,24 +655,24 @@ function renderResearch(query = "") {
       <div class="ticker-block">
         <div class="ticker-line">
           <button class="research-ticker" type="button" data-company-ticker="${escapeHtml(item.ticker)}" data-company-context="research" title="Open ${escapeHtml(item.ticker)} company details">${escapeHtml(item.ticker)}</button>
-          <span class="market-flag" title="${escapeHtml(item.exchange)}">${item.flag}</span>
+          <span class="market-flag" title="${escapeHtml(item.exchange)}">${escapeHtml(item.flag)}</span>
         </div>
-        <span>${item.industry}</span>
+        <span>${escapeHtml(item.industry)}</span>
         <div class="market-meta">
-          <span class="market-badge">${item.market}</span>
-          <span class="exchange-label">${item.exchange}${item.listingDetails ? ` · ${item.listingDetails}` : ""}</span>
+          <span class="market-badge">${escapeHtml(item.market)}</span>
+          <span class="exchange-label">${escapeHtml(item.exchange)}${item.listingDetails ? ` · ${escapeHtml(item.listingDetails)}` : ""}</span>
           <span class="listing-source">${item.source === "Yahoo Finance" ? "YF LIVE" : "FALLBACK"}</span>
         </div>
         <div class="index-strip">
           <small>INDEX / ETF</small>
-          ${item.references.map((reference) => `<b>${reference}</b>`).join("")}
+          ${item.references.map((reference) => `<b>${escapeHtml(reference)}</b>`).join("")}
         </div>
       </div>
-      <div class="research-thesis">${item.thesis}</div>
-      <div class="research-stat"><span>Posterior return</span><strong class="${financeClass(item.posteriorValue)}">${item.posterior}</strong></div>
+      <div class="research-thesis">${escapeHtml(item.thesis)}</div>
+      <div class="research-stat"><span>Posterior return</span><strong class="${financeClass(item.posteriorValue)}">${escapeHtml(item.posterior)}</strong></div>
       <div class="research-stat">
-        <span>Confidence</span><strong class="finance-neutral">${item.confidence}%</strong>
-        <div class="confidence-track"><i style="width:${item.confidence}%"></i></div>
+        <span>Confidence</span><strong class="finance-neutral">${Number(item.confidence)}%</strong>
+        <div class="confidence-track"><i style="width:${Number(item.confidence)}%"></i></div>
       </div>
     </article>
   `).join("");
@@ -712,6 +738,13 @@ function livePortfolio(portfolio, metrics) {
       return { markets: toRows(mkt, MARKET_COLORS), currencies: toRows(cur, CURRENCY_COLORS) };
     })()
   };
+}
+
+// The performance payload keys its series by name; the benchmark is whichever
+// series is not one of the two model portfolios. Shared by the chart renderer
+// and the interactive tooltip so the lookup stays consistent.
+function benchmarkSeriesName(series) {
+  return Object.keys(series || {}).find((name) => !["Max_Sharpe", "Min_Vol"].includes(name));
 }
 
 function chartPath(values, minimum, maximum) {
@@ -788,7 +821,7 @@ function renderPerformance(performance) {
   performanceCache = performance;
   const maxSeries = performance.series.Max_Sharpe || [];
   const minSeries = performance.series.Min_Vol || [];
-  const benchmarkName = Object.keys(performance.series).find((name) => !["Max_Sharpe", "Min_Vol"].includes(name));
+  const benchmarkName = benchmarkSeriesName(performance.series);
   const benchmarkSeries = benchmarkName ? performance.series[benchmarkName] : [];
   const allValues = [...maxSeries, ...minSeries, ...benchmarkSeries].map(Number).filter(Number.isFinite);
   if (!allValues.length) return;
@@ -826,6 +859,7 @@ function applyLiveResults(results) {
   const isExample = results.dataMode === "example";
   const isHistory = results.dataMode === "history";
   currentResultMode = isExample ? "example" : isHistory ? "history" : "live";
+  currentResultGeneratedAt = results.generatedAt || null;
   currentHistoryRunId = isHistory ? (results.archive?.id || currentHistoryRunId) : null;
   const durations = formatDuration(results.config);
   document.getElementById("hero-training").textContent = durations.training;
@@ -914,9 +948,9 @@ document.querySelectorAll("[data-shortcut-view]").forEach((item) => {
   item.addEventListener("click", () => showView(item.dataset.shortcutView));
 });
 
-const functionViews = ["overview", "research", "universe", "console", "history", "reference"];
+const functionViews = ["overview", "research", "universe", "console", "history", "reference", "guide"];
 document.addEventListener("keydown", (event) => {
-  const match = /^F([1-6])$/.exec(event.key);
+  const match = /^F([1-7])$/.exec(event.key);
   if (!match) return;
   event.preventDefault();
   showView(functionViews[Number(match[1]) - 1]);
@@ -993,23 +1027,30 @@ function renderUniverseSelector() {
   const visibleGroups = universeCatalogData.groups.filter((group) =>
     activeUniverseMarket === "all" || activeUniverseMarket === group.id
   );
+
   const groupMarkup = visibleGroups.map((group) => {
     const tickers = query
       ? rankSearch(group.tickers, query, (t) => t, null)
       : group.tickers;
     if (!tickers.length) return "";
     const groupSelected = group.tickers.filter((ticker) => selectedUniverseTickers.has(ticker)).length;
+    // Auto-expand when searching or when this specific market is focused
+    const forceExpand = !!query || activeUniverseMarket === group.id;
+    const isCollapsed = !forceExpand && collapsedGroups.has(group.id);
     return `
-      <article class="universe-group" data-universe-group="${escapeHtml(group.id)}">
-        <header>
-          <div>
+      <article class="universe-group${isCollapsed ? " collapsed" : ""}" data-universe-group="${escapeHtml(group.id)}">
+        <header class="universe-group-header" data-universe-group-toggle="${escapeHtml(group.id)}">
+          <div class="universe-group-title">
             <p class="eyebrow">${escapeHtml(group.shortLabel)}</p>
             <h4>${escapeHtml(group.label)}</h4>
             <span>${escapeHtml(group.description)}</span>
           </div>
           <div class="universe-group-actions">
             <strong>${groupSelected}/${group.tickers.length}</strong>
-            <button type="button" data-universe-group-action="select" data-universe-group-id="${escapeHtml(group.id)}">Select market</button>
+            <button class="universe-group-toggle-btn" type="button" aria-label="${isCollapsed ? "Expand" : "Collapse"}" data-universe-group-toggle="${escapeHtml(group.id)}">
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="${isCollapsed ? "M3 5l4 4 4-4" : "M3 9l4-4 4 4"}" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </button>
+            <button type="button" data-universe-group-action="select" data-universe-group-id="${escapeHtml(group.id)}">Select all</button>
             <button type="button" data-universe-group-action="clear" data-universe-group-id="${escapeHtml(group.id)}">Clear</button>
           </div>
         </header>
@@ -1031,6 +1072,8 @@ function renderUniverseSelector() {
 
 async function loadUniverseCatalog() {
   universeCatalogData = await runnerRequest("/api/universe");
+  // Start with all groups collapsed in the "all markets" view — each has 100+ tickers
+  collapsedGroups = new Set(universeCatalogData.groups.map((g) => g.id));
   let selection = null;
   try {
     const stored = JSON.parse(localStorage.getItem(UNIVERSE_STORAGE_KEY) || "null");
@@ -1064,11 +1107,33 @@ document.getElementById("universe-presets").addEventListener("click", (event) =>
 document.getElementById("universe-market-jump").addEventListener("click", (event) => {
   const button = event.target.closest("[data-universe-market]");
   if (!button) return;
-  activeUniverseMarket = button.dataset.universeMarket;
+  const newMarket = button.dataset.universeMarket;
+  if (newMarket !== "all" && newMarket !== activeUniverseMarket) {
+    // Auto-expand the selected market group, collapse all others
+    collapsedGroups = new Set(
+      (universeCatalogData?.groups || [])
+        .map((g) => g.id)
+        .filter((id) => id !== newMarket)
+    );
+  } else if (newMarket === "all") {
+    // Returning to all-markets view: collapse everything (user can open as needed)
+    collapsedGroups = new Set((universeCatalogData?.groups || []).map((g) => g.id));
+  }
+  activeUniverseMarket = newMarket;
   renderUniverseSelector();
 });
 
 document.getElementById("universe-groups").addEventListener("click", (event) => {
+  // Accordion toggle — header click or toggle button click
+  const toggle = event.target.closest("[data-universe-group-toggle]");
+  if (toggle && !event.target.closest("[data-universe-group-action]")) {
+    const groupId = toggle.dataset.universeGroupToggle;
+    if (collapsedGroups.has(groupId)) collapsedGroups.delete(groupId);
+    else collapsedGroups.add(groupId);
+    renderUniverseSelector();
+    return;
+  }
+  // Select / Clear action buttons
   const button = event.target.closest("[data-universe-group-action]");
   if (!button || !universeCatalogData) return;
   const group = universeCatalogData.groups.find((item) => item.id === button.dataset.universeGroupId);
@@ -1189,6 +1254,7 @@ regularizationSelect.addEventListener("change", syncConfigurationControls);
 populateModelSelect(remoteGptModel, "research", remoteResearchProvider.value, "gpt-5.4");
 populateModelSelect(remoteAuditModel, "audit", remoteAuditProvider.value, "gpt-5.5");
 syncConfigurationControls();
+restoreConsoleConfig();
 
 const runnerUrl = document.getElementById("runner-url");
 const runnerToken = document.getElementById("runner-token");
@@ -1210,6 +1276,7 @@ let runnerCapabilities = {};
 let artifactCompatibilityNoticeShown = false;
 let analysisEnvironmentReady = false;
 let currentResultMode = "empty";
+let currentResultGeneratedAt = null;
 let currentHistoryRunId = null;
 let historyRuns = [];
 let selectedHistoryRun = null;
@@ -1277,11 +1344,32 @@ function activateProjectLogo(apiVersion) {
   }
 }
 
-async function runnerRequest(path, options = {}) {
-  const response = await fetch(runnerEndpoint(path), {
-    ...options,
-    headers: { ...runnerHeaders(Boolean(options.body)), ...(options.headers || {}) }
-  });
+// Wraps fetch with an AbortController timeout so a hung connection can never
+// leave a spinner spinning forever. Rejects with the underlying error (an
+// AbortError when the timeout fires).
+function fetchWithTimeout(url, options = {}, timeoutMs = 30000) {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), timeoutMs);
+  return fetch(url, { ...options, signal: controller.signal })
+    .finally(() => clearTimeout(timer));
+}
+
+async function runnerRequest(path, options = {}, timeoutMs = 30000) {
+  let response;
+  try {
+    response = await fetchWithTimeout(runnerEndpoint(path), {
+      ...options,
+      headers: { ...runnerHeaders(Boolean(options.body)), ...(options.headers || {}) }
+    }, timeoutMs);
+  } catch (networkError) {
+    const error = new Error(
+      networkError?.name === "AbortError"
+        ? `Runner request timed out after ${Math.round(timeoutMs / 1000)}s`
+        : "Network error — unable to reach the runner service"
+    );
+    error.cause = networkError;
+    throw error;
+  }
   const payload = await response.json().catch(() => ({}));
   if (!response.ok) {
     const error = new Error(payload.error || `Runner returned HTTP ${response.status}`);
@@ -1696,7 +1784,18 @@ async function loadCompletedResults(status) {
 }
 
 async function fetchArtifact(path) {
-  const response = await fetch(runnerEndpoint(path), { headers: runnerHeaders(false) });
+  let response;
+  try {
+    response = await fetchWithTimeout(runnerEndpoint(path), { headers: runnerHeaders(false) });
+  } catch (networkError) {
+    const error = new Error(
+      networkError?.name === "AbortError"
+        ? "Artifact request timed out"
+        : "Network error — unable to reach the runner service"
+    );
+    error.cause = networkError;
+    throw error;
+  }
   if (!response.ok) {
     const payload = await response.json().catch(() => ({}));
     const error = new Error(payload.error || `Artifact returned HTTP ${response.status}`);
@@ -2176,7 +2275,7 @@ document.getElementById("terminal-copy").addEventListener("click", async () => {
 
     const maxSeries = performanceCache.series.Max_Sharpe || [];
     const minSeries = performanceCache.series.Min_Vol || [];
-    const benchName = Object.keys(performanceCache.series).find((n) => !["Max_Sharpe", "Min_Vol"].includes(n));
+    const benchName = benchmarkSeriesName(performanceCache.series);
     const benchSeries = benchName ? performanceCache.series[benchName] : [];
     const allVals = [...maxSeries, ...minSeries, ...benchSeries].map(Number).filter(Number.isFinite);
     if (!allVals.length) return;
@@ -2337,8 +2436,10 @@ initDonutInteraction("currency-donut", "currency-donut-tooltip", "currency-donut
         ? location.origin : "http://127.0.0.1:8765";
       const token = new URLSearchParams(location.search).get("desktopToken") || "";
       const headers = token ? { Authorization: `Bearer ${token}` } : {};
-      const response = await fetch(`${base}/api/status`, { headers });
-      const status = await response.json();
+      // Short timeout: the splash overlay covers the whole UI, so a hung
+      // request must never block dismissal.
+      const response = await fetchWithTimeout(`${base}/api/status`, { headers }, 6000);
+      const status = response.ok ? await response.json().catch(() => ({})) : {};
 
       if (status.provider_keys) {
         const providers = Object.values(status.provider_keys);
@@ -2350,7 +2451,7 @@ initDonutInteraction("currency-donut", "currency-donut-tooltip", "currency-donut
 
       if (status.results_available) {
         updateStatus("Loading portfolio data...");
-        await fetch(`${base}/api/results`, { headers });
+        await fetchWithTimeout(`${base}/api/results`, { headers }, 6000);
         updateStatus("Portfolio data loaded");
       }
     } catch {
@@ -2383,6 +2484,884 @@ document.querySelectorAll("[data-shortcut-view]").forEach((item) => {
 document.querySelectorAll("[data-portfolio]").forEach((button) => {
   button.addEventListener("click", () => triggerLogoAnimation("logo-bounce"));
 });
+
+/* === Guide Mode — Allo AI assistant ============================== */
+
+let guideHistory = [];
+let guidePendingConfig = null;
+let guideLoading = false;
+let guideMemoryLoaded = false;
+const GUIDE_COMPACT_THRESHOLD = 20;
+const GUIDE_MEMORY_KEY = "allolabs_guide_memory";
+const GUIDE_MEMORY_MAX = 4; // how many past session summaries to retain
+
+/* SVG icon markup injected into each chat bubble */
+const ALLO_ICON_SVG = `<svg class="guide-msg-icon" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+  <path fill="none" stroke="currentColor" stroke-width="24" stroke-linecap="butt" d="M17,52 A33,33 0 0,1 83,52"/>
+  <rect fill="currentColor" x="5"  y="62" width="24" height="30"/>
+  <rect fill="currentColor" x="71" y="62" width="24" height="30"/>
+  <rect fill="currentColor" x="5"  y="84" width="90" height="8"/>
+</svg>`;
+
+const USER_ICON_SVG = `<svg class="guide-msg-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+  <circle cx="12" cy="7.5" r="4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+  <path d="M4.5 21c0-4.142 3.358-7.5 7.5-7.5s7.5 3.358 7.5 7.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+</svg>`;
+
+const GUIDE_QUICK_ACTIONS = {
+  explain_bl:
+    "What is Black-Litterman and how does AlloLabs use it?",
+  draft_thesis:
+    "Help me draft an investment mandate for my AlloLabs run. Ask me what you need in one message, " +
+    "then produce a compact mandate text I can paste into the analyst seed prompt field.",
+  debug_alignment:
+    "Help me debug thesis alignment. What do you need from me? " +
+    "(My current mandate, what results look wrong, which tickers are misbehaving.)",
+  design_universe:
+    "Help me design a ticker universe. Ask me what you need in one message, " +
+    "then suggest 15–25 tickers with a brief rationale.",
+  explain_portfolio:
+    "Explain the current portfolio: what the allocation implies, key exposures, " +
+    "concentration risks, and how Max Sharpe and Min Vol differ.",
+  auto_configure:
+    "Configure an AlloLabs run for me. Ask me what you need in a single message, " +
+    "use safe defaults for the rest, then show me the complete config and ask once if I'm ready to load it.",
+  checklist:
+    "Give me a concise run-readiness checklist for my next AlloLabs optimization."
+};
+
+function guideFormatText(text) {
+  let html = escapeHtml(text);
+  html = html.replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>");
+  html = html.replace(/`([^`\n]+)`/g, "<code>$1</code>");
+  // Numbered lists
+  html = html.replace(/((?:^|\n)\d+\.\s.+)+/g, (block) => {
+    const items = block.trim().split(/\n(?=\d+\.\s)/);
+    return "<ol>" + items.map(i => `<li>${i.replace(/^\d+\.\s/, "")}</li>`).join("") + "</ol>";
+  });
+  // Bullet lists
+  html = html.replace(/((?:^|\n)[•\-]\s.+)+/g, (block) => {
+    const items = block.trim().split(/\n(?=[•\-]\s)/);
+    return "<ul>" + items.map(i => `<li>${i.replace(/^[•\-]\s/, "")}</li>`).join("") + "</ul>";
+  });
+  // Remaining newlines
+  html = html.replace(/\n/g, "<br>");
+  return html;
+}
+
+function guideAppendMessage(role, content) {
+  const chat = document.getElementById("guide-chat");
+  if (!chat) return;
+  const empty = document.getElementById("guide-empty");
+  if (empty) empty.remove();
+
+  const isAllo = role === "allo" || role === "assistant";
+  const cssRole = isAllo ? "allo" : "user";
+
+  const wrap = document.createElement("div");
+  wrap.className = `guide-message guide-message-${cssRole}`;
+
+  const avatar = document.createElement("div");
+  avatar.className = "guide-msg-avatar";
+  avatar.innerHTML = isAllo ? ALLO_ICON_SVG : USER_ICON_SVG;
+
+  const inner = document.createElement("div");
+  inner.className = "guide-msg-inner";
+
+  const label = document.createElement("span");
+  label.className = "guide-message-label";
+  label.textContent = isAllo ? "Allo" : "You";
+
+  const body = document.createElement("div");
+  body.className = "guide-message-body";
+  if (isAllo) {
+    body.innerHTML = guideFormatText(content);
+  } else {
+    body.textContent = content;
+  }
+
+  inner.appendChild(label);
+  inner.appendChild(body);
+  wrap.appendChild(avatar);
+  wrap.appendChild(inner);
+  chat.appendChild(wrap);
+  chat.scrollTop = chat.scrollHeight;
+}
+
+function guideAppendCompactBadge(messageCount) {
+  const chat = document.getElementById("guide-chat");
+  if (!chat) return;
+  const badge = document.createElement("div");
+  badge.className = "guide-compact-badge";
+  badge.textContent = `— ${messageCount} messages summarised —`;
+  chat.appendChild(badge);
+  chat.scrollTop = chat.scrollHeight;
+}
+
+function guideAppendMemoryBadge(count) {
+  const chat = document.getElementById("guide-chat");
+  if (!chat) return;
+  const empty = document.getElementById("guide-empty");
+  if (empty) empty.remove();
+  const badge = document.createElement("div");
+  badge.className = "guide-memory-badge";
+  badge.innerHTML = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M12 2a10 10 0 1 0 10 10"/><path d="M12 6v6l4 2"/><path d="M18 2v4h4"/></svg> Memory from ${count} past ${count === 1 ? "session" : "sessions"} recalled`;
+  chat.appendChild(badge);
+  chat.scrollTop = chat.scrollHeight;
+}
+
+function guideAnimateAlloMessage(text) {
+  const chat = document.getElementById("guide-chat");
+  if (!chat) return Promise.resolve();
+
+  const empty = document.getElementById("guide-empty");
+  if (empty) empty.remove();
+
+  const wrap = document.createElement("div");
+  wrap.className = "guide-message guide-message-allo";
+  wrap.style.animation = "none"; // typing is its own entrance
+
+  const avatar = document.createElement("div");
+  avatar.className = "guide-msg-avatar";
+  avatar.innerHTML = ALLO_ICON_SVG;
+
+  const inner = document.createElement("div");
+  inner.className = "guide-msg-inner";
+
+  const label = document.createElement("span");
+  label.className = "guide-message-label";
+  label.textContent = "Allo";
+
+  const body = document.createElement("div");
+  body.className = "guide-message-body";
+
+  inner.appendChild(label);
+  inner.appendChild(body);
+  wrap.appendChild(avatar);
+  wrap.appendChild(inner);
+  chat.appendChild(wrap);
+  chat.scrollTop = chat.scrollHeight;
+
+  const formattedHtml = guideFormatText(text);
+  const totalChars = text.length;
+  // Adaptive speed: 400ms minimum, ~1.5ms per char, 1800ms ceiling
+  const duration = Math.min(Math.max(400, totalChars * 1.5), 1800);
+
+  return new Promise((resolve) => {
+    const startTime = performance.now();
+
+    function tick(now) {
+      const elapsed = now - startTime;
+      const progress = Math.min(elapsed / duration, 1);
+      // Ease-out: fast start, gentle deceleration
+      const eased = 1 - Math.pow(1 - progress, 1.7);
+      const charsToShow = Math.floor(eased * totalChars);
+
+      if (progress < 1) {
+        body.textContent = text.slice(0, charsToShow) + "▋";
+        // Only scroll if the user is already near the bottom
+        if (chat.scrollHeight - chat.scrollTop - chat.clientHeight < 120) {
+          chat.scrollTop = chat.scrollHeight;
+        }
+        requestAnimationFrame(tick);
+      } else {
+        body.innerHTML = formattedHtml;
+        chat.scrollTop = chat.scrollHeight;
+        resolve();
+      }
+    }
+
+    requestAnimationFrame(tick);
+  });
+}
+
+function guideSaveMemory(summary) {
+  if (!summary) return;
+  try {
+    const stored = JSON.parse(localStorage.getItem(GUIDE_MEMORY_KEY) || "null");
+    const memories = Array.isArray(stored) ? stored : [];
+    memories.push({ summary, ts: Date.now() });
+    while (memories.length > GUIDE_MEMORY_MAX) memories.shift();
+    localStorage.setItem(GUIDE_MEMORY_KEY, JSON.stringify(memories));
+  } catch {}
+}
+
+function guideLoadMemory() {
+  if (guideMemoryLoaded) return;
+  guideMemoryLoaded = true;
+  try {
+    const stored = JSON.parse(localStorage.getItem(GUIDE_MEMORY_KEY) || "null");
+    if (!stored) return;
+    const memories = (Array.isArray(stored) ? stored : []).filter((m) => m?.summary);
+    if (memories.length === 0) return;
+    const fmt = (ts) => ts ? new Date(ts).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }) : "past session";
+    const combined = memories.map((m) => `[${fmt(m.ts)}]\n${m.summary}`).join("\n\n");
+    guideHistory.push(
+      { role: "user",      content: `RECALLED MEMORY FROM PAST SESSIONS:\n${combined}` },
+      { role: "assistant", content: "Past session context loaded — I have context from our previous conversations." },
+    );
+    guideAppendMemoryBadge(memories.length);
+  } catch {}
+}
+
+function guideAppendConfigCard(config) {
+  const chat = document.getElementById("guide-chat");
+  if (!chat) return;
+
+  let gridHtml = '<div class="guide-config-grid">';
+  if (config.objective) gridHtml += `<div><span>Objective</span><strong>${config.objective === "max_sharpe" ? "Max Sharpe" : "Min Volatility"}</strong></div>`;
+  if (config.tickers?.length) {
+    const preview = config.tickers.slice(0, 8).join(", ") + (config.tickers.length > 8 ? `… +${config.tickers.length - 8}` : "");
+    gridHtml += `<div><span>Tickers (${config.tickers.length})</span><strong>${escapeHtml(preview)}</strong></div>`;
+  }
+  if (config.out_of_sample_months != null) gridHtml += `<div><span>OOS window</span><strong>${escapeHtml(config.out_of_sample_months)} mo</strong></div>`;
+  if (config.max_position_weight != null) gridHtml += `<div><span>Max position</span><strong>${Math.round(config.max_position_weight * 100)}%</strong></div>`;
+  if (config.use_ai_views != null) gridHtml += `<div><span>BL AI views</span><strong>${config.use_ai_views ? "On" : "Off"}</strong></div>`;
+  if (config.use_ai_audit != null) gridHtml += `<div><span>AI audit</span><strong>${config.use_ai_audit ? "On" : "Off"}</strong></div>`;
+  if (config.regularization && config.regularization !== "none") gridHtml += `<div><span>Regularization</span><strong>${escapeHtml(String(config.regularization).toUpperCase())}</strong></div>`;
+  if (config.ai_provider) gridHtml += `<div><span>Provider</span><strong>${escapeHtml(config.ai_provider)}</strong></div>`;
+  gridHtml += "</div>";
+
+  if (config.analyst_seed_prompt) {
+    gridHtml += `<div class="guide-config-mandate"><p class="eyebrow">Investment mandate</p><p>${escapeHtml(config.analyst_seed_prompt)}</p></div>`;
+  }
+
+  const card = document.createElement("div");
+  card.className = "guide-config-card";
+
+  const header = document.createElement("div");
+  header.className = "guide-config-card-header";
+  header.innerHTML = `<p class="eyebrow">Run configuration ready</p><h3>${escapeHtml(config.run_name || "Guided Run")}</h3>`;
+
+  const body = document.createElement("div");
+  body.className = "guide-config-card-body";
+  body.innerHTML = gridHtml;
+
+  const actions = document.createElement("div");
+  actions.className = "guide-config-actions";
+
+  const loadBtn = document.createElement("button");
+  loadBtn.className = "button button-primary";
+  loadBtn.textContent = "Load into Settings";
+
+  const dismissBtn = document.createElement("button");
+  dismissBtn.className = "button button-secondary";
+  dismissBtn.textContent = "Dismiss";
+
+  loadBtn.addEventListener("click", () => {
+    guideImportConfig(config, loadBtn);
+  });
+  dismissBtn.addEventListener("click", () => {
+    card.style.transition = "opacity 0.18s ease, transform 0.18s ease";
+    card.style.opacity = "0";
+    card.style.transform = "translateY(-6px)";
+    setTimeout(() => card.remove(), 200);
+    if (guidePendingConfig === config) guidePendingConfig = null;
+  });
+
+  actions.appendChild(loadBtn);
+  actions.appendChild(dismissBtn);
+  card.appendChild(header);
+  card.appendChild(body);
+  card.appendChild(actions);
+  chat.appendChild(card);
+  chat.scrollTop = chat.scrollHeight;
+}
+
+// ─── Console & Guide Config Persistence ──────────────────────────────────────
+
+const CONSOLE_CONFIG_STORAGE_KEY = "allolabs_console_cfg";
+const GUIDE_CONFIG_STORAGE_KEY   = "allolabs_guide_cfg";
+
+function saveConsoleConfig() {
+  try {
+    const g = (id) => document.getElementById(id);
+    const cfg = {
+      training:               g("remote-training")?.value,
+      oos:                    g("remote-oos")?.value,
+      gpt:                    g("remote-gpt")?.checked,
+      researchProvider:       g("remote-research-provider")?.value,
+      gptModel:               g("remote-gpt-model")?.value,
+      audit:                  g("remote-audit")?.checked,
+      auditProvider:          g("remote-audit-provider")?.value,
+      auditModel:             g("remote-audit-model")?.value,
+      refresh:                g("remote-refresh")?.checked,
+      maxNews:                g("remote-max-news")?.value,
+      batchSize:              g("remote-batch-size")?.value,
+      analystSeed:            g("remote-analyst-seed")?.value,
+      auditorSeed:            g("remote-auditor-seed")?.value,
+      longOnly:               g("remote-long-only")?.checked,
+      position:               g("remote-position")?.value,
+      sectorCap:              g("remote-sector-cap")?.value,
+      regularization:         g("remote-regularization")?.value,
+      regularizationStrength: g("remote-regularization-strength")?.value,
+    };
+    localStorage.setItem(CONSOLE_CONFIG_STORAGE_KEY, JSON.stringify(cfg));
+  } catch {}
+}
+
+function saveGuideConfig() {
+  try {
+    const cfg = {
+      provider: document.getElementById("guide-provider")?.value ?? "",
+      model:    document.getElementById("guide-model")?.value ?? "",
+    };
+    localStorage.setItem(GUIDE_CONFIG_STORAGE_KEY, JSON.stringify(cfg));
+  } catch {}
+}
+
+function restoreConsoleConfig() {
+  try {
+    const raw = localStorage.getItem(CONSOLE_CONFIG_STORAGE_KEY);
+    if (!raw) return;
+    const cfg = JSON.parse(raw);
+    const set = (id, key, checkbox) => {
+      const el = document.getElementById(id);
+      if (!el || cfg[key] == null) return;
+      if (checkbox) el.checked = Boolean(cfg[key]);
+      else el.value = cfg[key];
+    };
+    set("remote-training",               "training");
+    set("remote-oos",                    "oos");
+    set("remote-gpt",                    "gpt",     true);
+    set("remote-audit",                  "audit",   true);
+    set("remote-refresh",                "refresh", true);
+    set("remote-long-only",              "longOnly", true);
+    set("remote-max-news",               "maxNews");
+    set("remote-batch-size",             "batchSize");
+    set("remote-analyst-seed",           "analystSeed");
+    set("remote-auditor-seed",           "auditorSeed");
+    set("remote-position",               "position");
+    set("remote-sector-cap",             "sectorCap");
+    set("remote-regularization",         "regularization");
+    set("remote-regularization-strength","regularizationStrength");
+    if (cfg.researchProvider) {
+      const el = document.getElementById("remote-research-provider");
+      if (el) el.value = cfg.researchProvider;
+      populateModelSelect(
+        document.getElementById("remote-gpt-model"),
+        "research", cfg.researchProvider, cfg.gptModel
+      );
+    }
+    if (cfg.auditProvider) {
+      const el = document.getElementById("remote-audit-provider");
+      if (el) el.value = cfg.auditProvider;
+      populateModelSelect(
+        document.getElementById("remote-audit-model"),
+        "audit", cfg.auditProvider, cfg.auditModel
+      );
+    }
+    syncConfigurationControls();
+  } catch {}
+}
+
+function restoreGuideConfig() {
+  try {
+    const raw = localStorage.getItem(GUIDE_CONFIG_STORAGE_KEY);
+    if (!raw) return;
+    const cfg = JSON.parse(raw);
+    const provEl  = document.getElementById("guide-provider");
+    const modelEl = document.getElementById("guide-model");
+    if (provEl  && cfg.provider != null) provEl.value  = cfg.provider;
+    if (modelEl && cfg.model    != null) {
+      modelEl.value = cfg.model;
+      if (provEl) {
+        const def = GUIDE_PROVIDER_DEFAULTS[provEl.value] || "";
+        modelEl.placeholder = def || "default";
+      }
+    }
+  } catch {}
+}
+
+let _configSaveTimer = null;
+function scheduleSave() {
+  clearTimeout(_configSaveTimer);
+  _configSaveTimer = setTimeout(() => { saveConsoleConfig(); saveGuideConfig(); }, 400);
+}
+
+// Save on window close
+window.addEventListener("beforeunload", () => { saveConsoleConfig(); saveGuideConfig(); });
+
+// Wire debounced save to every console field
+[
+  "remote-training", "remote-oos", "remote-gpt", "remote-research-provider",
+  "remote-gpt-model", "remote-audit", "remote-audit-provider", "remote-audit-model",
+  "remote-refresh", "remote-max-news", "remote-batch-size", "remote-analyst-seed",
+  "remote-auditor-seed", "remote-long-only", "remote-position", "remote-sector-cap",
+  "remote-regularization", "remote-regularization-strength",
+].forEach((id) => {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.addEventListener("change", scheduleSave);
+  el.addEventListener("input",  scheduleSave);
+});
+
+// Wire debounced save to guide fields
+document.getElementById("guide-provider")?.addEventListener("change", scheduleSave);
+document.getElementById("guide-model")?.addEventListener("input",   scheduleSave);
+
+// ─────────────────────────────────────────────────────────────────────────────
+
+function guideSetLoading(loading) {
+  guideLoading = loading;
+  const status = document.getElementById("guide-status");
+  const sendBtn = document.getElementById("guide-send");
+  const input = document.getElementById("guide-input");
+  if (status) status.hidden = !loading;
+  if (loading) {
+    const txt = document.getElementById("guide-status-text");
+    if (txt) txt.textContent = "Allo is thinking…";
+  }
+  if (sendBtn) sendBtn.disabled = loading;
+  if (input) input.disabled = loading;
+  document.querySelectorAll(".guide-action-btn").forEach((b) => { b.disabled = loading; });
+}
+
+function guideSetStatusText(text) {
+  const el = document.getElementById("guide-status-text");
+  if (el) el.textContent = text;
+}
+
+function guideClearError() {
+  const el = document.getElementById("guide-error");
+  if (el) { el.hidden = true; el.innerHTML = ""; }
+}
+
+function humanizeGuideError(raw) {
+  if (!raw) return "An unknown error occurred.";
+  const s = raw.toLowerCase();
+
+  // No key configured at all
+  if (s.includes("no ai provider api key") || s.includes("no api provider")) {
+    return "No AI provider is configured. Add at least one API key (OpenAI, Anthropic, Gemini, or Nvidia NIM) in the Reference tab, then restart AlloLabs.";
+  }
+  // Specific provider key missing
+  const noKeyMatch = raw.match(/No API key found for provider ['"]?(\S+?)['"]?\./i);
+  if (noKeyMatch) {
+    return `No API key is set for ${noKeyMatch[1]}. Add it in the Reference tab and restart AlloLabs.`;
+  }
+  // All providers failed — surface the individual reasons concisely
+  if (s.includes("all ai providers failed")) {
+    const reasons = raw.replace(/all ai providers failed\s*[—–-]\s*/i, "").trim();
+    // Translate common sub-errors inline
+    const cleaned = reasons
+      .replace(/timed out|read operation timed out/gi, "timed out")
+      .replace(/http 401[^;]*/gi, "invalid API key (401)")
+      .replace(/http 429[^;]*/gi, "rate limit hit (429)")
+      .replace(/http 400[^;]*/gi, "bad request (400)")
+      .replace(/http 5\d\d[^;]*/gi, "server error (5xx)")
+      .replace(/network error[^;]*/gi, "network unreachable");
+    return `All providers failed: ${cleaned}`;
+  }
+  // Timeout
+  if (s.includes("timed out") || s.includes("read operation")) {
+    return "Allo timed out waiting for the AI provider. The service may be busy — use Resend to try again.";
+  }
+  // Auth
+  if (s.includes("401") || s.includes("unauthorized") || s.includes("invalid api key") || s.includes("authentication")) {
+    return "Authentication failed — your API key may be invalid or expired. Check the Reference tab.";
+  }
+  // Rate limit
+  if (s.includes("429") || s.includes("rate limit") || s.includes("too many requests")) {
+    return "Rate limit exceeded — the AI provider is throttling requests. Wait a moment and resend.";
+  }
+  // Bad request (usually a model name issue)
+  if (s.includes("400") || s.includes("bad request")) {
+    return "Bad request to the AI provider — your model name may be incorrect. Check the Model field in the Guide toolbar.";
+  }
+  // Server error
+  if (s.includes("503") || s.includes("502") || s.includes("service unavailable")) {
+    return "The AI provider is temporarily unavailable (5xx). Try again in a moment.";
+  }
+  // Not connected
+  if (s.includes("not connected") || s.includes("connect in the console")) {
+    return "Not connected to the AlloLabs server. Go to the Console tab and start the connection first.";
+  }
+  // Guide module missing
+  if (s.includes("guide module unavailable") || s.includes("allolabs_guide")) {
+    return "Guide module (allolabs_guide.py) is not installed. Reinstall AlloLabs.";
+  }
+  // Network-level error
+  if (s.includes("network error") || s.includes("failed to fetch") || s.includes("networkerror")) {
+    return "Network error — cannot reach the AlloLabs server. Is the app still running?";
+  }
+  // Context length
+  if (s.includes("context") && (s.includes("length") || s.includes("limit") || s.includes("tokens"))) {
+    return "Conversation is too long for this model's context window. The session will be compacted automatically — try sending again.";
+  }
+  return raw; // fall back to the raw message if nothing matched
+}
+
+function guideShowError(msg, retryText) {
+  const el = document.getElementById("guide-error");
+  if (!el) return;
+  el.hidden = false;
+  el.innerHTML = "";
+  const msgSpan = document.createElement("span");
+  msgSpan.textContent = humanizeGuideError(msg);
+  el.appendChild(msgSpan);
+  if (retryText) {
+    const btn = document.createElement("button");
+    btn.className = "guide-error-retry";
+    btn.textContent = "Resend";
+    btn.addEventListener("click", () => {
+      el.hidden = true;
+      guideSendMessage(retryText);
+    });
+    el.appendChild(btn);
+  }
+}
+
+
+function _normalizeRunConfig(cfg) {
+  // Accept camelCase or snake_case — open-source models use both
+  return {
+    ...cfg,
+    training_years:      cfg.training_years      ?? cfg.trainingYears,
+    out_of_sample_months:cfg.out_of_sample_months?? cfg.outOfSampleMonths ?? cfg.oosMonths,
+    max_position_weight: cfg.max_position_weight ?? cfg.maxPositionWeight  ?? cfg.maxPosition,
+    max_sector_weight:   cfg.max_sector_weight   ?? cfg.maxSectorWeight,
+    long_only:           cfg.long_only           ?? cfg.longOnly,
+    use_ai_views:        cfg.use_ai_views        ?? cfg.useAiViews         ?? cfg.useAIViews,
+    use_ai_audit:        cfg.use_ai_audit        ?? cfg.useAiAudit         ?? cfg.useAIAudit,
+    ai_provider:         cfg.ai_provider         ?? cfg.aiProvider,
+    analyst_seed_prompt: cfg.analyst_seed_prompt ?? cfg.analystSeedPrompt  ?? cfg.mandate,
+    auditor_seed_prompt: cfg.auditor_seed_prompt ?? cfg.auditorSeedPrompt,
+  };
+}
+
+function guideImportConfig(config, feedbackBtn) {
+  if (!config) return;
+  config = _normalizeRunConfig(config);
+
+  const setVal = (id, val) => { const el = document.getElementById(id); if (el && val != null) el.value = val; };
+  const setChk = (id, val) => { const el = document.getElementById(id); if (el && val != null) { el.checked = Boolean(val); el.dispatchEvent(new Event("change")); } };
+
+  // Numbers
+  setVal("remote-training", config.training_years);
+  setVal("remote-oos",      config.out_of_sample_months);
+  if (config.max_position_weight != null)
+    setVal("remote-position", Math.round(config.max_position_weight * 100));
+  if (config.max_sector_weight != null)
+    setVal("remote-sector-cap", Math.round(config.max_sector_weight * 100));
+
+  // Checkboxes — set use_ai_views FIRST so syncConfigurationControls enables audit toggle
+  setChk("remote-long-only", config.long_only);
+  setChk("remote-gpt",       config.use_ai_views);
+  setChk("remote-audit",     config.use_ai_audit);  // syncConfigurationControls runs on each dispatchEvent
+
+  // Regularization
+  if (config.regularization) {
+    const el = document.getElementById("remote-regularization");
+    if (el) { el.value = config.regularization; el.dispatchEvent(new Event("change")); }
+  }
+
+  // Seed prompts
+  setVal("remote-analyst-seed",  config.analyst_seed_prompt);
+  setVal("remote-auditor-seed",  config.auditor_seed_prompt);
+
+  // Research provider — nvidia-nim is guide-only
+  const prov = config.ai_provider;
+  if (prov && prov !== "nvidia-nim") {
+    const el = document.getElementById("remote-research-provider");
+    if (el) {
+      el.value = prov;
+      populateModelSelect(document.getElementById("remote-gpt-model"), "research", prov);
+    }
+  }
+
+  // Universe tickers — use the canonical setter so localStorage format is correct
+  if (config.tickers?.length) {
+    setUniverseSelection(config.tickers, true);
+  }
+
+  syncConfigurationControls();
+  saveConsoleConfig();
+
+  if (feedbackBtn) {
+    feedbackBtn.textContent = "Loaded into Console!";
+    feedbackBtn.disabled = true;
+  }
+  showView("console"); // immediate — no delay
+}
+
+const GUIDE_PROVIDER_DEFAULTS = {
+  anthropic:   "claude-sonnet-4-6",
+  openai:      "gpt-4o-mini",
+  gemini:      "gemini-2.5-flash",
+  deepseek:    "deepseek-chat",
+  "nvidia-nim":"meta/llama-3.3-70b-instruct",
+};
+
+function guideGetProvider() {
+  const sel = document.getElementById("guide-provider");
+  const val = sel ? sel.value : "auto";
+  return val === "auto" ? null : val;
+}
+
+function guideGetModel() {
+  const el = document.getElementById("guide-model");
+  return el ? el.value.trim() : "";
+}
+
+function gatherConsoleConfig() {
+  return {
+    trainingYears:         Number(document.getElementById("remote-training")?.value)  || 1,
+    oosMonths:             Number(document.getElementById("remote-oos")?.value)        || 6,
+    maxPositionPercent:    Number(document.getElementById("remote-position")?.value)   || 25,
+    maxSectorPercent:      Number(sectorCapInput?.value)                               || 100,
+    longOnly:              longOnlyToggle?.checked ?? true,
+    regularization:        regularizationSelect?.value || "none",
+    regularizationStrength: Number(regularizationStrength?.value) || 0,
+    gptViews:              remoteGptToggle?.checked ?? false,
+    researchProvider:      remoteResearchProvider?.value || "",
+    researchModel:         document.getElementById("remote-gpt-model")?.value || "",
+    auditViews:            remoteAuditToggle?.checked ?? false,
+    auditProvider:         remoteAuditProvider?.value || "",
+    maxNewsArticles:       Number(document.getElementById("remote-max-news")?.value)   || 5,
+    researchBatchSize:     Number(document.getElementById("remote-batch-size")?.value) || 12,
+    analystSeedPrompt:     document.getElementById("remote-analyst-seed")?.value?.trim() || "",
+    auditorSeedPrompt:     document.getElementById("remote-auditor-seed")?.value?.trim() || "",
+  };
+}
+
+function gatherLatestResults() {
+  if (currentResultMode === "empty") return null;
+  const hasMax = portfolioData.max.holdings.length > 0;
+  if (!hasMax) return null;
+  const genAt = currentResultGeneratedAt
+    ? new Date(currentResultGeneratedAt).toLocaleString()
+    : null;
+  return {
+    hasData: true,
+    generatedAt: genAt,
+    tickerCount: portfolioData.max.holdings.length,
+    portfolios: {
+      max: {
+        metrics: portfolioData.max.metricValues,
+        topHoldings: portfolioData.max.holdings.slice(0, 8),
+      },
+      min: {
+        metrics: portfolioData.min.metricValues,
+        topHoldings: portfolioData.min.holdings.slice(0, 8),
+      },
+    },
+    research: (researchData || []).slice(0, 15).map((r) => ({
+      ticker:         r.ticker,
+      view:           r.thesis || "",
+      confidence:     r.confidence ?? null,
+      posteriorReturn: r.posteriorValue ?? null,
+    })),
+  };
+}
+
+function gatherAppContext() {
+  if (!universeCatalogData) return null;
+  const runStatusClass = runnerState?.className || "";
+  const runStatus = !runnerConnected ? "disconnected"
+    : runStatusClass.includes("running") ? "running"
+    : "idle";
+  const activeEl = document.querySelector(".nav-item.active[data-view]");
+  const activeView = activeEl?.dataset?.view || "unknown";
+  return {
+    selectedTickers:       orderedUniverseSelection(),
+    universePreset:        universeSelectionLabel(),
+    totalAvailableTickers: universeCatalogData.tickerCount || 0,
+    availableMarkets:      (universeCatalogData.groups || []).map((g) => ({
+      id:       g.id,
+      label:    g.shortLabel,
+      total:    g.tickers.length,
+      selected: g.tickers.filter((t) => selectedUniverseTickers.has(t)).length,
+    })),
+    consoleConfig:  gatherConsoleConfig(),
+    latestResults:  gatherLatestResults(),
+    runStatus,
+    activeView,
+  };
+}
+
+function guideAddRequestParams(body) {
+  const provider = guideGetProvider();
+  const model = guideGetModel();
+  if (provider) body.provider = provider;
+  if (model)    body.guideModel = model;
+  const ctx = gatherAppContext();
+  if (ctx) body.appContext = ctx;
+  return body;
+}
+
+async function guideCompact() {
+  if (guideHistory.length < 4 || !runnerConnected) return;
+  const originalCount = guideHistory.length;
+  try {
+    const body = guideAddRequestParams({ messages: guideHistory });
+    const response = await fetch(runnerEndpoint("/api/guide-compact"), {
+      method: "POST",
+      headers: runnerHeaders(true),
+      body: JSON.stringify(body),
+    });
+    if (!response.ok) return; // silent failure — compaction is best-effort
+    const data = await response.json();
+    const summary = data.summary || "";
+    if (!summary) return;
+    guideSaveMemory(summary);
+    const tail = guideHistory.slice(-4);
+    guideHistory = [
+      { role: "user",      content: `CONVERSATION SUMMARY (auto-compacted):\n${summary}` },
+      { role: "assistant", content: "Summary acknowledged — I have full context of our previous discussion." },
+      ...tail,
+    ];
+    guideAppendCompactBadge(originalCount - tail.length);
+  } catch {}
+}
+
+async function guideApiCall(body) {
+  const response = await fetch(runnerEndpoint("/api/guide"), {
+    method: "POST",
+    headers: runnerHeaders(true),
+    body: JSON.stringify(body),
+  });
+  if (!response.ok) {
+    let msg = `Server error ${response.status}`;
+    try { const errData = await response.json(); msg = errData.error || msg; } catch {}
+    const err = new Error(msg);
+    err.retryable = response.status >= 500; // 4xx = config issue, don't retry
+    throw err;
+  }
+  return response.json();
+}
+
+async function guideSendMessage(text) {
+  const trimmed = text?.trim();
+  if (!trimmed || guideLoading) return;
+
+  guideClearError();
+  guideHistory.push({ role: "user", content: trimmed });
+  guideAppendMessage("user", trimmed);
+
+  const input = document.getElementById("guide-input");
+  if (input) input.value = "";
+
+  guideSetLoading(true);
+  let responseHandled = false;
+
+  // Retry schedule: [delay before attempt, status label]
+  const RETRIES = [
+    [0,    "Allo is thinking…"],
+    [3000, "Taking a little longer than usual…"],
+    [5000, "Still working on it…"],
+  ];
+
+  try {
+    if (!runnerConnected) throw new Error("Not connected to the runner. Connect in the Console tab first.");
+
+    const body = guideAddRequestParams({ messages: guideHistory });
+    let data = null;
+    let lastErr = null;
+
+    for (let i = 0; i < RETRIES.length; i++) {
+      const [delay, label] = RETRIES[i];
+      if (i > 0) {
+        guideSetStatusText(label);
+        await new Promise((r) => setTimeout(r, delay));
+      }
+      try {
+        data = await guideApiCall(body);
+        lastErr = null;
+        break;
+      } catch (err) {
+        lastErr = err;
+        if (err.retryable === false) break; // configuration error, no point retrying
+        if (i === RETRIES.length - 1) break; // exhausted
+      }
+    }
+
+    if (lastErr) throw lastErr;
+
+    const reply = data.reply || "";
+    const mode = data.mode || "normal";
+    const runConfig = data.runConfig || null;
+
+    guideHistory.push({ role: "assistant", content: reply });
+
+    guideSetLoading(false);
+    responseHandled = true;
+
+    await guideAnimateAlloMessage(reply);
+
+    if (mode === "run_config" && runConfig) {
+      guidePendingConfig = runConfig;
+      guideAppendConfigCard(runConfig);
+    }
+
+    if (guideHistory.length >= GUIDE_COMPACT_THRESHOLD) {
+      guideCompact();
+    }
+  } catch (err) {
+    guideHistory.pop();
+    guideShowError(err.message || "Allo is unavailable. Check your API key configuration.", trimmed);
+  } finally {
+    if (!responseHandled) guideSetLoading(false);
+  }
+}
+
+document.getElementById("guide-send")?.addEventListener("click", () => {
+  const el = document.getElementById("guide-input");
+  if (el) guideSendMessage(el.value);
+});
+
+document.getElementById("guide-input")?.addEventListener("keydown", (e) => {
+  if (e.key === "Enter" && !e.shiftKey) {
+    e.preventDefault();
+    const el = document.getElementById("guide-input");
+    if (el) guideSendMessage(el.value);
+  }
+});
+
+document.getElementById("guide-clear")?.addEventListener("click", () => {
+  guideHistory = [];
+  guidePendingConfig = null;
+  guideMemoryLoaded = false; // allow memory recall on next message
+  const chat = document.getElementById("guide-chat");
+  if (chat) {
+    chat.innerHTML = `<div class="guide-empty" id="guide-empty">
+      <span class="guide-empty-title">Ask Allo anything</span>
+      <span class="guide-empty-sub">Portfolio theory, macro thesis, run configuration — or click a quick action above to get started.</span>
+    </div>`;
+  }
+  guideClearError();
+});
+
+document.querySelectorAll(".guide-action-btn").forEach((btn) => {
+  btn.addEventListener("click", () => {
+    const text = GUIDE_QUICK_ACTIONS[btn.dataset.action];
+    if (text) guideSendMessage(text);
+  });
+});
+
+
+// Update model placeholder when provider changes
+document.getElementById("guide-provider")?.addEventListener("change", (e) => {
+  const modelInput = document.getElementById("guide-model");
+  if (!modelInput) return;
+  const def = GUIDE_PROVIDER_DEFAULTS[e.target.value] || "";
+  modelInput.placeholder = def || "default";
+  // Only auto-fill if the field is empty or contained a previous default
+  const prevDefault = Object.values(GUIDE_PROVIDER_DEFAULTS).includes(modelInput.value);
+  if (!modelInput.value || prevDefault) modelInput.value = def;
+});
+restoreGuideConfig();
+
+// Save + compact on tab/window hide
+document.addEventListener("visibilitychange", () => {
+  if (document.hidden) {
+    saveConsoleConfig();
+    saveGuideConfig();
+    if (guideHistory.length >= 10) guideCompact();
+  }
+});
+
+/* ================================================================ */
 
 const initialView = location.hash.replace("#", "");
 const resolvedInitial = viewAliases[initialView] || initialView;

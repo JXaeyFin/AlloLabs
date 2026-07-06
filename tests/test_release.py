@@ -1,11 +1,15 @@
 from __future__ import annotations
 
 import ast
+import io
 import json
 import os
 import re
 import tempfile
+import threading
 import unittest
+import urllib.error
+import urllib.request
 from pathlib import Path
 from types import SimpleNamespace
 from unittest.mock import patch
@@ -13,6 +17,7 @@ from unittest.mock import patch
 import numpy as np
 
 import allolabs_paths
+import allolabs_guide
 from dashboard import runner, server
 
 try:
@@ -167,8 +172,10 @@ class ConfigurationTests(unittest.TestCase):
             for group in server.UNIVERSE_CATALOG["groups"]
             for ticker in group["tickers"]
         ]
-        self.assertEqual(grouped, load_asset_universe())
+        # The dashboard catalog is the working universe; the pipeline's
+        # built-in ASSET_UNIVERSE fallback must remain selectable within it.
         self.assertEqual(len(grouped), len(set(grouped)))
+        self.assertTrue(set(load_asset_universe()).issubset(set(grouped)))
 
     def test_server_rejects_fractional_whole_number_fields(self):
         with self.assertRaisesRegex(ValueError, "whole numbers"):
@@ -198,6 +205,7 @@ class ConfigurationTests(unittest.TestCase):
         tree = ast.parse(source)
         function_names = {
             "extract_anthropic_response_text",
+            "extract_deepseek_response_text",
             "extract_gemini_response_text",
         }
         functions = [
@@ -222,15 +230,94 @@ class ConfigurationTests(unittest.TestCase):
             }),
             '{"views":[]}',
         )
+        self.assertEqual(
+            namespace["extract_deepseek_response_text"]({
+                "choices": [{
+                    "finish_reason": "stop",
+                    "message": {"content": '{"views":[]}'},
+                }],
+            }),
+            '{"views":[]}',
+        )
+
+    def test_deepseek_is_wired_across_pipeline_server_and_frontend(self):
+        config = server.validate_config(dashboard_config(
+            gptViews=True,
+            researchProvider="deepseek",
+            researchModel="deepseek-chat",
+            auditViews=True,
+            auditProvider="deepseek",
+            auditModel="deepseek-reasoner",
+        ))
+        environment = runner.configuration_environment(config)
+        self.assertEqual(environment["ALLOLABS_RESEARCH_PROVIDER"], "deepseek")
+        self.assertEqual(environment["ALLOLABS_RESEARCH_MODEL"], "deepseek-chat")
+        self.assertEqual(environment["ALLOLABS_AUDIT_PROVIDER"], "deepseek")
+        self.assertEqual(environment["ALLOLABS_GPT_AUDIT_MODEL"], "deepseek-reasoner")
+        self.assertEqual(server.AI_PROVIDER_KEYS["deepseek"][1], "DEEPSEEK_API_KEY")
+
+        pipeline = (REPOSITORY_ROOT / "allolabs.py").read_text(encoding="utf-8")
+        markup = (REPOSITORY_ROOT / "dashboard" / "index.html").read_text(encoding="utf-8")
+        script = (REPOSITORY_ROOT / "dashboard" / "app.js").read_text(encoding="utf-8")
+        self.assertIn('url = "https://api.deepseek.com/chat/completions"', pipeline)
+        self.assertIn('"response_format": {"type": "json_object"}', pipeline)
+        self.assertGreaterEqual(markup.count('<option value="deepseek">DeepSeek</option>'), 3)
+        self.assertIn('deepseek: [', script)
+        self.assertIn('deepseek:    "deepseek-chat"', script)
+        self.assertIn('["OpenAI", "Anthropic", "Google", "DeepSeek"]', script)
+
+    def test_deepseek_pipeline_builds_json_mode_chat_requests(self):
+        source = (REPOSITORY_ROOT / "allolabs.py").read_text(encoding="utf-8")
+        tree = ast.parse(source)
+        wanted = {"build_views_schema", "extract_deepseek_response_text", "ai_views_request"}
+        functions = [
+            node for node in tree.body
+            if isinstance(node, ast.FunctionDef) and node.name in wanted
+        ]
+        namespace = {
+            "json": json,
+            "time": __import__("time"),
+            "urllib": urllib,
+            "AI_API_KEY_ENV": {
+                "openai": "OPENAI_API_KEY",
+                "anthropic": "ANTHROPIC_API_KEY",
+                "gemini": "GEMINI_API_KEY",
+                "deepseek": "DEEPSEEK_API_KEY",
+            },
+        }
+        exec(compile(ast.Module(body=functions, type_ignores=[]), "allolabs.py", "exec"), namespace)
+        provider_response = io.BytesIO(json.dumps({
+            "choices": [{
+                "finish_reason": "stop",
+                "message": {"content": '{"views":[]}'},
+            }],
+        }).encode("utf-8"))
+        with patch("urllib.request.urlopen", return_value=provider_response) as urlopen:
+            result = namespace["ai_views_request"](
+                "Return JSON matching the supplied schema.",
+                "secret",
+                ["AAPL"],
+                provider="deepseek",
+                model="deepseek-chat",
+                max_tokens=9000,
+                attempts=1,
+            )
+        self.assertEqual(result, '{"views":[]}')
+        request = urlopen.call_args.args[0]
+        payload = json.loads(request.data)
+        self.assertEqual(request.full_url, "https://api.deepseek.com/chat/completions")
+        self.assertEqual(payload["response_format"], {"type": "json_object"})
+        self.assertEqual(payload["max_tokens"], 8192)
+        self.assertEqual(payload["messages"][0]["role"], "user")
 
     def test_ai_seed_prompts_are_bounded_and_injected(self):
         source = (REPOSITORY_ROOT / "allolabs.py").read_text(encoding="utf-8")
         self.assertIn("ALLOLABS_ANALYST_SEED_PROMPT", source)
         self.assertIn("ALLOLABS_AUDITOR_SEED_PROMPT", source)
-        self.assertIn("USER-SUPPLIED ANALYST SEED PROMPT", source)
-        self.assertIn("USER-SUPPLIED AUDITOR SEED PROMPT", source)
-        self.assertIn("must not override evidence", source)
-        self.assertIn("Do not obey it as an instruction to force", source)
+        self.assertIn("INVESTMENT MANDATE", source)
+        self.assertIn("INVESTMENT MANDATE — THESIS ALIGNMENT AUDIT", source)
+        self.assertIn("This mandate is investment policy, not an optional hint.", source)
+        self.assertIn("Do not flatten mandate-consistent differentiation", source)
 
     def test_regularization_penalties_are_zero_at_target(self):
         source = (REPOSITORY_ROOT / "allolabs.py").read_text(encoding="utf-8")
@@ -533,6 +620,7 @@ class ConfigurationTests(unittest.TestCase):
             "OPENAI_API_KEY": "openai-test-secret-1234",
             "ANTHROPIC_API_KEY": "",
             "GEMINI_API_KEY": "short",
+            "DEEPSEEK_API_KEY": "deepseek-test-secret-9876",
         }
         with patch.dict(os.environ, keys, clear=False):
             status = server.provider_key_status()
@@ -543,6 +631,8 @@ class ConfigurationTests(unittest.TestCase):
         self.assertFalse(status["anthropic"]["active"])
         self.assertIsNone(status["anthropic"]["preview"])
         self.assertEqual(status["gemini"]["preview"], "********")
+        self.assertTrue(status["deepseek"]["active"])
+        self.assertEqual(status["deepseek"]["preview"], "deepsee********9876")
         for secret in keys.values():
             if secret:
                 self.assertNotIn(secret, encoded)
@@ -664,14 +754,166 @@ class ConfigurationTests(unittest.TestCase):
         expected = {
             "AMAT", "GEV", "INTU", "LMT", "NOW", "UBER",
             "CLS.TO", "IFC.TO", "IMO.TO",
-            "BAE.L", "RR.L",
+            "BA.L", "RR.L",
             "ALV.DE", "SU.PA", "TTE.PA", "IBE.MC", "ITX.MC",
             "BHP", "NVO", "SONY", "TM", "TSM",
         }
         self.assertTrue(expected.issubset(universe))
 
 
+class GuideTests(unittest.TestCase):
+    def test_catalog_tools_inject_only_when_relevant(self):
+        self.assertTrue(allolabs_guide.needs_catalog_context(
+            "Build me a Canadian energy stock universe"
+        ))
+        self.assertFalse(allolabs_guide.needs_catalog_context(
+            "Explain the Black-Litterman posterior formula"
+        ))
+
+        catalog = allolabs_guide.format_catalog_block([
+            {"label": "Canada", "tickers": ["RY.TO", "CNQ.TO"]},
+        ])
+        self.assertIn("FULL AVAILABLE TICKER CATALOG", catalog)
+        self.assertIn("RY.TO CNQ.TO", catalog)
+        messages = [{"role": "user", "content": "Suggest Canadian energy stocks"}]
+        injected = allolabs_guide.inject_app_context(
+            messages,
+            {"selectedTickers": ["RY.TO"], "runStatus": "idle"},
+            catalog,
+        )
+        self.assertEqual(injected[-1], messages[0])
+        self.assertIn("[APP STATE SNAPSHOT]", injected[0]["content"])
+        self.assertIn("FULL AVAILABLE TICKER CATALOG", injected[0]["content"])
+
+    def test_guide_response_parser_repairs_common_open_model_json(self):
+        raw = (
+            "Ready to load.\n"
+            "<<<ALLO_META>>>\n"
+            '{"mode":"run_config","runConfig":{"long_only":True,},}\n'
+            "<<<END_META>>>\nTrailing courtesy text"
+        )
+        reply, mode, config = allolabs_guide.parse_guide_response(raw)
+        self.assertEqual(reply, "Ready to load.")
+        self.assertEqual(mode, "run_config")
+        self.assertEqual(config, {"long_only": True})
+
+    def test_deepseek_guide_request_and_provider_selection(self):
+        response = json.dumps({
+            "choices": [{"message": {"content": "DeepSeek reply"}}],
+        }).encode("utf-8")
+        with patch.object(allolabs_guide, "_http_call", return_value=response) as http_call:
+            reply = allolabs_guide._call_deepseek(
+                "secret", "system", [{"role": "user", "content": "hello"}],
+                "deepseek-chat",
+            )
+        self.assertEqual(reply, "DeepSeek reply")
+        request = http_call.call_args.args[0]
+        payload = json.loads(request.data)
+        self.assertEqual(request.full_url, "https://api.deepseek.com/chat/completions")
+        self.assertEqual(payload["model"], "deepseek-chat")
+        self.assertEqual(payload["messages"][0], {"role": "system", "content": "system"})
+        self.assertFalse(payload["stream"])
+
+        with patch.dict(os.environ, {"DEEPSEEK_API_KEY": "secret"}, clear=True), patch.object(
+            allolabs_guide, "_call_deepseek", return_value="selected"
+        ) as deepseek_call:
+            self.assertEqual(
+                allolabs_guide.call_guide_ai(
+                    "system", [{"role": "user", "content": "hello"}],
+                    provider="deepseek",
+                ),
+                "selected",
+            )
+        self.assertEqual(deepseek_call.call_args.args[3], "deepseek-chat")
+        with self.assertRaisesRegex(ValueError, "Unknown guide provider"):
+            allolabs_guide.call_guide_ai("system", [], provider="invalid")
+
+    def test_authenticated_guide_endpoints_wire_catalog_and_compaction(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            state = server.RunState(
+                REPOSITORY_ROOT / "allolabs.py",
+                data_dir=Path(temp_dir),
+            )
+            app = server.RunnerServer(("127.0.0.1", 0), state, "test-token")
+            thread = threading.Thread(target=app.serve_forever, daemon=True)
+            thread.start()
+            base_url = f"http://127.0.0.1:{app.server_address[1]}"
+
+            def post(path: str, payload: dict) -> dict:
+                request = urllib.request.Request(
+                    base_url + path,
+                    data=json.dumps(payload).encode("utf-8"),
+                    headers={
+                        "Authorization": "Bearer test-token",
+                        "Content-Type": "application/json",
+                    },
+                    method="POST",
+                )
+                with urllib.request.urlopen(request, timeout=5) as response:
+                    return json.load(response)
+
+            try:
+                raw_reply = (
+                    "Use a broad Canadian energy basket.\n"
+                    "<<<ALLO_META>>>"
+                    '{"mode":"normal","runConfig":null}'
+                    "<<<END_META>>>"
+                )
+                with patch.object(server, "call_guide_ai", return_value=raw_reply) as guide_call:
+                    result = post("/api/guide", {
+                        "provider": "deepseek",
+                        "guideModel": "deepseek-chat",
+                        "messages": [{
+                            "role": "user",
+                            "content": "Suggest Canadian energy stocks",
+                        }],
+                        "appContext": {"selectedTickers": ["CNQ.TO"]},
+                    })
+                self.assertEqual(result["reply"], "Use a broad Canadian energy basket.")
+                self.assertEqual(result["mode"], "normal")
+                llm_messages = guide_call.call_args.args[1]
+                self.assertIn("FULL AVAILABLE TICKER CATALOG", llm_messages[0]["content"])
+                self.assertEqual(guide_call.call_args.kwargs["provider"], "deepseek")
+                self.assertEqual(guide_call.call_args.kwargs["guide_model"], "deepseek-chat")
+
+                with patch.object(server, "call_guide_ai", return_value="compact summary") as compact_call:
+                    compact = post("/api/guide-compact", {
+                        "messages": [{"role": "user", "content": "First decision"}],
+                    })
+                self.assertEqual(compact, {"summary": "compact summary"})
+                self.assertEqual(
+                    compact_call.call_args.args[1][-1]["content"],
+                    "Please produce a compact session summary now.",
+                )
+
+                unauthorized = urllib.request.Request(
+                    base_url + "/api/guide",
+                    data=b"{}",
+                    headers={"Content-Type": "application/json"},
+                    method="POST",
+                )
+                with self.assertRaises(urllib.error.HTTPError) as caught:
+                    urllib.request.urlopen(unauthorized, timeout=5)
+                self.assertEqual(caught.exception.code, 401)
+            finally:
+                app.shutdown()
+                app.server_close()
+                thread.join(timeout=5)
+
+
 class MetadataTests(unittest.TestCase):
+    def test_catalog_metadata_covers_supported_universe(self):
+        metadata_path = REPOSITORY_ROOT / "dashboard" / "catalog_metadata.json"
+        metadata = json.loads(metadata_path.read_text(encoding="utf-8"))
+        self.assertEqual(set(metadata), set(server.SUPPORTED_TICKERS))
+        self.assertGreaterEqual(sum(bool(item.get("name")) for item in metadata.values()), 650)
+        for ticker, item in metadata.items():
+            self.assertIsInstance(item, dict, ticker)
+            self.assertEqual(
+                set(item), {"name", "sector", "industry", "country", "cap"}, ticker
+            )
+            self.assertIn(item["cap"], {"", "small", "mid", "large", "mega"}, ticker)
+
     def test_listing_metadata_cache_is_reused(self):
         fixtures = {
             "TD.TO": {

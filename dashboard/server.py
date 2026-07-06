@@ -22,10 +22,33 @@ from pathlib import Path
 from urllib.parse import parse_qs, unquote, urlparse
 
 try:
-    from dashboard.universe import preset_id_for_selection, universe_catalog
+    from dashboard.universe import preset_id_for_selection, universe_catalog, ALL_UNIVERSE_TICKERS
 except ModuleNotFoundError:  # Direct execution: python dashboard/server.py
-    from universe import preset_id_for_selection, universe_catalog
+    from universe import preset_id_for_selection, universe_catalog, ALL_UNIVERSE_TICKERS  # type: ignore[no-redef]
 
+try:
+    _guide_root = Path(__file__).resolve().parent.parent
+    if str(_guide_root) not in sys.path:
+        sys.path.insert(0, str(_guide_root))
+    from allolabs_guide import (
+        call_guide_ai,
+        format_catalog_block,
+        get_compact_system,
+        get_guide_system,
+        inject_app_context,
+        needs_catalog_context,
+        parse_guide_response,
+    )
+    _GUIDE_AVAILABLE = True
+except Exception:
+    _GUIDE_AVAILABLE = False
+
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# SECTION: Module Constants & Configuration
+# File/directory pointers, allowlists, and API version stamp.
+# API_VERSION is checked by the desktop client to detect out-of-date servers.
+# ═══════════════════════════════════════════════════════════════════════════════
 
 ROOT = Path(__file__).resolve().parent
 RESOURCES_DIR = ROOT.parent / "resources"
@@ -38,12 +61,8 @@ DEFAULT_RESULTS = EXAMPLES_DIR / "default-run.json"
 DEFAULT_PDF = EXAMPLES_DIR / "default-portfolio-report.pdf"
 DEFAULT_CHART = EXAMPLES_DIR / "default-performance.png"
 UNIVERSE_CATALOG = universe_catalog(DEFAULT_SCRIPT)
-SUPPORTED_TICKERS = frozenset(
-    ticker
-    for group in UNIVERSE_CATALOG["groups"]
-    for ticker in group["tickers"]
-)
-ALLOWED_UNIVERSES = {"curated", "canada", "full", "custom"}
+SUPPORTED_TICKERS = frozenset(ALL_UNIVERSE_TICKERS)
+ALLOWED_UNIVERSES = {"index-leaders", "curated", "canada", "full", "custom"}
 ALLOWED_REGULARIZATIONS = {"none", "l2", "smooth_l1"}
 AI_PROVIDER_MODELS = {
     "openai": {"gpt-5.5", "gpt-5.4", "gpt-5.4-mini", "gpt-5.4-nano"},
@@ -62,11 +81,14 @@ AI_PROVIDER_MODELS = {
         "gemini-2.5-flash",
         "gemini-2.5-flash-lite",
     },
+    "deepseek": {"deepseek-chat", "deepseek-reasoner"},
 }
 AI_PROVIDER_KEYS = {
-    "openai": ("OpenAI", "OPENAI_API_KEY"),
-    "anthropic": ("Anthropic", "ANTHROPIC_API_KEY"),
-    "gemini": ("Google Gemini", "GEMINI_API_KEY"),
+    "openai":      ("OpenAI",        "OPENAI_API_KEY"),
+    "anthropic":   ("Anthropic",     "ANTHROPIC_API_KEY"),
+    "gemini":      ("Google Gemini", "GEMINI_API_KEY"),
+    "deepseek":    ("DeepSeek",      "DEEPSEEK_API_KEY"),
+    "nvidia-nim":  ("Nvidia NIM",    "NVIDIA_NIM_API_KEY"),
 }
 ALLOWED_AI_MODELS = {
     stage: {
@@ -75,13 +97,24 @@ ALLOWED_AI_MODELS = {
     }
     for stage in ("research", "audit")
 }
-API_VERSION = 21
+API_VERSION = 23
+# Suppresses a flashing console window when spawning subprocesses on Windows;
+# a no-op flag (0) on every other platform.  Centralised so every subprocess
+# launch in this module stays consistent.
+CREATE_NO_WINDOW = subprocess.CREATE_NO_WINDOW if os.name == "nt" else 0
 REQUIRED_ANALYSIS_MODULES = ("matplotlib", "numpy", "pandas", "scipy", "yfinance")
 COMPANY_DETAILS_CACHE_SECONDS = 15 * 60
 TICKER_PATTERN = re.compile(r"^[A-Z0-9][A-Z0-9.\-]{0,19}$")
 HISTORY_ID_PATTERN = re.compile(r"^\d{4}-\d{2}-\d{2}/[a-z0-9][a-z0-9._\-]{0,159}$")
 MAX_SEED_PROMPT_LENGTH = 12000
 
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# SECTION: API Key Utilities
+# Masks and resolves provider API keys; checks the process environment and,
+# on Windows, the user/machine registry so keys set via System Properties are
+# found even if the current shell session was opened before they were set.
+# ═══════════════════════════════════════════════════════════════════════════════
 
 def masked_api_key(value: str) -> str:
     cleaned = value.strip()
@@ -157,6 +190,12 @@ def result_portfolio_tickers(results: dict) -> set[str]:
     """Backward-compatible alias for callers using the earlier helper name."""
     return result_company_tickers(results)
 
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# SECTION: Run State
+# Thread-safe container for the lifecycle of a single allolabs.py execution.
+# Shared between the HTTP handler threads and the background log consumer.
+# ═══════════════════════════════════════════════════════════════════════════════
 
 class RunState:
     def __init__(
@@ -236,6 +275,12 @@ class RunState:
             }
 
 
+# ═══════════════════════════════════════════════════════════════════════════════
+# SECTION: Python Environment Discovery
+# Finds a Python interpreter that has all required analysis modules installed.
+# Checked in priority order: explicit arg → env var → sys.executable → PATH.
+# ═══════════════════════════════════════════════════════════════════════════════
+
 def probe_analysis_python(candidate: Path) -> tuple[bool, str]:
     try:
         is_file = candidate.is_file()
@@ -257,7 +302,7 @@ def probe_analysis_python(candidate: Path) -> tuple[bool, str]:
             encoding="utf-8",
             errors="replace",
             timeout=20,
-            creationflags=subprocess.CREATE_NO_WINDOW if os.name == "nt" else 0,
+            creationflags=CREATE_NO_WINDOW,
         )
     except (OSError, subprocess.SubprocessError) as exc:
         return False, str(exc)
@@ -302,6 +347,13 @@ def discover_analysis_python(explicit: Path | None = None) -> tuple[Path | None,
 
     return None, None, "No compatible Python environment found. " + " | ".join(failures)
 
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# SECTION: Request Validation
+# Parses and validates the JSON payload from /api/run before launching a
+# subprocess.  Raises ValueError with a user-facing message on any invalid
+# input; never passes untrusted data to the shell.
+# ═══════════════════════════════════════════════════════════════════════════════
 
 def validate_config(payload: dict) -> dict:
     try:
@@ -461,21 +513,40 @@ def validate_config(payload: dict) -> dict:
     }
 
 
+# ═══════════════════════════════════════════════════════════════════════════════
+# SECTION: Background Process Management
+# consume_output() runs in a daemon thread and drains stdout from the allolabs
+# subprocess into the run-state log deque.  start_run() spawns the process and
+# that thread; the handler's /api/stop endpoint terminates it gracefully.
+# ═══════════════════════════════════════════════════════════════════════════════
+
 def consume_output(state: RunState, process: subprocess.Popen[str]) -> None:
-    assert process.stdout is not None
-    for line in process.stdout:
-        state.add_log(line, "stdout")
-    exit_code = process.wait()
-    with state.lock:
-        was_stopping = state.status == "stopping"
-        state.exit_code = exit_code
-        state.finished_at = time.time()
-        state.status = "stopped" if was_stopping else ("completed" if exit_code == 0 else "failed")
-        state.process = None
-    state.add_log(
-        f"[runner] Process {'stopped' if was_stopping else 'finished'} with exit code {exit_code}.",
-        "system" if exit_code == 0 or was_stopping else "stderr",
-    )
+    # This runs in a daemon thread; if the read loop raises (e.g. the pipe is
+    # torn down mid-read) the run must still reach a terminal state instead of
+    # being stuck reporting "running" forever, so the finalisation lives in a
+    # finally block that always runs exactly once.
+    try:
+        if process.stdout is not None:
+            for line in process.stdout:
+                state.add_log(line, "stdout")
+    finally:
+        try:
+            exit_code = process.wait()
+        except Exception:  # noqa: BLE001 - process already gone / un-waitable
+            exit_code = process.returncode if process.returncode is not None else -1
+        with state.lock:
+            was_stopping = state.status == "stopping"
+            state.exit_code = exit_code
+            state.finished_at = time.time()
+            state.status = (
+                "stopped" if was_stopping
+                else ("completed" if exit_code == 0 else "failed")
+            )
+            state.process = None
+        state.add_log(
+            f"[runner] Process {'stopped' if was_stopping else 'finished'} with exit code {exit_code}.",
+            "system" if exit_code == 0 or was_stopping else "stderr",
+        )
 
 
 def start_run(state: RunState, config: dict) -> str:
@@ -491,14 +562,6 @@ def start_run(state: RunState, config: dict) -> str:
             )
 
         run_id = secrets.token_hex(4)
-        state.status = "running"
-        state.run_id = run_id
-        state.exit_code = None
-        state.started_at = time.time()
-        state.finished_at = None
-        state.config = config
-        state.logs.clear()
-        state.next_line_id = 1
 
         env = os.environ.copy()
         for _, environment_name in AI_PROVIDER_KEYS.values():
@@ -523,23 +586,46 @@ def start_run(state: RunState, config: dict) -> str:
                 str(state.script_path),
                 json.dumps(config),
             ]
-        process = subprocess.Popen(
-            command,
-            cwd=state.data_dir,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.STDOUT,
-            text=True,
-            encoding="utf-8",
-            errors="replace",
-            env=env,
-            creationflags=subprocess.CREATE_NO_WINDOW if os.name == "nt" else 0,
-        )
+        # Only commit the "running" state once the subprocess actually starts.
+        # If Popen fails (missing interpreter, permissions, etc.) the exception
+        # propagates to the caller with the run state left untouched/idle rather
+        # than wedged at "running" with no live process behind it.
+        try:
+            process = subprocess.Popen(
+                command,
+                cwd=state.data_dir,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.STDOUT,
+                text=True,
+                encoding="utf-8",
+                errors="replace",
+                env=env,
+                creationflags=CREATE_NO_WINDOW,
+            )
+        except OSError as exc:
+            raise RuntimeError(f"Could not launch the analysis process: {exc}") from exc
+
+        state.status = "running"
+        state.run_id = run_id
+        state.exit_code = None
+        state.started_at = time.time()
+        state.finished_at = None
+        state.config = config
+        state.logs.clear()
+        state.next_line_id = 1
         state.process = process
 
     state.add_log(f"[runner] Run {run_id} launched.", "system")
     threading.Thread(target=consume_output, args=(state, process), daemon=True).start()
     return run_id
 
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# SECTION: HTTP Request Handler
+# Handles all GET and POST API routes plus static file serving.
+# Authentication is enforced via a bearer token on every authenticated route.
+# CORS is restricted to same-origin and null (file://) requests only.
+# ═══════════════════════════════════════════════════════════════════════════════
 
 class Handler(BaseHTTPRequestHandler):
     server_version = "AlloLabsRunner/1.2"
@@ -712,7 +798,7 @@ class Handler(BaseHTTPRequestHandler):
             encoding="utf-8",
             errors="replace",
             timeout=45,
-            creationflags=subprocess.CREATE_NO_WINDOW if os.name == "nt" else 0,
+            creationflags=CREATE_NO_WINDOW,
         )
         if completed.returncode != 0:
             detail = completed.stderr.strip() or "Yahoo Finance lookup failed."
@@ -742,6 +828,12 @@ class Handler(BaseHTTPRequestHandler):
             raise ValueError("Request body is missing or too large.")
         return json.loads(self.rfile.read(length).decode("utf-8"))
 
+    def read_json_guide(self) -> dict:
+        length = int(self.headers.get("Content-Length", "0"))
+        if length <= 0 or length > 262144:
+            raise ValueError("Request body is missing or too large.")
+        return json.loads(self.rfile.read(length).decode("utf-8"))
+
     def do_OPTIONS(self) -> None:
         if not self.origin_allowed():
             self.send_json({"error": "Browser origin is not allowed."}, HTTPStatus.FORBIDDEN)
@@ -750,6 +842,29 @@ class Handler(BaseHTTPRequestHandler):
         self.end_headers()
 
     def do_GET(self) -> None:
+        self._dispatch(self._route_get)
+
+    def do_POST(self) -> None:
+        self._dispatch(self._route_post)
+
+    def _dispatch(self, route) -> None:
+        # Last line of defence: any route that raises an unanticipated error
+        # returns a clean JSON 500 instead of dropping the connection with a
+        # bare traceback on the console.  If the response was already partly
+        # written we can no longer send status/headers, so the fallback send is
+        # itself guarded and simply swallowed.
+        try:
+            route()
+        except Exception as exc:  # noqa: BLE001 - intentional catch-all safety net
+            try:
+                self.send_json(
+                    {"error": f"Unexpected server error: {exc}"},
+                    HTTPStatus.INTERNAL_SERVER_ERROR,
+                )
+            except Exception:  # noqa: BLE001 - response already committed
+                pass
+
+    def _route_get(self) -> None:
         parsed = urlparse(self.path)
         if parsed.path == "/api/status":
             if self.require_auth():
@@ -908,7 +1023,7 @@ class Handler(BaseHTTPRequestHandler):
             return
         self.send_json({"error": "Not found."}, HTTPStatus.NOT_FOUND)
 
-    def do_POST(self) -> None:
+    def _route_post(self) -> None:
         if not self.origin_allowed():
             self.send_json({"error": "Browser origin is not allowed."}, HTTPStatus.FORBIDDEN)
             return
@@ -932,8 +1047,105 @@ class Handler(BaseHTTPRequestHandler):
                 process.terminate()
             self.send_json({"status": "stopping"}, HTTPStatus.ACCEPTED)
             return
+        if self.path == "/api/guide":
+            if not _GUIDE_AVAILABLE:
+                self.send_json(
+                    {"error": "Guide module unavailable. Check that allolabs_guide.py is present."},
+                    HTTPStatus.NOT_IMPLEMENTED,
+                )
+                return
+            try:
+                payload = self.read_json_guide()
+                messages = payload.get("messages") or []
+                provider = str(payload.get("provider") or "").strip() or None
+                guide_model = str(payload.get("guideModel") or "").strip() or None
+                app_context = payload.get("appContext") if isinstance(payload.get("appContext"), dict) else None
+                if not isinstance(messages, list):
+                    raise ValueError("messages must be a list.")
+                sanitized: list[dict] = []
+                for m in messages[-40:]:
+                    if not isinstance(m, dict):
+                        continue
+                    role = str(m.get("role", ""))
+                    content = str(m.get("content", ""))
+                    if role not in ("user", "assistant") or not content.strip():
+                        continue
+                    sanitized.append({"role": role, "content": content[:8000]})
+                if not sanitized:
+                    raise ValueError("No valid messages provided.")
+                if sanitized[-1]["role"] != "user":
+                    raise ValueError("Conversation must end with a user message.")
+                # Two-stage context: if the query involves tickers/sectors, inject
+                # the full catalog so Allo only suggests symbols that actually exist.
+                last_user_msg = sanitized[-1]["content"]
+                catalog_block: str | None = None
+                if _GUIDE_AVAILABLE and needs_catalog_context(last_user_msg):
+                    catalog_block = format_catalog_block(
+                        UNIVERSE_CATALOG.get("groups", [])
+                    )
+                llm_messages = inject_app_context(sanitized, app_context, catalog_block)
+                raw = call_guide_ai(
+                    get_guide_system(), llm_messages,
+                    provider=provider, guide_model=guide_model,
+                )
+                reply, mode, run_config = parse_guide_response(raw)
+                self.send_json({"reply": reply, "mode": mode, "runConfig": run_config})
+            except ValueError as exc:
+                self.send_json({"error": str(exc)}, HTTPStatus.BAD_REQUEST)
+            except RuntimeError as exc:
+                self.send_json({"error": str(exc)}, HTTPStatus.SERVICE_UNAVAILABLE)
+            except Exception as exc:
+                self.send_json({"error": f"Guide AI call failed: {exc}"}, HTTPStatus.INTERNAL_SERVER_ERROR)
+            return
+        if self.path == "/api/guide-compact":
+            if not _GUIDE_AVAILABLE:
+                self.send_json(
+                    {"error": "Guide module unavailable."},
+                    HTTPStatus.NOT_IMPLEMENTED,
+                )
+                return
+            try:
+                payload = self.read_json_guide()
+                messages = payload.get("messages") or []
+                provider = str(payload.get("provider") or "").strip() or None
+                guide_model = str(payload.get("guideModel") or "").strip() or None
+                if not isinstance(messages, list) or not messages:
+                    raise ValueError("messages must be a non-empty list.")
+                sanitized = []
+                for m in messages:
+                    if not isinstance(m, dict):
+                        continue
+                    role = str(m.get("role", ""))
+                    content = str(m.get("content", ""))
+                    if role not in ("user", "assistant") or not content.strip():
+                        continue
+                    sanitized.append({"role": role, "content": content[:8000]})
+                if not sanitized:
+                    raise ValueError("No valid messages to compact.")
+                compact_request = sanitized + [{
+                    "role": "user",
+                    "content": "Please produce a compact session summary now.",
+                }]
+                summary = call_guide_ai(
+                    get_compact_system(), compact_request,
+                    provider=provider, guide_model=guide_model,
+                )
+                self.send_json({"summary": summary.strip()})
+            except ValueError as exc:
+                self.send_json({"error": str(exc)}, HTTPStatus.BAD_REQUEST)
+            except RuntimeError as exc:
+                self.send_json({"error": str(exc)}, HTTPStatus.SERVICE_UNAVAILABLE)
+            except Exception as exc:
+                self.send_json({"error": f"Compaction failed: {exc}"}, HTTPStatus.INTERNAL_SERVER_ERROR)
+            return
         self.send_json({"error": "Not found."}, HTTPStatus.NOT_FOUND)
 
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# SECTION: Threaded Server
+# Subclasses ThreadingHTTPServer to attach application state and the company
+# details cache.  SO_EXCLUSIVEADDRUSE prevents port reuse collisions on Windows.
+# ═══════════════════════════════════════════════════════════════════════════════
 
 class RunnerServer(ThreadingHTTPServer):
     allow_reuse_address = False
@@ -950,6 +1162,12 @@ class RunnerServer(ThreadingHTTPServer):
             self.socket.setsockopt(socket.SOL_SOCKET, socket.SO_EXCLUSIVEADDRUSE, 1)
         super().server_bind()
 
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# SECTION: CLI Entry Point
+# Used by scripts/start-dashboard.ps1 (developer/browser mode) and by the
+# desktop/app.py wrapper (production desktop mode, random port + auth token).
+# ═══════════════════════════════════════════════════════════════════════════════
 
 def main() -> int:
     parser = argparse.ArgumentParser(description="Run the constrained AlloLabs browser relay.")

@@ -8,6 +8,12 @@ from urllib.parse import urlparse
 import yfinance as yf
 
 
+# ═══════════════════════════════════════════════════════════════════════════════
+# SECTION: Module Constants
+# Mapping of yfinance info keys → human-readable ratio labels.
+# Only keys present in the yfinance Ticker.get_info() payload are included.
+# ═══════════════════════════════════════════════════════════════════════════════
+
 RATIO_FIELDS = {
     "trailingPE": "P/E (TTM)",
     "priceToBook": "P/B",
@@ -22,6 +28,11 @@ RATIO_FIELDS = {
     "marketCap": "Market Cap",
 }
 
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# SECTION: Internal Helpers
+# Private formatting and URL-extraction utilities used only by fetch_ticker_context.
+# ═══════════════════════════════════════════════════════════════════════════════
 
 def _format_ratio(key: str, value):
     if key in {"returnOnEquity", "netMargins", "earningsGrowth"}:
@@ -51,6 +62,13 @@ def _news_url(item: dict, content: dict) -> str:
             return candidate
     return ""
 
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# SECTION: Public API
+# Single exported function consumed by allolabs.py (AI research prompts),
+# dashboard/company_details.py (subprocess worker), and the dashboard's
+# /api/company endpoint.
+# ═══════════════════════════════════════════════════════════════════════════════
 
 def fetch_ticker_context(ticker: str, max_news: int = 5) -> dict:
     """Return the exact fundamentals and news context supplied to AI research."""
@@ -85,7 +103,11 @@ def fetch_ticker_context(ticker: str, max_news: int = 5) -> dict:
     except Exception:
         raw_news = []
     for item in raw_news[:max_news]:
-        content = item.get("content") or item
+        if not isinstance(item, dict):
+            continue
+        content = item.get("content")
+        if not isinstance(content, dict):
+            content = item
         title = str(content.get("title") or "").strip()
         if not title:
             continue

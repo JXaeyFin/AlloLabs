@@ -39,7 +39,7 @@ if (-not (Test-Path -LiteralPath $python -PathType Leaf)) {
 if ($LASTEXITCODE -ne 0) {
     throw "Could not update pip in the desktop build environment."
 }
-& $python -m pip install -r (Join-Path $root "requirements-desktop.txt")
+& $python -m pip install -r (Join-Path $root "requirements-desktop-win.txt")
 if ($LASTEXITCODE -ne 0) {
     throw "Could not install the AlloLabs desktop build requirements."
 }

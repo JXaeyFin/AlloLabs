@@ -25,11 +25,13 @@ Dependencies: numpy, pandas, scipy, matplotlib, yfinance
 
 import hashlib
 import json
+import logging
 import os
 import re
 import time
 import urllib.error
 import urllib.request
+from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 from typing import Tuple
 
@@ -159,71 +161,104 @@ def env_text(name: str, default: str = "", *, maximum: int = 12000) -> str:
     return value
 
 
-def fetch_market_caps(tickers_list) -> dict:
-    """Return {ticker: float market cap} from yfinance; None for unavailable tickers."""
-    caps = {}
-    for ticker in tickers_list:
-        try:
-            info = yf.Ticker(ticker).get_info() or {}
-            cap = info.get("marketCap")
-            caps[ticker] = float(cap) if cap and float(cap) > 0 else None
-        except Exception:
-            caps[ticker] = None
+def _fetch_single_market_cap(ticker: str):
+    """Return (ticker, market cap or None). Isolated so one failure never aborts the pool."""
+    try:
+        info = yf.Ticker(ticker).get_info() or {}
+        cap = info.get("marketCap")
+        return ticker, (float(cap) if cap and float(cap) > 0 else None)
+    except Exception:
+        return ticker, None
+
+
+def fetch_market_caps(tickers_list, *, max_workers: int = 8) -> dict:
+    """Return {ticker: float market cap} from yfinance; None for unavailable tickers.
+
+    Requests run in a small thread pool so ~hundreds of network calls complete in
+    parallel; per-ticker exceptions are contained and reported as None.
+    """
+    tickers = list(dict.fromkeys(tickers_list))
+    if not tickers:
+        return {}
+    workers = max(1, min(max_workers, len(tickers)))
+    caps: dict = {}
+    with ThreadPoolExecutor(max_workers=workers) as executor:
+        for ticker, cap in executor.map(_fetch_single_market_cap, tickers):
+            caps[ticker] = cap
     return caps
 
 
-def download_close_prices(tickers_list, start, end, *, label: str) -> pd.DataFrame:
-    """Download adjusted closes and retry symbols omitted by a bulk request."""
+def download_close_prices(
+    tickers_list, start, end, *, label: str, retry_pause: float = 0.75
+) -> pd.DataFrame:
+    """Download adjusted closes and retry symbols omitted by a bulk request.
+
+    yfinance's own per-ticker error logging is quieted during the retry sweep and a
+    short pause is inserted between retries so a handful of delisted or renamed
+    symbols do not spam the console or hammer the vendor.
+    """
     requested = list(dict.fromkeys(tickers_list))
-    downloaded = yf.download(
-        requested,
-        start=start,
-        end=end,
-        progress=False,
-        auto_adjust=True,
-    )
-    if "Close" not in downloaded:
-        raise RuntimeError(f"{label} download did not return closing prices.")
+    yf_logger = logging.getLogger("yfinance")
+    previous_level = yf_logger.level
+    yf_logger.setLevel(logging.CRITICAL)
+    try:
+        downloaded = yf.download(
+            requested,
+            start=start,
+            end=end,
+            progress=False,
+            auto_adjust=True,
+        )
+        if "Close" not in downloaded:
+            raise RuntimeError(f"{label} download did not return closing prices.")
 
-    close = downloaded["Close"]
-    if isinstance(close, pd.Series):
-        close = close.to_frame(name=requested[0])
-    close.columns = [str(column) for column in close.columns]
+        close = downloaded["Close"]
+        if isinstance(close, pd.Series):
+            close = close.to_frame(name=requested[0])
+        close.columns = [str(column) for column in close.columns]
 
-    missing = [
-        ticker
-        for ticker in requested
-        if ticker not in close.columns or close[ticker].dropna().empty
-    ]
-    if missing:
-        print(f"  Retrying {len(missing)} omitted {label} ticker(s) individually...")
+        missing = [
+            ticker
+            for ticker in requested
+            if ticker not in close.columns or close[ticker].dropna().empty
+        ]
+        if missing:
+            print(f"  Retrying {len(missing)} omitted {label} ticker(s) individually...")
 
-    unresolved = []
-    for ticker in missing:
-        try:
-            retry = yf.download(
-                [ticker],
-                start=start,
-                end=end,
-                progress=False,
-                auto_adjust=True,
-            )
-            retry_close = retry["Close"]
-            if isinstance(retry_close, pd.DataFrame):
-                if ticker in retry_close.columns:
-                    retry_close = retry_close[ticker]
-                elif len(retry_close.columns) == 1:
-                    retry_close = retry_close.iloc[:, 0]
-            if not isinstance(retry_close, pd.Series) or retry_close.dropna().empty:
+        unresolved = []
+        for attempt_index, ticker in enumerate(missing):
+            if attempt_index:
+                # Brief backoff so individual retries do not hammer the vendor.
+                time.sleep(retry_pause)
+            try:
+                retry = yf.download(
+                    [ticker],
+                    start=start,
+                    end=end,
+                    progress=False,
+                    auto_adjust=True,
+                )
+                retry_close = retry["Close"]
+                if isinstance(retry_close, pd.DataFrame):
+                    if ticker in retry_close.columns:
+                        retry_close = retry_close[ticker]
+                    elif len(retry_close.columns) == 1:
+                        retry_close = retry_close.iloc[:, 0]
+                if not isinstance(retry_close, pd.Series) or retry_close.dropna().empty:
+                    unresolved.append(ticker)
+                    continue
+                close = close.drop(columns=[ticker], errors="ignore")
+                close = close.join(retry_close.rename(ticker), how="outer")
+            except Exception:
                 unresolved.append(ticker)
-                continue
-            close = close.drop(columns=[ticker], errors="ignore")
-            close = close.join(retry_close.rename(ticker), how="outer")
-        except Exception:
-            unresolved.append(ticker)
+    finally:
+        yf_logger.setLevel(previous_level)
 
     if unresolved:
-        print(f"  WARNING: no usable {label} prices for: {', '.join(unresolved)}")
+        print(
+            f"  WARNING: no usable {label} prices for {len(unresolved)} ticker(s): "
+            + ", ".join(unresolved)
+        )
     return close
 
 
@@ -238,14 +273,14 @@ TERMINAL_BANNER = r"""
                     Invest with caution
 """.strip("\n")
 
-# =============================================================================
-# BLOCK 0: UNIVERSE DEFINITION
-# =============================================================================
+# ═══════════════════════════════════════════════════════════════════════════════
+# SECTION: Universe Definition
 # Global large-cap research universe in Yahoo Finance ticker format.
-# Benchmarks are maintained separately from the optimizable universe.
+# Benchmarks are maintained separately from the optimisable universe.
+# ═══════════════════════════════════════════════════════════════════════════════
 
 ASSET_UNIVERSE = [
-    
+
     # ==========================================================
     # 🇺🇸 US CORE (S&P 100 MEGA CAPS)
     # ==========================================================
@@ -317,7 +352,7 @@ ASSET_UNIVERSE = [
     "AZN.L","ULVR.L","SHEL.L","BP.L","HSBA.L",
     "GSK.L","RIO.L","BATS.L","DGE.L","GLEN.L",
     "AAL.L","LSEG.L","NG.L","VOD.L","REL.L",
-    "BAE.L","CPG.L","SMIN.L","IMB.L","CRH.L","LLOY.L","RR.L","SN.L",
+    "BA.L","CPG.L","SMIN.L","IMB.L","CRH","LLOY.L","RR.L","SN.L",
 
     # ==========================================================
     # 🇪🇺 EUROPEAN LARGE CAP EXPOSURE
@@ -336,15 +371,18 @@ ASSET_UNIVERSE = [
     "BHP","MUFG","NVO","SONY","TM","TSM"
 ]
 
-ACTIVE_ASSET_UNIVERSE = (
-    env_ticker_subset("ALLOLABS_ASSET_UNIVERSE_TICKERS")
-    or list(ASSET_UNIVERSE)
-)
-unknown_asset_tickers = sorted(set(ACTIVE_ASSET_UNIVERSE) - set(ASSET_UNIVERSE))
-if unknown_asset_tickers:
+# The dashboard supplies the working universe via ALLOLABS_ASSET_UNIVERSE_TICKERS.
+# ASSET_UNIVERSE above is retained only as the built-in fallback when no override
+# is present; its length is not comparable to the active selection.
+_configured_universe = env_ticker_subset("ALLOLABS_ASSET_UNIVERSE_TICKERS")
+_universe_source = "dashboard selection" if _configured_universe is not None else "built-in default"
+ACTIVE_ASSET_UNIVERSE = _configured_universe or list(ASSET_UNIVERSE)
+_TICKER_RE = re.compile(r'^[A-Z0-9][A-Z0-9.\-]{0,19}$')
+invalid_format_tickers = [t for t in ACTIVE_ASSET_UNIVERSE if not _TICKER_RE.match(t)]
+if invalid_format_tickers:
     raise ValueError(
-        "ALLOLABS_ASSET_UNIVERSE_TICKERS contains tickers outside ASSET_UNIVERSE: "
-        + ", ".join(unknown_asset_tickers)
+        "Selected tickers contain invalid symbols: "
+        + ", ".join(invalid_format_tickers)
     )
 if len(ACTIVE_ASSET_UNIVERSE) < 2:
     raise ValueError("The selected asset universe must contain at least two tickers.")
@@ -353,10 +391,11 @@ if len(ACTIVE_ASSET_UNIVERSE) < 2:
 # U.K., and European indices. Users can customise this list.
 BENCHMARK_TICKERS = ["XIU.TO", "SPY", "QQQ", "ISF.L", "^STOXX50E"]
 
-# =============================================================================
-# BLOCK 1: DATE WINDOW CONFIGURATION
-# =============================================================================
-# USER-FACING KNOBS
+# ═══════════════════════════════════════════════════════════════════════════════
+# SECTION: Date Window Configuration
+# Training and out-of-sample windows; driven by ALLOLABS_TRAINING_YEARS and
+# ALLOLABS_OOS_YEARS environment variables set by the dashboard runner.
+# ═══════════════════════════════════════════════════════════════════════════════
 training_years = env_float(
     "ALLOLABS_TRAINING_YEARS", 1.0, minimum=0.25, maximum=10.0
 )
@@ -392,13 +431,13 @@ if oos_years == 0:
 else:
     print(f"Out-of-sample   : {oos_start.date()} -> {oos_end.date()}  ({oos_years} yr)")
 print(
-    f"Asset universe  : {len(ACTIVE_ASSET_UNIVERSE)} selected "
-    f"of {len(ASSET_UNIVERSE)} configured assets"
+    f"Asset universe  : {len(ACTIVE_ASSET_UNIVERSE)} tickers "
+    f"({_universe_source})"
 )
 
-# =============================================================================
-# BLOCK 2: YFINANCE DATA INGESTION - TRAINING
-# =============================================================================
+# ═══════════════════════════════════════════════════════════════════════════════
+# SECTION: yFinance Data Ingestion — Training Window
+# ═══════════════════════════════════════════════════════════════════════════════
 print("\nDownloading training prices from yfinance...")
 
 raw_train = download_close_prices(
@@ -438,9 +477,11 @@ if len(train_returns) < 20:
 print(f"Clean training universe: {num_assets} assets across "
       f"{len(train_returns)} trading days.")
 
-# =============================================================================
-# BLOCK 3: STATISTICAL FOUNDATIONS
-# =============================================================================
+# ═══════════════════════════════════════════════════════════════════════════════
+# SECTION: Statistical Foundations
+# Annualised mean returns (mu) and covariance matrix (Sigma) from the cleaned
+# training universe; risk-free rate for Sharpe calculations.
+# ═══════════════════════════════════════════════════════════════════════════════
 mu    = train_returns.mean() * 252          # annualised expected return
 Sigma = train_returns.cov()  * 252          # annualised covariance matrix
 
@@ -450,9 +491,10 @@ Sigma = pd.DataFrame(Sigma_values, index=Sigma.index, columns=Sigma.columns)
 
 risk_free_rate = 0.0268   # Hardcoded short-term risk-free rate; update as needed
 
-# =============================================================================
-# BLACK-LITTERMAN + GPT CONFIGURATION
-# =============================================================================
+# ═══════════════════════════════════════════════════════════════════════════════
+# SECTION: Black-Litterman + AI Configuration
+# Tau/delta priors for the BL model and API key routing per provider.
+# ═══════════════════════════════════════════════════════════════════════════════
 black_litterman_tau = 0.05
 black_litterman_delta = 2.5
 
@@ -461,6 +503,7 @@ AI_API_KEY_ENV = {
     "openai": "OPENAI_API_KEY",
     "anthropic": "ANTHROPIC_API_KEY",
     "gemini": "GEMINI_API_KEY",
+    "deepseek": "DEEPSEEK_API_KEY",
 }
 research_provider = env_choice(
     "ALLOLABS_RESEARCH_PROVIDER",
@@ -471,6 +514,7 @@ DEFAULT_RESEARCH_MODELS = {
     "openai": "gpt-5.4",
     "anthropic": "claude-sonnet-4-6",
     "gemini": "gemini-3.5-flash",
+    "deepseek": "deepseek-chat",
 }
 research_model = (
     os.getenv("ALLOLABS_RESEARCH_MODEL")
@@ -498,6 +542,7 @@ DEFAULT_AUDIT_MODELS = {
     "openai": "gpt-5.5",
     "anthropic": "claude-opus-4-8",
     "gemini": "gemini-3.1-pro-preview",
+    "deepseek": "deepseek-reasoner",
 }
 gpt_audit_model = (
     os.getenv("ALLOLABS_GPT_AUDIT_MODEL")
@@ -541,9 +586,10 @@ gpt_audit_status = {
     "adjustedCount": 0,
 }
 
-# =============================================================================
-# BLOCK 4: OBJECTIVE FUNCTIONS
-# =============================================================================
+# ═══════════════════════════════════════════════════════════════════════════════
+# SECTION: Objective Functions & Optimisation Core
+# SLSQP objective callables, Jobson-Korkie test, and restart wrapper.
+# ═══════════════════════════════════════════════════════════════════════════════
 
 def portfolio_performance(
     weights: np.ndarray,
@@ -637,6 +683,23 @@ def extract_gemini_response_text(response_json: dict) -> str:
     ).strip()
     if not text:
         raise RuntimeError("Gemini response contained no text output.")
+    return text
+
+
+def extract_deepseek_response_text(response_json: dict) -> str:
+    """Extract final JSON text from a DeepSeek chat-completions response."""
+    if response_json.get("error"):
+        raise RuntimeError(f"DeepSeek response error: {response_json['error']}")
+    choices = response_json.get("choices") or []
+    if not choices:
+        raise RuntimeError("DeepSeek response contained no choices.")
+    choice = choices[0]
+    finish_reason = choice.get("finish_reason")
+    if finish_reason not in (None, "stop"):
+        raise RuntimeError(f"DeepSeek response stopped with reason: {finish_reason}")
+    text = str((choice.get("message") or {}).get("content") or "").strip()
+    if not text:
+        raise RuntimeError("DeepSeek response contained no output text.")
     return text
 
 
@@ -740,7 +803,7 @@ def ai_views_request(
             },
         }
         extractor = extract_anthropic_response_text
-    else:
+    elif provider == "gemini":
         url = (
             "https://generativelanguage.googleapis.com/v1beta/models/"
             f"{model}:generateContent"
@@ -763,6 +826,24 @@ def ai_views_request(
             },
         }
         extractor = extract_gemini_response_text
+    else:  # deepseek
+        url = "https://api.deepseek.com/chat/completions"
+        headers = {
+            "Authorization": f"Bearer {api_key.strip()}",
+            "Content-Type": "application/json",
+            "User-Agent": "allolabs/1.2",
+        }
+        # DeepSeek exposes JSON mode rather than provider-side JSON Schema.
+        # The prompt already contains the exact schema and explicitly requests JSON.
+        token_limit = 64000 if model == "deepseek-reasoner" else 8192
+        payload = {
+            "model": model,
+            "messages": [{"role": "user", "content": prompt}],
+            "max_tokens": min(max_tokens, token_limit),
+            "response_format": {"type": "json_object"},
+            "stream": False,
+        }
+        extractor = extract_deepseek_response_text
 
     request_body = json.dumps(payload).encode("utf-8")
 
@@ -1369,7 +1450,7 @@ def load_cached_views(path: Path, allowed_tickers, seed_hash: str = "") -> dict:
         elif stored_hash and stored_hash != hashlib.sha256(b"").hexdigest()[:16]:
             # No current thesis but cache was generated with one — flag but don't block.
             print(
-                f"  Warning: cache was generated with a thesis (hash={stored_hash[:8]}…) "
+                f"  WARNING: cache was generated with a thesis (hash={stored_hash[:8]}…) "
                 "but no thesis is active now. Set ALLOLABS_REFRESH_CACHE=1 to regenerate "
                 "without thesis influence."
             )
@@ -1434,7 +1515,20 @@ def apply_black_litterman(mu_prior: np.ndarray, Sigma: np.ndarray, tickers_list)
     )
     unknown_tickers = sorted(set(selected_tickers) - set(tickers_list))
     if unknown_tickers:
-        raise ValueError(f"Black-Litterman subset contains unknown tickers: {unknown_tickers}")
+        # Tickers can drop out of the universe when their price history fails to
+        # download (delistings, renames, vendor outages). Continue with the
+        # tickers that survived rather than aborting the whole run.
+        print(
+            f"  WARNING: {len(unknown_tickers)} research ticker(s) are not in the "
+            "usable training universe and will be skipped: "
+            + ", ".join(unknown_tickers)
+        )
+        selected_tickers = [t for t in selected_tickers if t in set(tickers_list)]
+    if not selected_tickers:
+        raise ValueError(
+            "No Black-Litterman research tickers remain after removing symbols "
+            "without usable price data."
+        )
 
     # Compute a short hash of the current thesis so stale views can be invalidated.
     _raw_thesis = (analyst_seed_prompt or "").strip()
@@ -1743,9 +1837,11 @@ def run_slsqp_with_restarts(
     )
 
 
-# =============================================================================
-# BLOCK 5: CONSTRAINTS AND BOUNDS
-# =============================================================================
+# ═══════════════════════════════════════════════════════════════════════════════
+# SECTION: Constraints & Bounds
+# Per-asset position cap, long-only flag, and optional sector concentration
+# limit, all configurable via environment variables.
+# ═══════════════════════════════════════════════════════════════════════════════
 initial_guess = np.ones(num_assets) / num_assets
 max_position_weight = env_float(
     "ALLOLABS_MAX_POSITION_WEIGHT", 1.0, minimum=0.01, maximum=1.0
@@ -1861,9 +1957,11 @@ print(
     f"regularization {regularization_method} ({regularization_strength:g})."
 )
 
-# =============================================================================
-# BLOCK 6: SLSQP OPTIMISATION
-# =============================================================================
+# ═══════════════════════════════════════════════════════════════════════════════
+# SECTION: SLSQP Optimisation
+# Solves Min-Volatility (convex, used as warm-start) then Max-Sharpe (non-
+# convex, requires multi-start restarts for robustness).
+# ═══════════════════════════════════════════════════════════════════════════════
 print("\nRunning SLSQP optimisation engines...")
 
 # Solve the convex minimum-volatility portfolio first. It is also a stable
@@ -1919,9 +2017,10 @@ res_sharpe, w_sharpe = run_slsqp_with_restarts(
 )
 opt_ret_S, opt_risk_S, opt_sr_S = portfolio_performance(w_sharpe, mu_values, Sigma_values, risk_free_rate)
 
-# =============================================================================
-# BLOCK 7: IN-SAMPLE ALLOCATION TABLE
-# =============================================================================
+# ═══════════════════════════════════════════════════════════════════════════════
+# SECTION: In-Sample Allocation Table
+# Console summary of optimal weights, returns, and Sharpe ratios.
+# ═══════════════════════════════════════════════════════════════════════════════
 print("\n" + "=" * 78)
 # Display configuration: show very small weights with more decimal places
 # `WEIGHT_DISPLAY_DECIMALS` controls how many decimals are shown for percent
@@ -1951,9 +2050,10 @@ print(f"\nIn-sample Max Sharpe  ->  ret {opt_ret_S*100:.2f}%  "
 print(f"In-sample Min Vol     ->  ret {opt_ret_V*100:.2f}%  "
       f"vol {opt_risk_V*100:.2f}%  Sharpe {opt_sr_V:.3f}")
 
-# =============================================================================
-# BLOCK 8: YFINANCE DATA INGESTION - OUT-OF-SAMPLE  (skipped if oos_years = 0)
-# =============================================================================
+# ═══════════════════════════════════════════════════════════════════════════════
+# SECTION: yFinance Data Ingestion — Out-of-Sample Window
+# Skipped entirely when ALLOLABS_OOS_YEARS = 0.
+# ═══════════════════════════════════════════════════════════════════════════════
 if oos_years == 0:
     print("\n[OOS DISABLED]  oos_years = 0 - skipping out-of-sample blocks.")
     master  = None
@@ -2064,9 +2164,11 @@ else:
     print("-" * 62)
     print("-" * 62)
 
-# =============================================================================
-# BLOCK 9: STATISTICAL SIGNIFICANCE - JOBSON-KORKIE (1981)
-# =============================================================================
+# ═══════════════════════════════════════════════════════════════════════════════
+# SECTION: Statistical Significance — Jobson-Korkie (1981)
+# Tests whether the Sharpe ratio difference between two portfolios is
+# statistically significant using the asymptotic Z-test from JK 1981.
+# ═══════════════════════════════════════════════════════════════════════════════
 
 def jobson_korkie_test(
     returns_a: pd.Series,
@@ -2083,9 +2185,16 @@ def jobson_korkie_test(
     exc_b   = returns_b - rf_d
     n       = len(returns_a)
 
-    sr_a    = exc_a.mean() / exc_a.std() * np.sqrt(periods)
-    sr_b    = exc_b.mean() / exc_b.std() * np.sqrt(periods)
+    std_a   = float(exc_a.std())
+    std_b   = float(exc_b.std())
+    sr_a    = exc_a.mean() / std_a * np.sqrt(periods) if std_a > 1e-12 else 0.0
+    sr_b    = exc_b.mean() / std_b * np.sqrt(periods) if std_b > 1e-12 else 0.0
+    # Guard against constant or single-observation series that make the test undefined.
+    if n < 2 or std_a <= 1e-12 or std_b <= 1e-12:
+        return 0.0, 1.0, float(sr_a), float(sr_b)
     rho     = np.corrcoef(returns_a, returns_b)[0, 1]
+    if not np.isfinite(rho):
+        rho = 0.0
 
     var_jk  = (1 / n) * (
         2 - 2 * rho
@@ -2117,9 +2226,10 @@ if master is not None:
         print(f"    Sharpe (portfolio): {sra:.3f}  |  Sharpe (benchmark): {srb:.3f}")
         print(f"    Z-statistic: {z:.3f}  |  P-value: {p:.4f}  ({sig} at 95%)")
 
-# =============================================================================
-# BLOCK 10: VISUALISATION - EQUITY CURVES  (skipped if oos_years = 0)
-# =============================================================================
+# ═══════════════════════════════════════════════════════════════════════════════
+# SECTION: Visualisation — Out-of-Sample Equity Curves
+# Produces portfolio_vs_markets_oos.png; skipped when oos_years = 0.
+# ═══════════════════════════════════════════════════════════════════════════════
 
 def annotate_extremes(series_dict: dict, colors_dict: dict) -> None:
     """Annotates global highs and lows with basic collision avoidance."""

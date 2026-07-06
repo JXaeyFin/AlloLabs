@@ -2,109 +2,123 @@
 
 from __future__ import annotations
 
-import ast
 from pathlib import Path
 
+try:
+    from dashboard.market_tickers import (
+        CANADA_RESEARCH_TICKERS,
+        CANADA_TSX_ALL,
+        CURATED_RESEARCH_TICKERS,
+        EUROPE_STOXX_ALL,
+        EUROSTOXX50,
+        FTSE100,
+        GLOBAL_ADRS,
+        INDEX_LEADERS_TICKERS,
+        SP500_TOP100,
+        TSX60,
+        UK_FTSE_ALL,
+        US_NASDAQ_EXT,
+        US_SP500,
+    )
+except ModuleNotFoundError:  # Direct execution or relative import
+    from market_tickers import (  # type: ignore[no-redef]
+        CANADA_RESEARCH_TICKERS,
+        CANADA_TSX_ALL,
+        CURATED_RESEARCH_TICKERS,
+        EUROPE_STOXX_ALL,
+        EUROSTOXX50,
+        FTSE100,
+        GLOBAL_ADRS,
+        INDEX_LEADERS_TICKERS,
+        SP500_TOP100,
+        TSX60,
+        UK_FTSE_ALL,
+        US_NASDAQ_EXT,
+        US_SP500,
+    )
 
-CURATED_RESEARCH_TICKERS = [
-    "AAPL", "MSFT", "NVDA", "AMZN", "GOOGL", "META", "AVGO", "LLY",
-    "JPM", "XOM", "COST", "ISRG", "RY.TO", "TD.TO", "ENB.TO", "CNQ.TO",
-    "BAM.TO", "MFC.TO", "FTS.TO", "CNR.TO", "CP.TO", "SHOP.TO", "CSU.TO",
-    "AEM.TO", "NTR.TO", "AZN.L", "SHEL.L", "HSBA.L", "ULVR.L", "LSEG.L",
-    "ASML.AS", "SAP.DE", "SIE.DE", "MC.PA", "BNP.PA", "NESN.SW",
-    "NOVN.SW", "RHHBY", "UBSG.SW",
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# SECTION: Full Market Groups
+# Six mutually-exclusive market segments that together form the browseable
+# universe.  Each ticker appears in exactly one group.
+# ═══════════════════════════════════════════════════════════════════════════════
+
+_GROUPS: list[dict] = [
+    {
+        "id": "us-large-cap",
+        "label": "S&P 500 & U.S. large cap",
+        "shortLabel": "S&P 500 / NYSE",
+        "description": "Full S&P 500 plus notable S&P 400 mid-caps and NYSE-listed large caps.",
+        "tickers": US_SP500,
+    },
+    {
+        "id": "us-growth",
+        "label": "NASDAQ Extended",
+        "shortLabel": "NASDAQ / Growth",
+        "description": "High-growth NASDAQ-listed companies beyond the S&P 500 — cloud, fintech, EV, and biotech.",
+        "tickers": US_NASDAQ_EXT,
+    },
+    {
+        "id": "canada",
+        "label": "Canada — TSX",
+        "shortLabel": "Canada (TSX)",
+        "description": "TSX 60 blue chips plus TSX Composite leaders across energy, mining, financials, and tech.",
+        "tickers": CANADA_TSX_ALL,
+    },
+    {
+        "id": "london",
+        "label": "United Kingdom — FTSE",
+        "shortLabel": "UK (LSE)",
+        "description": "FTSE 100 constituents and selected FTSE 250 names.",
+        "tickers": UK_FTSE_ALL,
+    },
+    {
+        "id": "europe",
+        "label": "Europe — STOXX 600",
+        "shortLabel": "Europe",
+        "description": "EuroStoxx 50 plus STOXX 600 coverage: Germany, France, Netherlands, Switzerland, Italy, Spain, and Nordics.",
+        "tickers": EUROPE_STOXX_ALL,
+    },
+    {
+        "id": "global-adrs",
+        "label": "Global ADRs",
+        "shortLabel": "Global ADRs",
+        "description": "International market leaders trading as U.S.-listed ADRs — Japan, Korea, Taiwan, China, India, Brazil, and Australia.",
+        "tickers": GLOBAL_ADRS,
+    },
 ]
 
-CANADA_RESEARCH_TICKERS = [
-    "RY.TO", "TD.TO", "BMO.TO", "BNS.TO", "NA.TO", "CM.TO",
-    "ENB.TO", "TRP.TO", "SU.TO", "CNQ.TO", "CVE.TO", "TOU.TO",
-    "POW.TO", "SLF.TO", "MFC.TO", "FFH.TO", "BAM.TO", "BN.TO",
-    "BIP-UN.TO", "FTS.TO", "EMA.TO", "PPL.TO", "TRI.TO", "OTEX.TO",
-    "CSU.TO", "WCN.TO", "WSP.TO", "CNR.TO", "CP.TO", "ATD.TO",
-    "DOL.TO", "QSR.TO", "MRU.TO", "SHOP.TO", "GIB-A.TO", "WN.TO",
-    "WPM.TO", "FNV.TO", "AEM.TO", "ABX.TO", "TECK-B.TO", "NTR.TO",
-    "FM.TO", "CCO.TO", "BCE.TO", "T.TO", "RCI-B.TO", "CLS.TO",
-    "GWO.TO", "IFC.TO", "IMO.TO",
-]
+# Flattened ticker list (used to build SUPPORTED_TICKERS in server.py)
+ALL_UNIVERSE_TICKERS: list[str] = [t for group in _GROUPS for t in group["tickers"]]
 
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# SECTION: Legacy AST Loader (kept for backward compatibility with any external
+# tooling that calls load_asset_universe directly)
+# ═══════════════════════════════════════════════════════════════════════════════
 
 def load_asset_universe(script_path: Path) -> list[str]:
-    """Read the pipeline's literal asset list without importing and executing it."""
-    tree = ast.parse(script_path.read_text(encoding="utf-8-sig"))
-    assignment = next(
-        node
-        for node in tree.body
-        if isinstance(node, ast.Assign)
-        and any(
-            isinstance(target, ast.Name) and target.id == "ASSET_UNIVERSE"
-            for target in node.targets
-        )
-    )
-    tickers = ast.literal_eval(assignment.value)
-    if not isinstance(tickers, list) or not all(isinstance(item, str) for item in tickers):
-        raise ValueError("ASSET_UNIVERSE must be a literal list of ticker symbols.")
-    return tickers
+    """Return the full browseable ticker list (no longer parses allolabs.py)."""
+    return list(ALL_UNIVERSE_TICKERS)
 
 
-def _slice(tickers: list[str], first: str, following: str | None) -> list[str]:
-    start = tickers.index(first)
-    end = tickers.index(following) if following else len(tickers)
-    return tickers[start:end]
+# ═══════════════════════════════════════════════════════════════════════════════
+# SECTION: Catalog Builder
+# ═══════════════════════════════════════════════════════════════════════════════
 
-
-def universe_catalog(script_path: Path) -> dict:
-    """Return every supported ticker grouped by its market coverage."""
-    tickers = load_asset_universe(script_path)
-    groups = [
-        {
-            "id": "us-large-cap",
-            "label": "S&P 100 & U.S. large cap",
-            "shortLabel": "S&P 100 / U.S.",
-            "description": "U.S. core and mega-cap coverage, anchored in S&P 100 names.",
-            "tickers": _slice(tickers, "AAPL", "ABNB"),
-        },
-        {
-            "id": "us-growth",
-            "label": "Nasdaq & U.S. growth",
-            "shortLabel": "Nasdaq / Growth",
-            "description": "Growth, technology, healthcare, consumer, industrial and utility extensions.",
-            "tickers": _slice(tickers, "ABNB", "RY.TO"),
-        },
-        {
-            "id": "canada",
-            "label": "Canada large cap",
-            "shortLabel": "Canada",
-            "description": "Canadian financials, energy, industrial, defensive and growth leaders.",
-            "tickers": _slice(tickers, "RY.TO", "AZN.L"),
-        },
-        {
-            "id": "london",
-            "label": "FTSE 100 / London",
-            "shortLabel": "FTSE / London",
-            "description": "London-listed global companies represented in the research catalog.",
-            "tickers": _slice(tickers, "AZN.L", "ALV.DE"),
-        },
-        {
-            "id": "europe",
-            "label": "Euro STOXX & Europe",
-            "shortLabel": "Europe",
-            "description": "Large-cap listings across the Eurozone and Switzerland.",
-            "tickers": _slice(tickers, "ALV.DE", "BHP"),
-        },
-        {
-            "id": "global-adrs",
-            "label": "Global ADR leaders",
-            "shortLabel": "Global ADRs",
-            "description": "International leaders represented through U.S.-traded securities.",
-            "tickers": _slice(tickers, "BHP", None),
-        },
-    ]
-    flattened = [ticker for group in groups for ticker in group["tickers"]]
-    if flattened != tickers:
-        raise ValueError("Universe market grouping must preserve every asset exactly once.")
+def universe_catalog(script_path: Path | None = None) -> dict:
+    """Return every supported ticker grouped by market, plus preset selections."""
+    all_tickers = ALL_UNIVERSE_TICKERS
     return {
-        "groups": groups,
+        "groups": _GROUPS,
         "presets": [
+            {
+                "id": "index-leaders",
+                "label": "Index leaders",
+                "description": "S&P 500 top 100, TSX 60, FTSE 100, EuroStoxx 50 — the benchmark core.",
+                "tickers": INDEX_LEADERS_TICKERS,
+            },
             {
                 "id": "curated",
                 "label": "Curated essentials",
@@ -121,10 +135,10 @@ def universe_catalog(script_path: Path) -> dict:
                 "id": "full",
                 "label": "Full catalog",
                 "description": "Every supported security across all markets.",
-                "tickers": tickers,
+                "tickers": all_tickers,
             },
         ],
-        "tickerCount": len(tickers),
+        "tickerCount": len(all_tickers),
     }
 
 

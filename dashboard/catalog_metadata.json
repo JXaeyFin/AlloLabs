@@ -1,0 +1,6631 @@
+{
+ "AAPL": {
+  "name": "Apple Inc.",
+  "sector": "Technology",
+  "industry": "Consumer Electronics",
+  "country": "United States",
+  "cap": "mega"
+ },
+ "MSFT": {
+  "name": "Microsoft Corporation",
+  "sector": "Technology",
+  "industry": "Software - Infrastructure",
+  "country": "United States",
+  "cap": "mega"
+ },
+ "NVDA": {
+  "name": "NVIDIA Corporation",
+  "sector": "Technology",
+  "industry": "Semiconductors",
+  "country": "United States",
+  "cap": "mega"
+ },
+ "AVGO": {
+  "name": "Broadcom Inc.",
+  "sector": "Technology",
+  "industry": "Semiconductors",
+  "country": "United States",
+  "cap": "mega"
+ },
+ "ORCL": {
+  "name": "Oracle Corporation",
+  "sector": "Technology",
+  "industry": "Software - Infrastructure",
+  "country": "United States",
+  "cap": "mega"
+ },
+ "CSCO": {
+  "name": "Cisco Systems, Inc.",
+  "sector": "Technology",
+  "industry": "Communication Equipment",
+  "country": "United States",
+  "cap": "mega"
+ },
+ "ADBE": {
+  "name": "Adobe Inc.",
+  "sector": "Technology",
+  "industry": "Software - Application",
+  "country": "United States",
+  "cap": "large"
+ },
+ "ACN": {
+  "name": "Accenture plc",
+  "sector": "Technology",
+  "industry": "Information Technology Services",
+  "country": "Ireland",
+  "cap": "large"
+ },
+ "INTU": {
+  "name": "Intuit Inc.",
+  "sector": "Technology",
+  "industry": "Software - Application",
+  "country": "United States",
+  "cap": "large"
+ },
+ "IBM": {
+  "name": "International Business Machines Corporation",
+  "sector": "Technology",
+  "industry": "Information Technology Services",
+  "country": "United States",
+  "cap": "mega"
+ },
+ "QCOM": {
+  "name": "QUALCOMM Incorporated",
+  "sector": "Technology",
+  "industry": "Semiconductors",
+  "country": "United States",
+  "cap": "large"
+ },
+ "AMD": {
+  "name": "Advanced Micro Devices, Inc.",
+  "sector": "Technology",
+  "industry": "Semiconductors",
+  "country": "United States",
+  "cap": "mega"
+ },
+ "TXN": {
+  "name": "Texas Instruments Incorporated",
+  "sector": "Technology",
+  "industry": "Semiconductors",
+  "country": "United States",
+  "cap": "mega"
+ },
+ "NOW": {
+  "name": "ServiceNow, Inc.",
+  "sector": "Technology",
+  "industry": "Software - Application",
+  "country": "United States",
+  "cap": "large"
+ },
+ "AMAT": {
+  "name": "Applied Materials, Inc.",
+  "sector": "Technology",
+  "industry": "Semiconductor Equipment & Materials",
+  "country": "United States",
+  "cap": "mega"
+ },
+ "ADI": {
+  "name": "Analog Devices, Inc.",
+  "sector": "Technology",
+  "industry": "Semiconductors",
+  "country": "United States",
+  "cap": "large"
+ },
+ "LRCX": {
+  "name": "Lam Research Corporation",
+  "sector": "Technology",
+  "industry": "Semiconductor Equipment & Materials",
+  "country": "United States",
+  "cap": "mega"
+ },
+ "KLAC": {
+  "name": "KLA Corporation",
+  "sector": "Technology",
+  "industry": "Semiconductor Equipment & Materials",
+  "country": "United States",
+  "cap": "mega"
+ },
+ "MU": {
+  "name": "Micron Technology, Inc.",
+  "sector": "Technology",
+  "industry": "Semiconductors",
+  "country": "United States",
+  "cap": "mega"
+ },
+ "MRVL": {
+  "name": "Marvell Technology, Inc.",
+  "sector": "Technology",
+  "industry": "Semiconductors",
+  "country": "United States",
+  "cap": "mega"
+ },
+ "CDNS": {
+  "name": "Cadence Design Systems, Inc.",
+  "sector": "Technology",
+  "industry": "Software - Application",
+  "country": "United States",
+  "cap": "large"
+ },
+ "SNPS": {
+  "name": "Synopsys, Inc.",
+  "sector": "Technology",
+  "industry": "Software - Infrastructure",
+  "country": "United States",
+  "cap": "large"
+ },
+ "FTNT": {
+  "name": "Fortinet, Inc.",
+  "sector": "Technology",
+  "industry": "Software - Infrastructure",
+  "country": "United States",
+  "cap": "large"
+ },
+ "PANW": {
+  "name": "Palo Alto Networks, Inc.",
+  "sector": "Technology",
+  "industry": "Software - Infrastructure",
+  "country": "United States",
+  "cap": "mega"
+ },
+ "CRWD": {
+  "name": "CrowdStrike Holdings, Inc.",
+  "sector": "Technology",
+  "industry": "Software - Infrastructure",
+  "country": "United States",
+  "cap": "large"
+ },
+ "WDAY": {
+  "name": "Workday, Inc.",
+  "sector": "Technology",
+  "industry": "Software - Application",
+  "country": "United States",
+  "cap": "large"
+ },
+ "INTC": {
+  "name": "Intel Corporation",
+  "sector": "Technology",
+  "industry": "Semiconductors",
+  "country": "United States",
+  "cap": "mega"
+ },
+ "STX": {
+  "name": "Seagate Technology Holdings plc",
+  "sector": "Technology",
+  "industry": "Computer Hardware",
+  "country": "Singapore",
+  "cap": "large"
+ },
+ "AKAM": {
+  "name": "Akamai Technologies, Inc.",
+  "sector": "Technology",
+  "industry": "Software - Infrastructure",
+  "country": "United States",
+  "cap": "large"
+ },
+ "GEN": {
+  "name": "Gen Digital Inc.",
+  "sector": "Technology",
+  "industry": "Software - Infrastructure",
+  "country": "United States",
+  "cap": "large"
+ },
+ "MSI": {
+  "name": "Motorola Solutions, Inc.",
+  "sector": "Technology",
+  "industry": "Communication Equipment",
+  "country": "United States",
+  "cap": "large"
+ },
+ "ZBRA": {
+  "name": "Zebra Technologies Corporation",
+  "sector": "Technology",
+  "industry": "Communication Equipment",
+  "country": "United States",
+  "cap": "large"
+ },
+ "TRMB": {
+  "name": "Trimble Inc.",
+  "sector": "Technology",
+  "industry": "Scientific & Technical Instruments",
+  "country": "United States",
+  "cap": "large"
+ },
+ "TER": {
+  "name": "Teradyne, Inc.",
+  "sector": "Technology",
+  "industry": "Semiconductor Equipment & Materials",
+  "country": "United States",
+  "cap": "large"
+ },
+ "NTAP": {
+  "name": "NetApp, Inc.",
+  "sector": "Technology",
+  "industry": "Software - Infrastructure",
+  "country": "United States",
+  "cap": "large"
+ },
+ "SWKS": {
+  "name": "Skyworks Solutions, Inc.",
+  "sector": "Technology",
+  "industry": "Semiconductors",
+  "country": "United States",
+  "cap": "mid"
+ },
+ "QRVO": {
+  "name": "Qorvo, Inc.",
+  "sector": "Technology",
+  "industry": "Semiconductors",
+  "country": "United States",
+  "cap": "mid"
+ },
+ "KEYS": {
+  "name": "Keysight Technologies, Inc.",
+  "sector": "Technology",
+  "industry": "Scientific & Technical Instruments",
+  "country": "United States",
+  "cap": "large"
+ },
+ "EPAM": {
+  "name": "EPAM Systems, Inc.",
+  "sector": "Technology",
+  "industry": "Information Technology Services",
+  "country": "United States",
+  "cap": "mid"
+ },
+ "DT": {
+  "name": "Dynatrace, Inc.",
+  "sector": "Technology",
+  "industry": "Software - Application",
+  "country": "United States",
+  "cap": "large"
+ },
+ "GDDY": {
+  "name": "GoDaddy Inc.",
+  "sector": "Technology",
+  "industry": "Software - Infrastructure",
+  "country": "United States",
+  "cap": "large"
+ },
+ "IT": {
+  "name": "Gartner, Inc.",
+  "sector": "Technology",
+  "industry": "Information Technology Services",
+  "country": "United States",
+  "cap": "mid"
+ },
+ "LDOS": {
+  "name": "Leidos Holdings, Inc.",
+  "sector": "Technology",
+  "industry": "Information Technology Services",
+  "country": "United States",
+  "cap": "large"
+ },
+ "PAYC": {
+  "name": "Paycom Software, Inc.",
+  "sector": "Technology",
+  "industry": "Software - Application",
+  "country": "United States",
+  "cap": "mid"
+ },
+ "TYL": {
+  "name": "Tyler Technologies, Inc.",
+  "sector": "Technology",
+  "industry": "Software - Application",
+  "country": "United States",
+  "cap": "large"
+ },
+ "WEX": {
+  "name": "WEX Inc.",
+  "sector": "Technology",
+  "industry": "Software - Infrastructure",
+  "country": "United States",
+  "cap": "mid"
+ },
+ "ANET": {
+  "name": "Arista Networks, Inc.",
+  "sector": "Technology",
+  "industry": "Computer Hardware",
+  "country": "United States",
+  "cap": "mega"
+ },
+ "SMCI": {
+  "name": "Super Micro Computer, Inc.",
+  "sector": "Technology",
+  "industry": "Computer Hardware",
+  "country": "United States",
+  "cap": "large"
+ },
+ "FFIV": {
+  "name": "F5, Inc.",
+  "sector": "Technology",
+  "industry": "Software - Infrastructure",
+  "country": "United States",
+  "cap": "large"
+ },
+ "HPQ": {
+  "name": "HP Inc.",
+  "sector": "Technology",
+  "industry": "Computer Hardware",
+  "country": "United States",
+  "cap": "large"
+ },
+ "HPE": {
+  "name": "Hewlett Packard Enterprise Company",
+  "sector": "Technology",
+  "industry": "Communication Equipment",
+  "country": "United States",
+  "cap": "large"
+ },
+ "GLW": {
+  "name": "Corning Incorporated",
+  "sector": "Technology",
+  "industry": "Electronic Components",
+  "country": "United States",
+  "cap": "large"
+ },
+ "FSLR": {
+  "name": "First Solar, Inc.",
+  "sector": "Technology",
+  "industry": "Solar",
+  "country": "United States",
+  "cap": "large"
+ },
+ "META": {
+  "name": "Meta Platforms, Inc.",
+  "sector": "Communication Services",
+  "industry": "Internet Content & Information",
+  "country": "United States",
+  "cap": "mega"
+ },
+ "GOOGL": {
+  "name": "Alphabet Inc.",
+  "sector": "Communication Services",
+  "industry": "Internet Content & Information",
+  "country": "United States",
+  "cap": "mega"
+ },
+ "GOOG": {
+  "name": "Alphabet Inc.",
+  "sector": "Communication Services",
+  "industry": "Internet Content & Information",
+  "country": "United States",
+  "cap": "mega"
+ },
+ "NFLX": {
+  "name": "Netflix, Inc.",
+  "sector": "Communication Services",
+  "industry": "Entertainment",
+  "country": "United States",
+  "cap": "mega"
+ },
+ "CMCSA": {
+  "name": "Comcast Corporation",
+  "sector": "Communication Services",
+  "industry": "Telecom Services",
+  "country": "United States",
+  "cap": "large"
+ },
+ "TMUS": {
+  "name": "T-Mobile US, Inc.",
+  "sector": "Communication Services",
+  "industry": "Telecom Services",
+  "country": "United States",
+  "cap": "large"
+ },
+ "T": {
+  "name": "AT&T Inc.",
+  "sector": "Communication Services",
+  "industry": "Telecom Services",
+  "country": "United States",
+  "cap": "large"
+ },
+ "VZ": {
+  "name": "Verizon Communications Inc.",
+  "sector": "Communication Services",
+  "industry": "Telecom Services",
+  "country": "United States",
+  "cap": "large"
+ },
+ "DIS": {
+  "name": "The Walt Disney Company",
+  "sector": "Communication Services",
+  "industry": "Entertainment",
+  "country": "United States",
+  "cap": "large"
+ },
+ "CHTR": {
+  "name": "Charter Communications, Inc.",
+  "sector": "Communication Services",
+  "industry": "Telecom Services",
+  "country": "United States",
+  "cap": "large"
+ },
+ "WBD": {
+  "name": "Warner Bros. Discovery, Inc.",
+  "sector": "Communication Services",
+  "industry": "Entertainment",
+  "country": "United States",
+  "cap": "large"
+ },
+ "EA": {
+  "name": "Electronic Arts Inc.",
+  "sector": "Communication Services",
+  "industry": "Electronic Gaming & Multimedia",
+  "country": "United States",
+  "cap": "large"
+ },
+ "TTWO": {
+  "name": "Take-Two Interactive Software, Inc.",
+  "sector": "Communication Services",
+  "industry": "Electronic Gaming & Multimedia",
+  "country": "United States",
+  "cap": "large"
+ },
+ "OMC": {
+  "name": "Omnicom Group Inc.",
+  "sector": "Communication Services",
+  "industry": "Advertising Agencies",
+  "country": "United States",
+  "cap": "large"
+ },
+ "PSKY": {
+  "name": "Paramount Skydance Corporation",
+  "sector": "Communication Services",
+  "industry": "Entertainment",
+  "country": "United States",
+  "cap": "large"
+ },
+ "MTCH": {
+  "name": "Match Group, Inc.",
+  "sector": "Communication Services",
+  "industry": "Internet Content & Information",
+  "country": "United States",
+  "cap": "mid"
+ },
+ "AMZN": {
+  "name": "Amazon.com, Inc.",
+  "sector": "Consumer Cyclical",
+  "industry": "Internet Retail",
+  "country": "United States",
+  "cap": "mega"
+ },
+ "TSLA": {
+  "name": "Tesla, Inc.",
+  "sector": "Consumer Cyclical",
+  "industry": "Auto Manufacturers",
+  "country": "United States",
+  "cap": "mega"
+ },
+ "HD": {
+  "name": "The Home Depot, Inc.",
+  "sector": "Consumer Cyclical",
+  "industry": "Home Improvement Retail",
+  "country": "United States",
+  "cap": "mega"
+ },
+ "MCD": {
+  "name": "McDonald's Corporation",
+  "sector": "Consumer Cyclical",
+  "industry": "Restaurants",
+  "country": "United States",
+  "cap": "large"
+ },
+ "NKE": {
+  "name": "NIKE, Inc.",
+  "sector": "Consumer Cyclical",
+  "industry": "Footwear & Accessories",
+  "country": "United States",
+  "cap": "large"
+ },
+ "SBUX": {
+  "name": "Starbucks Corporation",
+  "sector": "Consumer Cyclical",
+  "industry": "Restaurants",
+  "country": "United States",
+  "cap": "large"
+ },
+ "LOW": {
+  "name": "Lowe's Companies, Inc.",
+  "sector": "Consumer Cyclical",
+  "industry": "Home Improvement Retail",
+  "country": "United States",
+  "cap": "large"
+ },
+ "BKNG": {
+  "name": "Booking Holdings Inc.",
+  "sector": "Consumer Cyclical",
+  "industry": "Travel Services",
+  "country": "United States",
+  "cap": "large"
+ },
+ "TJX": {
+  "name": "The TJX Companies, Inc.",
+  "sector": "Consumer Cyclical",
+  "industry": "Apparel Retail",
+  "country": "United States",
+  "cap": "large"
+ },
+ "ORLY": {
+  "name": "O'Reilly Automotive, Inc.",
+  "sector": "Consumer Cyclical",
+  "industry": "Auto Parts",
+  "country": "United States",
+  "cap": "large"
+ },
+ "MAR": {
+  "name": "Marriott International, Inc.",
+  "sector": "Consumer Cyclical",
+  "industry": "Lodging",
+  "country": "United States",
+  "cap": "large"
+ },
+ "AZO": {
+  "name": "AutoZone, Inc.",
+  "sector": "Consumer Cyclical",
+  "industry": "Auto Parts",
+  "country": "United States",
+  "cap": "large"
+ },
+ "GM": {
+  "name": "General Motors Company",
+  "sector": "Consumer Cyclical",
+  "industry": "Auto Manufacturers",
+  "country": "United States",
+  "cap": "large"
+ },
+ "F": {
+  "name": "Ford Motor Company",
+  "sector": "Consumer Cyclical",
+  "industry": "Auto Manufacturers",
+  "country": "United States",
+  "cap": "large"
+ },
+ "HLT": {
+  "name": "Hilton Worldwide Holdings Inc.",
+  "sector": "Consumer Cyclical",
+  "industry": "Lodging",
+  "country": "United States",
+  "cap": "large"
+ },
+ "CMG": {
+  "name": "Chipotle Mexican Grill, Inc.",
+  "sector": "Consumer Cyclical",
+  "industry": "Restaurants",
+  "country": "United States",
+  "cap": "large"
+ },
+ "EBAY": {
+  "name": "eBay Inc.",
+  "sector": "Consumer Cyclical",
+  "industry": "Internet Retail",
+  "country": "United States",
+  "cap": "large"
+ },
+ "ABNB": {
+  "name": "Airbnb, Inc.",
+  "sector": "Consumer Cyclical",
+  "industry": "Travel Services",
+  "country": "United States",
+  "cap": "large"
+ },
+ "TSCO": {
+  "name": "Tractor Supply Company",
+  "sector": "Consumer Cyclical",
+  "industry": "Specialty Retail",
+  "country": "United States",
+  "cap": "large"
+ },
+ "YUM": {
+  "name": "Yum! Brands, Inc.",
+  "sector": "Consumer Cyclical",
+  "industry": "Restaurants",
+  "country": "United States",
+  "cap": "large"
+ },
+ "DRI": {
+  "name": "Darden Restaurants, Inc.",
+  "sector": "Consumer Cyclical",
+  "industry": "Restaurants",
+  "country": "United States",
+  "cap": "large"
+ },
+ "PHM": {
+  "name": "PulteGroup, Inc.",
+  "sector": "Consumer Cyclical",
+  "industry": "Residential Construction",
+  "country": "United States",
+  "cap": "large"
+ },
+ "LEN": {
+  "name": "Lennar Corporation",
+  "sector": "Consumer Cyclical",
+  "industry": "Residential Construction",
+  "country": "United States",
+  "cap": "large"
+ },
+ "NVR": {
+  "name": "NVR, Inc.",
+  "sector": "Consumer Cyclical",
+  "industry": "Residential Construction",
+  "country": "United States",
+  "cap": "large"
+ },
+ "POOL": {
+  "name": "Pool Corporation",
+  "sector": "Industrials",
+  "industry": "Industrial Distribution",
+  "country": "United States",
+  "cap": "mid"
+ },
+ "RCL": {
+  "name": "Royal Caribbean Cruises Ltd.",
+  "sector": "Consumer Cyclical",
+  "industry": "Travel Services",
+  "country": "United States",
+  "cap": "large"
+ },
+ "NCLH": {
+  "name": "Norwegian Cruise Line Holdings Ltd.",
+  "sector": "Consumer Cyclical",
+  "industry": "Travel Services",
+  "country": "United States",
+  "cap": "mid"
+ },
+ "LVS": {
+  "name": "Las Vegas Sands Corp.",
+  "sector": "Consumer Cyclical",
+  "industry": "Resorts & Casinos",
+  "country": "United States",
+  "cap": "large"
+ },
+ "CZR": {
+  "name": "Caesars Entertainment, Inc.",
+  "sector": "Consumer Cyclical",
+  "industry": "Resorts & Casinos",
+  "country": "United States",
+  "cap": "mid"
+ },
+ "PVH": {
+  "name": "PVH Corp.",
+  "sector": "Consumer Cyclical",
+  "industry": "Apparel Manufacturing",
+  "country": "United States",
+  "cap": "mid"
+ },
+ "RL": {
+  "name": "Ralph Lauren Corporation",
+  "sector": "Consumer Cyclical",
+  "industry": "Apparel Manufacturing",
+  "country": "United States",
+  "cap": "large"
+ },
+ "ULTA": {
+  "name": "Ulta Beauty, Inc.",
+  "sector": "Consumer Cyclical",
+  "industry": "Specialty Retail",
+  "country": "United States",
+  "cap": "large"
+ },
+ "DASH": {
+  "name": "DoorDash, Inc.",
+  "sector": "Consumer Cyclical",
+  "industry": "Internet Retail",
+  "country": "United States",
+  "cap": "large"
+ },
+ "GPC": {
+  "name": "Genuine Parts Company",
+  "sector": "Consumer Cyclical",
+  "industry": "Auto Parts",
+  "country": "United States",
+  "cap": "large"
+ },
+ "DHI": {
+  "name": "D.R. Horton, Inc.",
+  "sector": "Consumer Cyclical",
+  "industry": "Residential Construction",
+  "country": "United States",
+  "cap": "large"
+ },
+ "MHK": {
+  "name": "Mohawk Industries, Inc.",
+  "sector": "Consumer Cyclical",
+  "industry": "Furnishings, Fixtures & Appliances",
+  "country": "United States",
+  "cap": "mid"
+ },
+ "BWA": {
+  "name": "BorgWarner Inc.",
+  "sector": "Consumer Cyclical",
+  "industry": "Auto Parts",
+  "country": "United States",
+  "cap": "large"
+ },
+ "LKQ": {
+  "name": "LKQ Corporation",
+  "sector": "Consumer Cyclical",
+  "industry": "Auto Parts",
+  "country": "United States",
+  "cap": "mid"
+ },
+ "DPZ": {
+  "name": "Domino's Pizza, Inc.",
+  "sector": "Consumer Cyclical",
+  "industry": "Restaurants",
+  "country": "United States",
+  "cap": "large"
+ },
+ "BBWI": {
+  "name": "Bath & Body Works, Inc.",
+  "sector": "Consumer Cyclical",
+  "industry": "Specialty Retail",
+  "country": "United States",
+  "cap": "mid"
+ },
+ "WSM": {
+  "name": "Williams-Sonoma, Inc.",
+  "sector": "Consumer Cyclical",
+  "industry": "Specialty Retail",
+  "country": "United States",
+  "cap": "large"
+ },
+ "WMT": {
+  "name": "Walmart Inc.",
+  "sector": "Consumer Defensive",
+  "industry": "Discount Stores",
+  "country": "United States",
+  "cap": "mega"
+ },
+ "COST": {
+  "name": "Costco Wholesale Corporation",
+  "sector": "Consumer Defensive",
+  "industry": "Discount Stores",
+  "country": "United States",
+  "cap": "mega"
+ },
+ "KO": {
+  "name": "The Coca-Cola Company",
+  "sector": "Consumer Defensive",
+  "industry": "Beverages - Non-Alcoholic",
+  "country": "United States",
+  "cap": "mega"
+ },
+ "PEP": {
+  "name": "PepsiCo, Inc.",
+  "sector": "Consumer Defensive",
+  "industry": "Beverages - Non-Alcoholic",
+  "country": "United States",
+  "cap": "large"
+ },
+ "PM": {
+  "name": "Philip Morris International Inc.",
+  "sector": "Consumer Defensive",
+  "industry": "Tobacco",
+  "country": "United States",
+  "cap": "mega"
+ },
+ "MO": {
+  "name": "Altria Group, Inc.",
+  "sector": "Consumer Defensive",
+  "industry": "Tobacco",
+  "country": "United States",
+  "cap": "large"
+ },
+ "MDLZ": {
+  "name": "Mondelez International, Inc.",
+  "sector": "Consumer Defensive",
+  "industry": "Confectioners",
+  "country": "United States",
+  "cap": "large"
+ },
+ "KHC": {
+  "name": "The Kraft Heinz Company",
+  "sector": "Consumer Defensive",
+  "industry": "Packaged Foods",
+  "country": "United States",
+  "cap": "large"
+ },
+ "CL": {
+  "name": "Colgate-Palmolive Company",
+  "sector": "Consumer Defensive",
+  "industry": "Household & Personal Products",
+  "country": "United States",
+  "cap": "large"
+ },
+ "GIS": {
+  "name": "General Mills, Inc.",
+  "sector": "Consumer Defensive",
+  "industry": "Packaged Foods",
+  "country": "United States",
+  "cap": "large"
+ },
+ "KMB": {
+  "name": "Kimberly-Clark Corporation",
+  "sector": "Consumer Defensive",
+  "industry": "Household & Personal Products",
+  "country": "United States",
+  "cap": "large"
+ },
+ "EL": {
+  "name": "The Estée Lauder Companies Inc.",
+  "sector": "Consumer Defensive",
+  "industry": "Household & Personal Products",
+  "country": "United States",
+  "cap": "large"
+ },
+ "SYY": {
+  "name": "Sysco Corporation",
+  "sector": "Consumer Defensive",
+  "industry": "Food Distribution",
+  "country": "United States",
+  "cap": "large"
+ },
+ "ADM": {
+  "name": "Archer-Daniels-Midland Company",
+  "sector": "Consumer Defensive",
+  "industry": "Farm Products",
+  "country": "United States",
+  "cap": "large"
+ },
+ "MKC": {
+  "name": "McCormick & Company, Incorporated",
+  "sector": "Consumer Defensive",
+  "industry": "Packaged Foods",
+  "country": "United States",
+  "cap": "large"
+ },
+ "CHD": {
+  "name": "Church & Dwight Co., Inc.",
+  "sector": "Consumer Defensive",
+  "industry": "Household & Personal Products",
+  "country": "United States",
+  "cap": "large"
+ },
+ "HSY": {
+  "name": "The Hershey Company",
+  "sector": "Consumer Defensive",
+  "industry": "Confectioners",
+  "country": "United States",
+  "cap": "large"
+ },
+ "CAG": {
+  "name": "Conagra Brands, Inc.",
+  "sector": "Consumer Defensive",
+  "industry": "Packaged Foods",
+  "country": "United States",
+  "cap": "mid"
+ },
+ "TSN": {
+  "name": "Tyson Foods, Inc.",
+  "sector": "Consumer Defensive",
+  "industry": "Farm Products",
+  "country": "United States",
+  "cap": "large"
+ },
+ "CPB": {
+  "name": "The Campbell's Company",
+  "sector": "Consumer Defensive",
+  "industry": "Packaged Foods",
+  "country": "United States",
+  "cap": "mid"
+ },
+ "HRL": {
+  "name": "Hormel Foods Corporation",
+  "sector": "Consumer Defensive",
+  "industry": "Packaged Foods",
+  "country": "United States",
+  "cap": "large"
+ },
+ "SJM": {
+  "name": "The J. M. Smucker Company",
+  "sector": "Consumer Defensive",
+  "industry": "Packaged Foods",
+  "country": "United States",
+  "cap": "large"
+ },
+ "CLX": {
+  "name": "The Clorox Company",
+  "sector": "Consumer Defensive",
+  "industry": "Household & Personal Products",
+  "country": "United States",
+  "cap": "large"
+ },
+ "LW": {
+  "name": "Lamb Weston Holdings, Inc.",
+  "sector": "Consumer Defensive",
+  "industry": "Packaged Foods",
+  "country": "United States",
+  "cap": "mid"
+ },
+ "STZ": {
+  "name": "Constellation Brands, Inc.",
+  "sector": "Consumer Defensive",
+  "industry": "Beverages - Brewers",
+  "country": "United States",
+  "cap": "large"
+ },
+ "TAP": {
+  "name": "Molson Coors Beverage Company",
+  "sector": "Consumer Defensive",
+  "industry": "Beverages - Brewers",
+  "country": "United States",
+  "cap": "mid"
+ },
+ "KR": {
+  "name": "The Kroger Co.",
+  "sector": "Consumer Defensive",
+  "industry": "Grocery Stores",
+  "country": "United States",
+  "cap": "large"
+ },
+ "MNST": {
+  "name": "Monster Beverage Corporation",
+  "sector": "Consumer Defensive",
+  "industry": "Beverages - Non-Alcoholic",
+  "country": "United States",
+  "cap": "large"
+ },
+ "KDP": {
+  "name": "Keurig Dr Pepper Inc.",
+  "sector": "Consumer Defensive",
+  "industry": "Beverages - Non-Alcoholic",
+  "country": "United States",
+  "cap": "large"
+ },
+ "XOM": {
+  "name": "ExxonMobil Holdings Corporation",
+  "sector": "Energy",
+  "industry": "Oil & Gas Integrated",
+  "country": "United States",
+  "cap": "mega"
+ },
+ "CVX": {
+  "name": "Chevron Corporation",
+  "sector": "Energy",
+  "industry": "Oil & Gas Integrated",
+  "country": "United States",
+  "cap": "mega"
+ },
+ "COP": {
+  "name": "ConocoPhillips",
+  "sector": "Energy",
+  "industry": "Oil & Gas E&P",
+  "country": "United States",
+  "cap": "large"
+ },
+ "SLB": {
+  "name": "SLB N.V.",
+  "sector": "Energy",
+  "industry": "Oil & Gas Equipment & Services",
+  "country": "United States",
+  "cap": "large"
+ },
+ "EOG": {
+  "name": "EOG Resources, Inc.",
+  "sector": "Energy",
+  "industry": "Oil & Gas E&P",
+  "country": "United States",
+  "cap": "large"
+ },
+ "PSX": {
+  "name": "Phillips 66",
+  "sector": "Energy",
+  "industry": "Oil & Gas Refining & Marketing",
+  "country": "United States",
+  "cap": "large"
+ },
+ "MPC": {
+  "name": "Marathon Petroleum Corporation",
+  "sector": "Energy",
+  "industry": "Oil & Gas Refining & Marketing",
+  "country": "United States",
+  "cap": "large"
+ },
+ "VLO": {
+  "name": "Valero Energy Corporation",
+  "sector": "Energy",
+  "industry": "Oil & Gas Refining & Marketing",
+  "country": "United States",
+  "cap": "large"
+ },
+ "OXY": {
+  "name": "Occidental Petroleum Corporation",
+  "sector": "Energy",
+  "industry": "Oil & Gas E&P",
+  "country": "United States",
+  "cap": "large"
+ },
+ "DVN": {
+  "name": "Devon Energy Corporation",
+  "sector": "Energy",
+  "industry": "Oil & Gas E&P",
+  "country": "United States",
+  "cap": "large"
+ },
+ "FANG": {
+  "name": "Diamondback Energy, Inc.",
+  "sector": "Energy",
+  "industry": "Oil & Gas E&P",
+  "country": "United States",
+  "cap": "large"
+ },
+ "BKR": {
+  "name": "Baker Hughes Company",
+  "sector": "Energy",
+  "industry": "Oil & Gas Equipment & Services",
+  "country": "United States",
+  "cap": "large"
+ },
+ "TRGP": {
+  "name": "Targa Resources Corp.",
+  "sector": "Energy",
+  "industry": "Oil & Gas Midstream",
+  "country": "United States",
+  "cap": "large"
+ },
+ "KMI": {
+  "name": "Kinder Morgan, Inc.",
+  "sector": "Energy",
+  "industry": "Oil & Gas Midstream",
+  "country": "United States",
+  "cap": "large"
+ },
+ "OKE": {
+  "name": "ONEOK, Inc.",
+  "sector": "Energy",
+  "industry": "Oil & Gas Midstream",
+  "country": "United States",
+  "cap": "large"
+ },
+ "WMB": {
+  "name": "The Williams Companies, Inc.",
+  "sector": "Energy",
+  "industry": "Oil & Gas Midstream",
+  "country": "United States",
+  "cap": "large"
+ },
+ "APA": {
+  "name": "APA Corporation",
+  "sector": "Energy",
+  "industry": "Oil & Gas E&P",
+  "country": "United States",
+  "cap": "large"
+ },
+ "JPM": {
+  "name": "JPMorgan Chase & Co.",
+  "sector": "Financial Services",
+  "industry": "Banks - Diversified",
+  "country": "United States",
+  "cap": "mega"
+ },
+ "BAC": {
+  "name": "Bank of America Corporation",
+  "sector": "Financial Services",
+  "industry": "Banks - Diversified",
+  "country": "United States",
+  "cap": "mega"
+ },
+ "WFC": {
+  "name": "Wells Fargo & Company",
+  "sector": "Financial Services",
+  "industry": "Banks - Diversified",
+  "country": "United States",
+  "cap": "mega"
+ },
+ "GS": {
+  "name": "The Goldman Sachs Group, Inc.",
+  "sector": "Financial Services",
+  "industry": "Capital Markets",
+  "country": "United States",
+  "cap": "mega"
+ },
+ "MS": {
+  "name": "Morgan Stanley",
+  "sector": "Financial Services",
+  "industry": "Capital Markets",
+  "country": "United States",
+  "cap": "mega"
+ },
+ "BLK": {
+  "name": "BlackRock, Inc.",
+  "sector": "Financial Services",
+  "industry": "Asset Management",
+  "country": "United States",
+  "cap": "large"
+ },
+ "AXP": {
+  "name": "American Express Company",
+  "sector": "Financial Services",
+  "industry": "Credit Services",
+  "country": "United States",
+  "cap": "mega"
+ },
+ "SCHW": {
+  "name": "The Charles Schwab Corporation",
+  "sector": "Financial Services",
+  "industry": "Capital Markets",
+  "country": "United States",
+  "cap": "large"
+ },
+ "USB": {
+  "name": "U.S. Bancorp",
+  "sector": "Financial Services",
+  "industry": "Banks - Regional",
+  "country": "United States",
+  "cap": "large"
+ },
+ "C": {
+  "name": "Citigroup Inc.",
+  "sector": "Financial Services",
+  "industry": "Banks - Diversified",
+  "country": "United States",
+  "cap": "mega"
+ },
+ "COF": {
+  "name": "Capital One Financial Corporation",
+  "sector": "Financial Services",
+  "industry": "Credit Services",
+  "country": "United States",
+  "cap": "large"
+ },
+ "PGR": {
+  "name": "The Progressive Corporation",
+  "sector": "Financial Services",
+  "industry": "Insurance - Property & Casualty",
+  "country": "United States",
+  "cap": "large"
+ },
+ "MET": {
+  "name": "MetLife, Inc.",
+  "sector": "Financial Services",
+  "industry": "Insurance - Life",
+  "country": "United States",
+  "cap": "large"
+ },
+ "PRU": {
+  "name": "Prudential Financial, Inc.",
+  "sector": "Financial Services",
+  "industry": "Insurance - Life",
+  "country": "United States",
+  "cap": "large"
+ },
+ "AIG": {
+  "name": "American International Group, Inc.",
+  "sector": "Financial Services",
+  "industry": "Insurance - Diversified",
+  "country": "United States",
+  "cap": "large"
+ },
+ "AMP": {
+  "name": "Ameriprise Financial, Inc.",
+  "sector": "Financial Services",
+  "industry": "Asset Management",
+  "country": "United States",
+  "cap": "large"
+ },
+ "TRV": {
+  "name": "The Travelers Companies, Inc.",
+  "sector": "Financial Services",
+  "industry": "Insurance - Property & Casualty",
+  "country": "United States",
+  "cap": "large"
+ },
+ "AFL": {
+  "name": "Aflac Incorporated",
+  "sector": "Financial Services",
+  "industry": "Insurance - Life",
+  "country": "United States",
+  "cap": "large"
+ },
+ "CB": {
+  "name": "Chubb Limited",
+  "sector": "Financial Services",
+  "industry": "Insurance - Property & Casualty",
+  "country": "Switzerland",
+  "cap": "large"
+ },
+ "ALL": {
+  "name": "The Allstate Corporation",
+  "sector": "Financial Services",
+  "industry": "Insurance - Property & Casualty",
+  "country": "United States",
+  "cap": "large"
+ },
+ "HIG": {
+  "name": "The Hartford Insurance Group, Inc.",
+  "sector": "Financial Services",
+  "industry": "Insurance - Diversified",
+  "country": "United States",
+  "cap": "large"
+ },
+ "ACGL": {
+  "name": "Arch Capital Group Ltd.",
+  "sector": "Financial Services",
+  "industry": "Insurance - Diversified",
+  "country": "Bermuda",
+  "cap": "large"
+ },
+ "AON": {
+  "name": "Aon plc",
+  "sector": "Financial Services",
+  "industry": "Insurance Brokers",
+  "country": "Ireland",
+  "cap": "large"
+ },
+ "BEN": {
+  "name": "Franklin Resources, Inc.",
+  "sector": "Financial Services",
+  "industry": "Asset Management",
+  "country": "United States",
+  "cap": "large"
+ },
+ "BRO": {
+  "name": "Brown & Brown, Inc.",
+  "sector": "Financial Services",
+  "industry": "Insurance Brokers",
+  "country": "United States",
+  "cap": "large"
+ },
+ "CBOE": {
+  "name": "Cboe Global Markets, Inc.",
+  "sector": "Financial Services",
+  "industry": "Financial Data & Stock Exchanges",
+  "country": "United States",
+  "cap": "large"
+ },
+ "CINF": {
+  "name": "Cincinnati Financial Corporation",
+  "sector": "Financial Services",
+  "industry": "Insurance - Property & Casualty",
+  "country": "United States",
+  "cap": "large"
+ },
+ "EG": {
+  "name": "Everest Group, Ltd.",
+  "sector": "Financial Services",
+  "industry": "Insurance - Reinsurance",
+  "country": "Bermuda",
+  "cap": "large"
+ },
+ "FITB": {
+  "name": "Fifth Third Bancorp",
+  "sector": "Financial Services",
+  "industry": "Banks - Regional",
+  "country": "United States",
+  "cap": "large"
+ },
+ "CPAY": {
+  "name": "Corpay, Inc.",
+  "sector": "Technology",
+  "industry": "Software - Infrastructure",
+  "country": "United States",
+  "cap": "large"
+ },
+ "GL": {
+  "name": "Globe Life Inc.",
+  "sector": "Financial Services",
+  "industry": "Insurance - Life",
+  "country": "United States",
+  "cap": "large"
+ },
+ "HBAN": {
+  "name": "Huntington Bancshares Incorporated",
+  "sector": "Financial Services",
+  "industry": "Banks - Regional",
+  "country": "United States",
+  "cap": "large"
+ },
+ "ICE": {
+  "name": "Intercontinental Exchange, Inc.",
+  "sector": "Financial Services",
+  "industry": "Financial Data & Stock Exchanges",
+  "country": "United States",
+  "cap": "large"
+ },
+ "IVZ": {
+  "name": "Invesco Ltd.",
+  "sector": "Financial Services",
+  "industry": "Asset Management",
+  "country": "United States",
+  "cap": "large"
+ },
+ "KEY": {
+  "name": "KeyCorp",
+  "sector": "Financial Services",
+  "industry": "Banks - Regional",
+  "country": "United States",
+  "cap": "large"
+ },
+ "LNC": {
+  "name": "Lincoln National Corporation",
+  "sector": "Financial Services",
+  "industry": "Insurance - Life",
+  "country": "United States",
+  "cap": "mid"
+ },
+ "MCO": {
+  "name": "Moody's Corporation",
+  "sector": "Financial Services",
+  "industry": "Financial Data & Stock Exchanges",
+  "country": "United States",
+  "cap": "large"
+ },
+ "MTB": {
+  "name": "M&T Bank Corporation",
+  "sector": "Financial Services",
+  "industry": "Banks - Regional",
+  "country": "United States",
+  "cap": "large"
+ },
+ "PFG": {
+  "name": "Principal Financial Group, Inc.",
+  "sector": "Financial Services",
+  "industry": "Asset Management",
+  "country": "United States",
+  "cap": "large"
+ },
+ "RF": {
+  "name": "Regions Financial Corporation",
+  "sector": "Financial Services",
+  "industry": "Banks - Regional",
+  "country": "United States",
+  "cap": "large"
+ },
+ "RJF": {
+  "name": "Raymond James Financial, Inc.",
+  "sector": "Financial Services",
+  "industry": "Asset Management",
+  "country": "United States",
+  "cap": "large"
+ },
+ "SPGI": {
+  "name": "S&P Global Inc.",
+  "sector": "Financial Services",
+  "industry": "Financial Data & Stock Exchanges",
+  "country": "United States",
+  "cap": "large"
+ },
+ "STT": {
+  "name": "State Street Corporation",
+  "sector": "Financial Services",
+  "industry": "Asset Management",
+  "country": "United States",
+  "cap": "large"
+ },
+ "TROW": {
+  "name": "T. Rowe Price Group, Inc.",
+  "sector": "Financial Services",
+  "industry": "Asset Management",
+  "country": "United States",
+  "cap": "large"
+ },
+ "WRB": {
+  "name": "W. R. Berkley Corporation",
+  "sector": "Financial Services",
+  "industry": "Insurance - Property & Casualty",
+  "country": "United States",
+  "cap": "large"
+ },
+ "WTW": {
+  "name": "Willis Towers Watson Public Limited Company",
+  "sector": "Financial Services",
+  "industry": "Insurance Brokers",
+  "country": "United Kingdom",
+  "cap": "large"
+ },
+ "AJG": {
+  "name": "Arthur J. Gallagher & Co.",
+  "sector": "Financial Services",
+  "industry": "Insurance Brokers",
+  "country": "United States",
+  "cap": "large"
+ },
+ "BK": {
+  "name": "Bank of New York Mellon Corp",
+  "sector": "Financial Services",
+  "industry": "Banks - Diversified",
+  "country": "United States",
+  "cap": "large"
+ },
+ "SYF": {
+  "name": "Synchrony Financial",
+  "sector": "Financial Services",
+  "industry": "Credit Services",
+  "country": "United States",
+  "cap": "large"
+ },
+ "BNY": {
+  "name": "The Bank of New York Mellon Cor",
+  "sector": "Financial Services",
+  "industry": "Banks - Diversified",
+  "country": "United States",
+  "cap": "large"
+ },
+ "BRK-B": {
+  "name": "Berkshire Hathaway Inc.",
+  "sector": "Financial Services",
+  "industry": "Insurance - Diversified",
+  "country": "United States",
+  "cap": "mega"
+ },
+ "UNH": {
+  "name": "UnitedHealth Group Incorporated",
+  "sector": "Healthcare",
+  "industry": "Healthcare Plans",
+  "country": "United States",
+  "cap": "mega"
+ },
+ "LLY": {
+  "name": "Eli Lilly and Company",
+  "sector": "Healthcare",
+  "industry": "Drug Manufacturers - General",
+  "country": "United States",
+  "cap": "mega"
+ },
+ "JNJ": {
+  "name": "Johnson & Johnson",
+  "sector": "Healthcare",
+  "industry": "Drug Manufacturers - General",
+  "country": "United States",
+  "cap": "mega"
+ },
+ "ABT": {
+  "name": "Abbott Laboratories",
+  "sector": "Healthcare",
+  "industry": "Medical Devices",
+  "country": "United States",
+  "cap": "large"
+ },
+ "MRK": {
+  "name": "Merck & Co., Inc.",
+  "sector": "Healthcare",
+  "industry": "Drug Manufacturers - General",
+  "country": "United States",
+  "cap": "mega"
+ },
+ "TMO": {
+  "name": "Thermo Fisher Scientific Inc.",
+  "sector": "Healthcare",
+  "industry": "Diagnostics & Research",
+  "country": "United States",
+  "cap": "large"
+ },
+ "DHR": {
+  "name": "Danaher Corporation",
+  "sector": "Healthcare",
+  "industry": "Diagnostics & Research",
+  "country": "United States",
+  "cap": "large"
+ },
+ "ABBV": {
+  "name": "AbbVie Inc.",
+  "sector": "Healthcare",
+  "industry": "Drug Manufacturers - General",
+  "country": "United States",
+  "cap": "mega"
+ },
+ "CVS": {
+  "name": "CVS Health Corporation",
+  "sector": "Healthcare",
+  "industry": "Healthcare Plans",
+  "country": "United States",
+  "cap": "large"
+ },
+ "MDT": {
+  "name": "Medtronic plc",
+  "sector": "Healthcare",
+  "industry": "Medical Devices",
+  "country": "Ireland",
+  "cap": "large"
+ },
+ "BSX": {
+  "name": "Boston Scientific Corporation",
+  "sector": "Healthcare",
+  "industry": "Medical Devices",
+  "country": "United States",
+  "cap": "large"
+ },
+ "ELV": {
+  "name": "Elevance Health, Inc.",
+  "sector": "Healthcare",
+  "industry": "Healthcare Plans",
+  "country": "United States",
+  "cap": "large"
+ },
+ "HCA": {
+  "name": "HCA Healthcare, Inc.",
+  "sector": "Healthcare",
+  "industry": "Medical Care Facilities",
+  "country": "United States",
+  "cap": "large"
+ },
+ "SYK": {
+  "name": "Stryker Corporation",
+  "sector": "Healthcare",
+  "industry": "Medical Devices",
+  "country": "United States",
+  "cap": "large"
+ },
+ "ISRG": {
+  "name": "Intuitive Surgical, Inc.",
+  "sector": "Healthcare",
+  "industry": "Medical Instruments & Supplies",
+  "country": "United States",
+  "cap": "large"
+ },
+ "AMGN": {
+  "name": "Amgen Inc.",
+  "sector": "Healthcare",
+  "industry": "Drug Manufacturers - General",
+  "country": "United States",
+  "cap": "mega"
+ },
+ "GILD": {
+  "name": "Gilead Sciences, Inc.",
+  "sector": "Healthcare",
+  "industry": "Drug Manufacturers - General",
+  "country": "United States",
+  "cap": "large"
+ },
+ "REGN": {
+  "name": "Regeneron Pharmaceuticals, Inc.",
+  "sector": "Healthcare",
+  "industry": "Biotechnology",
+  "country": "United States",
+  "cap": "large"
+ },
+ "VRTX": {
+  "name": "Vertex Pharmaceuticals Incorporated",
+  "sector": "Healthcare",
+  "industry": "Biotechnology",
+  "country": "United States",
+  "cap": "large"
+ },
+ "BIIB": {
+  "name": "Biogen Inc.",
+  "sector": "Healthcare",
+  "industry": "Drug Manufacturers - General",
+  "country": "United States",
+  "cap": "large"
+ },
+ "IQV": {
+  "name": "IQVIA Holdings Inc.",
+  "sector": "Healthcare",
+  "industry": "Diagnostics & Research",
+  "country": "United States",
+  "cap": "large"
+ },
+ "MCK": {
+  "name": "McKesson Corporation",
+  "sector": "Healthcare",
+  "industry": "Medical Distribution",
+  "country": "United States",
+  "cap": "large"
+ },
+ "CI": {
+  "name": "The Cigna Group",
+  "sector": "Healthcare",
+  "industry": "Healthcare Plans",
+  "country": "United States",
+  "cap": "large"
+ },
+ "HUM": {
+  "name": "Humana Inc.",
+  "sector": "Healthcare",
+  "industry": "Healthcare Plans",
+  "country": "United States",
+  "cap": "large"
+ },
+ "MOH": {
+  "name": "Molina Healthcare, Inc.",
+  "sector": "Healthcare",
+  "industry": "Healthcare Plans",
+  "country": "United States",
+  "cap": "large"
+ },
+ "ZBH": {
+  "name": "Zimmer Biomet Holdings, Inc.",
+  "sector": "Healthcare",
+  "industry": "Medical Devices",
+  "country": "United States",
+  "cap": "large"
+ },
+ "BAX": {
+  "name": "Baxter International Inc.",
+  "sector": "Healthcare",
+  "industry": "Medical Instruments & Supplies",
+  "country": "United States",
+  "cap": "large"
+ },
+ "BDX": {
+  "name": "Becton, Dickinson and Company",
+  "sector": "Healthcare",
+  "industry": "Medical Instruments & Supplies",
+  "country": "United States",
+  "cap": "large"
+ },
+ "CAH": {
+  "name": "Cardinal Health, Inc.",
+  "sector": "Healthcare",
+  "industry": "Medical Distribution",
+  "country": "United States",
+  "cap": "large"
+ },
+ "CRL": {
+  "name": "Charles River Laboratories International, Inc.",
+  "sector": "Healthcare",
+  "industry": "Diagnostics & Research",
+  "country": "United States",
+  "cap": "large"
+ },
+ "DGX": {
+  "name": "Quest Diagnostics Incorporated",
+  "sector": "Healthcare",
+  "industry": "Diagnostics & Research",
+  "country": "United States",
+  "cap": "large"
+ },
+ "DVA": {
+  "name": "DaVita Inc.",
+  "sector": "Healthcare",
+  "industry": "Medical Care Facilities",
+  "country": "United States",
+  "cap": "large"
+ },
+ "EW": {
+  "name": "Edwards Lifesciences Corporation",
+  "sector": "Healthcare",
+  "industry": "Medical Devices",
+  "country": "United States",
+  "cap": "large"
+ },
+ "HSIC": {
+  "name": "Henry Schein, Inc.",
+  "sector": "Healthcare",
+  "industry": "Medical Distribution",
+  "country": "United States",
+  "cap": "mid"
+ },
+ "IDXX": {
+  "name": "IDEXX Laboratories, Inc.",
+  "sector": "Healthcare",
+  "industry": "Diagnostics & Research",
+  "country": "United States",
+  "cap": "large"
+ },
+ "ILMN": {
+  "name": "Illumina, Inc.",
+  "sector": "Healthcare",
+  "industry": "Diagnostics & Research",
+  "country": "United States",
+  "cap": "large"
+ },
+ "INCY": {
+  "name": "Incyte Corporation",
+  "sector": "Healthcare",
+  "industry": "Biotechnology",
+  "country": "United States",
+  "cap": "large"
+ },
+ "LH": {
+  "name": "Labcorp Holdings Inc.",
+  "sector": "Healthcare",
+  "industry": "Diagnostics & Research",
+  "country": "United States",
+  "cap": "large"
+ },
+ "MTD": {
+  "name": "Mettler-Toledo International Inc.",
+  "sector": "Healthcare",
+  "industry": "Diagnostics & Research",
+  "country": "Switzerland",
+  "cap": "large"
+ },
+ "PODD": {
+  "name": "Insulet Corporation",
+  "sector": "Healthcare",
+  "industry": "Medical Devices",
+  "country": "United States",
+  "cap": "large"
+ },
+ "RMD": {
+  "name": "ResMed Inc.",
+  "sector": "Healthcare",
+  "industry": "Medical Instruments & Supplies",
+  "country": "United States",
+  "cap": "large"
+ },
+ "STE": {
+  "name": "STERIS plc",
+  "sector": "Healthcare",
+  "industry": "Medical Devices",
+  "country": "United States",
+  "cap": "large"
+ },
+ "TECH": {
+  "name": "Bio-Techne Corporation",
+  "sector": "Healthcare",
+  "industry": "Biotechnology",
+  "country": "United States",
+  "cap": "large"
+ },
+ "UHS": {
+  "name": "Universal Health Services, Inc.",
+  "sector": "Healthcare",
+  "industry": "Medical Care Facilities",
+  "country": "United States",
+  "cap": "mid"
+ },
+ "VTRS": {
+  "name": "Viatris Inc.",
+  "sector": "Healthcare",
+  "industry": "Drug Manufacturers - Specialty & Generic",
+  "country": "United States",
+  "cap": "large"
+ },
+ "A": {
+  "name": "Agilent Technologies, Inc.",
+  "sector": "Healthcare",
+  "industry": "Diagnostics & Research",
+  "country": "United States",
+  "cap": "large"
+ },
+ "WST": {
+  "name": "West Pharmaceutical Services, Inc.",
+  "sector": "Healthcare",
+  "industry": "Medical Instruments & Supplies",
+  "country": "United States",
+  "cap": "large"
+ },
+ "ZTS": {
+  "name": "Zoetis Inc.",
+  "sector": "Healthcare",
+  "industry": "Drug Manufacturers - Specialty & Generic",
+  "country": "United States",
+  "cap": "large"
+ },
+ "DXCM": {
+  "name": "DexCom, Inc.",
+  "sector": "Healthcare",
+  "industry": "Medical Devices",
+  "country": "United States",
+  "cap": "large"
+ },
+ "ALGN": {
+  "name": "Align Technology, Inc.",
+  "sector": "Healthcare",
+  "industry": "Medical Instruments & Supplies",
+  "country": "United States",
+  "cap": "large"
+ },
+ "MRNA": {
+  "name": "Moderna, Inc.",
+  "sector": "Healthcare",
+  "industry": "Biotechnology",
+  "country": "United States",
+  "cap": "large"
+ },
+ "RVTY": {
+  "name": "Revvity, Inc.",
+  "sector": "Healthcare",
+  "industry": "Diagnostics & Research",
+  "country": "United States",
+  "cap": "large"
+ },
+ "ALNY": {
+  "name": "Alnylam Pharmaceuticals, Inc.",
+  "sector": "Healthcare",
+  "industry": "Biotechnology",
+  "country": "United States",
+  "cap": "large"
+ },
+ "INSM": {
+  "name": "Insmed Incorporated",
+  "sector": "Healthcare",
+  "industry": "Biotechnology",
+  "country": "United States",
+  "cap": "large"
+ },
+ "HON": {
+  "name": "Honeywell International Inc.",
+  "sector": "Industrials",
+  "industry": "Conglomerates",
+  "country": "United States",
+  "cap": "large"
+ },
+ "UNP": {
+  "name": "Union Pacific Corporation",
+  "sector": "Industrials",
+  "industry": "Railroads",
+  "country": "United States",
+  "cap": "large"
+ },
+ "UPS": {
+  "name": "United Parcel Service, Inc.",
+  "sector": "Industrials",
+  "industry": "Integrated Freight & Logistics",
+  "country": "United States",
+  "cap": "large"
+ },
+ "GE": {
+  "name": "GE Aerospace",
+  "sector": "Industrials",
+  "industry": "Aerospace & Defense",
+  "country": "United States",
+  "cap": "mega"
+ },
+ "CAT": {
+  "name": "Caterpillar Inc.",
+  "sector": "Industrials",
+  "industry": "Farm & Heavy Construction Machinery",
+  "country": "United States",
+  "cap": "mega"
+ },
+ "RTX": {
+  "name": "RTX Corporation",
+  "sector": "Industrials",
+  "industry": "Aerospace & Defense",
+  "country": "United States",
+  "cap": "mega"
+ },
+ "GD": {
+  "name": "General Dynamics Corporation",
+  "sector": "Industrials",
+  "industry": "Aerospace & Defense",
+  "country": "United States",
+  "cap": "large"
+ },
+ "DE": {
+  "name": "Deere & Company",
+  "sector": "Industrials",
+  "industry": "Farm & Heavy Construction Machinery",
+  "country": "United States",
+  "cap": "large"
+ },
+ "LMT": {
+  "name": "Lockheed Martin Corporation",
+  "sector": "Industrials",
+  "industry": "Aerospace & Defense",
+  "country": "United States",
+  "cap": "large"
+ },
+ "BA": {
+  "name": "The Boeing Company",
+  "sector": "Industrials",
+  "industry": "Aerospace & Defense",
+  "country": "United States",
+  "cap": "large"
+ },
+ "EMR": {
+  "name": "Emerson Electric Co.",
+  "sector": "Industrials",
+  "industry": "Specialty Industrial Machinery",
+  "country": "United States",
+  "cap": "large"
+ },
+ "ETN": {
+  "name": "Eaton Corporation plc",
+  "sector": "Industrials",
+  "industry": "Specialty Industrial Machinery",
+  "country": "Ireland",
+  "cap": "large"
+ },
+ "ITW": {
+  "name": "Illinois Tool Works Inc.",
+  "sector": "Industrials",
+  "industry": "Specialty Industrial Machinery",
+  "country": "United States",
+  "cap": "large"
+ },
+ "PH": {
+  "name": "Parker-Hannifin Corporation",
+  "sector": "Industrials",
+  "industry": "Specialty Industrial Machinery",
+  "country": "United States",
+  "cap": "large"
+ },
+ "ROK": {
+  "name": "Rockwell Automation, Inc.",
+  "sector": "Industrials",
+  "industry": "Specialty Industrial Machinery",
+  "country": "United States",
+  "cap": "large"
+ },
+ "AME": {
+  "name": "AMETEK, Inc.",
+  "sector": "Industrials",
+  "industry": "Specialty Industrial Machinery",
+  "country": "United States",
+  "cap": "large"
+ },
+ "CARR": {
+  "name": "Carrier Global Corporation",
+  "sector": "Industrials",
+  "industry": "Building Products & Equipment",
+  "country": "United States",
+  "cap": "large"
+ },
+ "OTIS": {
+  "name": "Otis Worldwide Corporation",
+  "sector": "Industrials",
+  "industry": "Specialty Industrial Machinery",
+  "country": "United States",
+  "cap": "large"
+ },
+ "CSX": {
+  "name": "CSX Corporation",
+  "sector": "Industrials",
+  "industry": "Railroads",
+  "country": "United States",
+  "cap": "large"
+ },
+ "FDX": {
+  "name": "FedEx Corporation",
+  "sector": "Industrials",
+  "industry": "Integrated Freight & Logistics",
+  "country": "United States",
+  "cap": "large"
+ },
+ "DAL": {
+  "name": "Delta Air Lines, Inc.",
+  "sector": "Industrials",
+  "industry": "Airlines",
+  "country": "United States",
+  "cap": "large"
+ },
+ "UAL": {
+  "name": "United Airlines Holdings, Inc.",
+  "sector": "Industrials",
+  "industry": "Airlines",
+  "country": "United States",
+  "cap": "large"
+ },
+ "LUV": {
+  "name": "Southwest Airlines Co.",
+  "sector": "Industrials",
+  "industry": "Airlines",
+  "country": "United States",
+  "cap": "large"
+ },
+ "FAST": {
+  "name": "Fastenal Company",
+  "sector": "Industrials",
+  "industry": "Industrial Distribution",
+  "country": "United States",
+  "cap": "large"
+ },
+ "PCAR": {
+  "name": "PACCAR Inc",
+  "sector": "Industrials",
+  "industry": "Farm & Heavy Construction Machinery",
+  "country": "United States",
+  "cap": "large"
+ },
+ "IR": {
+  "name": "Ingersoll Rand Inc.",
+  "sector": "Industrials",
+  "industry": "Specialty Industrial Machinery",
+  "country": "United States",
+  "cap": "large"
+ },
+ "CTAS": {
+  "name": "Cintas Corporation",
+  "sector": "Industrials",
+  "industry": "Specialty Business Services",
+  "country": "United States",
+  "cap": "large"
+ },
+ "VRSK": {
+  "name": "Verisk Analytics, Inc.",
+  "sector": "Industrials",
+  "industry": "Consulting Services",
+  "country": "United States",
+  "cap": "large"
+ },
+ "CPRT": {
+  "name": "Copart, Inc.",
+  "sector": "Industrials",
+  "industry": "Specialty Business Services",
+  "country": "United States",
+  "cap": "large"
+ },
+ "ODFL": {
+  "name": "Old Dominion Freight Line, Inc.",
+  "sector": "Industrials",
+  "industry": "Trucking",
+  "country": "United States",
+  "cap": "large"
+ },
+ "WAB": {
+  "name": "Westinghouse Air Brake Technologies Corporation",
+  "sector": "Industrials",
+  "industry": "Railroads",
+  "country": "United States",
+  "cap": "large"
+ },
+ "DOV": {
+  "name": "Dover Corporation",
+  "sector": "Industrials",
+  "industry": "Specialty Industrial Machinery",
+  "country": "United States",
+  "cap": "large"
+ },
+ "SWK": {
+  "name": "Stanley Black & Decker, Inc.",
+  "sector": "Industrials",
+  "industry": "Tools & Accessories",
+  "country": "United States",
+  "cap": "large"
+ },
+ "GWW": {
+  "name": "W.W. Grainger, Inc.",
+  "sector": "Industrials",
+  "industry": "Industrial Distribution",
+  "country": "United States",
+  "cap": "large"
+ },
+ "XYL": {
+  "name": "Xylem Inc.",
+  "sector": "Industrials",
+  "industry": "Specialty Industrial Machinery",
+  "country": "United States",
+  "cap": "large"
+ },
+ "AOS": {
+  "name": "A. O. Smith Corporation",
+  "sector": "Industrials",
+  "industry": "Specialty Industrial Machinery",
+  "country": "United States",
+  "cap": "mid"
+ },
+ "FTV": {
+  "name": "Fortive Corporation",
+  "sector": "Technology",
+  "industry": "Scientific & Technical Instruments",
+  "country": "United States",
+  "cap": "large"
+ },
+ "PWR": {
+  "name": "Quanta Services, Inc.",
+  "sector": "Industrials",
+  "industry": "Engineering & Construction",
+  "country": "United States",
+  "cap": "large"
+ },
+ "JBHT": {
+  "name": "J.B. Hunt Transport Services, Inc.",
+  "sector": "Industrials",
+  "industry": "Integrated Freight & Logistics",
+  "country": "United States",
+  "cap": "large"
+ },
+ "SNA": {
+  "name": "Snap-on Incorporated",
+  "sector": "Industrials",
+  "industry": "Tools & Accessories",
+  "country": "United States",
+  "cap": "large"
+ },
+ "TXT": {
+  "name": "Textron Inc.",
+  "sector": "Industrials",
+  "industry": "Aerospace & Defense",
+  "country": "United States",
+  "cap": "large"
+ },
+ "HII": {
+  "name": "Huntington Ingalls Industries, Inc.",
+  "sector": "Industrials",
+  "industry": "Aerospace & Defense",
+  "country": "United States",
+  "cap": "large"
+ },
+ "HUBB": {
+  "name": "Hubbell Incorporated",
+  "sector": "Industrials",
+  "industry": "Electrical Equipment & Parts",
+  "country": "United States",
+  "cap": "large"
+ },
+ "MAS": {
+  "name": "Masco Corporation",
+  "sector": "Industrials",
+  "industry": "Building Products & Equipment",
+  "country": "United States",
+  "cap": "large"
+ },
+ "ALLE": {
+  "name": "Allegion plc",
+  "sector": "Industrials",
+  "industry": "Security & Protection Services",
+  "country": "Ireland",
+  "cap": "large"
+ },
+ "CMI": {
+  "name": "Cummins Inc.",
+  "sector": "Industrials",
+  "industry": "Specialty Industrial Machinery",
+  "country": "United States",
+  "cap": "large"
+ },
+ "TDG": {
+  "name": "TransDigm Group Incorporated",
+  "sector": "Industrials",
+  "industry": "Aerospace & Defense",
+  "country": "United States",
+  "cap": "large"
+ },
+ "TDY": {
+  "name": "Teledyne Technologies Incorporated",
+  "sector": "Technology",
+  "industry": "Scientific & Technical Instruments",
+  "country": "United States",
+  "cap": "large"
+ },
+ "LHX": {
+  "name": "L3Harris Technologies, Inc.",
+  "sector": "Industrials",
+  "industry": "Aerospace & Defense",
+  "country": "United States",
+  "cap": "large"
+ },
+ "AXON": {
+  "name": "Axon Enterprise, Inc.",
+  "sector": "Industrials",
+  "industry": "Aerospace & Defense",
+  "country": "United States",
+  "cap": "large"
+ },
+ "ROP": {
+  "name": "Roper Technologies, Inc.",
+  "sector": "Technology",
+  "industry": "Software - Application",
+  "country": "United States",
+  "cap": "large"
+ },
+ "GEV": {
+  "name": "GE Vernova Inc.",
+  "sector": "Industrials",
+  "industry": "Specialty Industrial Machinery",
+  "country": "United States",
+  "cap": "mega"
+ },
+ "SAIA": {
+  "name": "Saia, Inc.",
+  "sector": "Industrials",
+  "industry": "Trucking",
+  "country": "United States",
+  "cap": "large"
+ },
+ "URI": {
+  "name": "United Rentals, Inc.",
+  "sector": "Industrials",
+  "industry": "Rental & Leasing Services",
+  "country": "United States",
+  "cap": "large"
+ },
+ "IEX": {
+  "name": "IDEX Corporation",
+  "sector": "Industrials",
+  "industry": "Specialty Industrial Machinery",
+  "country": "United States",
+  "cap": "large"
+ },
+ "JCI": {
+  "name": "Johnson Controls International plc",
+  "sector": "Industrials",
+  "industry": "Building Products & Equipment",
+  "country": "Ireland",
+  "cap": "large"
+ },
+ "LIN": {
+  "name": "Linde plc",
+  "sector": "Basic Materials",
+  "industry": "Specialty Chemicals",
+  "country": "United Kingdom",
+  "cap": "mega"
+ },
+ "SHW": {
+  "name": "The Sherwin-Williams Company",
+  "sector": "Basic Materials",
+  "industry": "Specialty Chemicals",
+  "country": "United States",
+  "cap": "large"
+ },
+ "APD": {
+  "name": "Air Products and Chemicals, Inc.",
+  "sector": "Basic Materials",
+  "industry": "Specialty Chemicals",
+  "country": "United States",
+  "cap": "large"
+ },
+ "ECL": {
+  "name": "Ecolab Inc.",
+  "sector": "Basic Materials",
+  "industry": "Specialty Chemicals",
+  "country": "United States",
+  "cap": "large"
+ },
+ "DD": {
+  "name": "DuPont de Nemours, Inc.",
+  "sector": "Basic Materials",
+  "industry": "Specialty Chemicals",
+  "country": "United States",
+  "cap": "large"
+ },
+ "PPG": {
+  "name": "PPG Industries, Inc.",
+  "sector": "Basic Materials",
+  "industry": "Specialty Chemicals",
+  "country": "United States",
+  "cap": "large"
+ },
+ "NEM": {
+  "name": "Newmont Corporation",
+  "sector": "Basic Materials",
+  "industry": "Gold",
+  "country": "United States",
+  "cap": "large"
+ },
+ "FCX": {
+  "name": "Freeport-McMoRan Inc.",
+  "sector": "Basic Materials",
+  "industry": "Copper",
+  "country": "United States",
+  "cap": "large"
+ },
+ "NUE": {
+  "name": "Nucor Corporation",
+  "sector": "Basic Materials",
+  "industry": "Steel",
+  "country": "United States",
+  "cap": "large"
+ },
+ "VMC": {
+  "name": "Vulcan Materials Company",
+  "sector": "Basic Materials",
+  "industry": "Building Materials",
+  "country": "United States",
+  "cap": "large"
+ },
+ "ALB": {
+  "name": "Albemarle Corporation",
+  "sector": "Basic Materials",
+  "industry": "Specialty Chemicals",
+  "country": "United States",
+  "cap": "large"
+ },
+ "CE": {
+  "name": "Celanese Corporation",
+  "sector": "Basic Materials",
+  "industry": "Chemicals",
+  "country": "United States",
+  "cap": "mid"
+ },
+ "CF": {
+  "name": "CF Industries Holdings, Inc.",
+  "sector": "Basic Materials",
+  "industry": "Agricultural Inputs",
+  "country": "United States",
+  "cap": "large"
+ },
+ "FMC": {
+  "name": "FMC Corporation",
+  "sector": "Basic Materials",
+  "industry": "Agricultural Inputs",
+  "country": "United States",
+  "cap": "small"
+ },
+ "IFF": {
+  "name": "International Flavors & Fragrances Inc.",
+  "sector": "Basic Materials",
+  "industry": "Specialty Chemicals",
+  "country": "United States",
+  "cap": "large"
+ },
+ "EMN": {
+  "name": "Eastman Chemical Company",
+  "sector": "Basic Materials",
+  "industry": "Specialty Chemicals",
+  "country": "United States",
+  "cap": "mid"
+ },
+ "LYB": {
+  "name": "LyondellBasell Industries N.V.",
+  "sector": "Basic Materials",
+  "industry": "Specialty Chemicals",
+  "country": "Netherlands",
+  "cap": "large"
+ },
+ "MOS": {
+  "name": "The Mosaic Company",
+  "sector": "Basic Materials",
+  "industry": "Agricultural Inputs",
+  "country": "United States",
+  "cap": "mid"
+ },
+ "BALL": {
+  "name": "Ball Corporation",
+  "sector": "Consumer Cyclical",
+  "industry": "Packaging & Containers",
+  "country": "United States",
+  "cap": "large"
+ },
+ "IP": {
+  "name": "International Paper Company",
+  "sector": "Consumer Cyclical",
+  "industry": "Packaging & Containers",
+  "country": "United States",
+  "cap": "large"
+ },
+ "RPM": {
+  "name": "RPM International Inc.",
+  "sector": "Basic Materials",
+  "industry": "Specialty Chemicals",
+  "country": "United States",
+  "cap": "large"
+ },
+ "PKG": {
+  "name": "Packaging Corporation of America",
+  "sector": "Consumer Cyclical",
+  "industry": "Packaging & Containers",
+  "country": "United States",
+  "cap": "large"
+ },
+ "AVY": {
+  "name": "Avery Dennison Corporation",
+  "sector": "Consumer Cyclical",
+  "industry": "Packaging & Containers",
+  "country": "United States",
+  "cap": "large"
+ },
+ "SW": {
+  "name": "Smurfit Westrock Plc",
+  "sector": "Consumer Cyclical",
+  "industry": "Packaging & Containers",
+  "country": "Ireland",
+  "cap": "large"
+ },
+ "DOW": {
+  "name": "Dow Inc.",
+  "sector": "Basic Materials",
+  "industry": "Chemicals",
+  "country": "United States",
+  "cap": "large"
+ },
+ "AMT": {
+  "name": "American Tower Corporation",
+  "sector": "Real Estate",
+  "industry": "REIT - Specialty",
+  "country": "United States",
+  "cap": "large"
+ },
+ "PLD": {
+  "name": "Prologis, Inc.",
+  "sector": "Real Estate",
+  "industry": "REIT - Industrial",
+  "country": "United States",
+  "cap": "large"
+ },
+ "CCI": {
+  "name": "Crown Castle Inc.",
+  "sector": "Real Estate",
+  "industry": "REIT - Specialty",
+  "country": "United States",
+  "cap": "large"
+ },
+ "EQIX": {
+  "name": "Equinix, Inc.",
+  "sector": "Real Estate",
+  "industry": "REIT - Specialty",
+  "country": "United States",
+  "cap": "large"
+ },
+ "PSA": {
+  "name": "Public Storage",
+  "sector": "Real Estate",
+  "industry": "REIT - Industrial",
+  "country": "United States",
+  "cap": "large"
+ },
+ "DLR": {
+  "name": "Digital Realty Trust, Inc.",
+  "sector": "Real Estate",
+  "industry": "REIT - Specialty",
+  "country": "United States",
+  "cap": "large"
+ },
+ "SPG": {
+  "name": "Simon Property Group, Inc.",
+  "sector": "Real Estate",
+  "industry": "REIT - Retail",
+  "country": "United States",
+  "cap": "large"
+ },
+ "O": {
+  "name": "Realty Income Corporation",
+  "sector": "Real Estate",
+  "industry": "REIT - Retail",
+  "country": "United States",
+  "cap": "large"
+ },
+ "WELL": {
+  "name": "Welltower Inc.",
+  "sector": "Real Estate",
+  "industry": "REIT - Healthcare Facilities",
+  "country": "United States",
+  "cap": "large"
+ },
+ "EQR": {
+  "name": "Equity Residential",
+  "sector": "Real Estate",
+  "industry": "REIT - Residential",
+  "country": "United States",
+  "cap": "large"
+ },
+ "AVB": {
+  "name": "AvalonBay Communities, Inc.",
+  "sector": "Real Estate",
+  "industry": "REIT - Residential",
+  "country": "United States",
+  "cap": "large"
+ },
+ "EXR": {
+  "name": "Extra Space Storage Inc.",
+  "sector": "Real Estate",
+  "industry": "REIT - Industrial",
+  "country": "United States",
+  "cap": "large"
+ },
+ "SBAC": {
+  "name": "SBA Communications Corporation",
+  "sector": "Real Estate",
+  "industry": "REIT - Specialty",
+  "country": "United States",
+  "cap": "large"
+ },
+ "ARE": {
+  "name": "Alexandria Real Estate Equities, Inc.",
+  "sector": "Real Estate",
+  "industry": "REIT - Office",
+  "country": "United States",
+  "cap": "mid"
+ },
+ "VTR": {
+  "name": "Ventas, Inc.",
+  "sector": "Real Estate",
+  "industry": "REIT - Healthcare Facilities",
+  "country": "United States",
+  "cap": "large"
+ },
+ "BXP": {
+  "name": "BXP, Inc.",
+  "sector": "Real Estate",
+  "industry": "REIT - Office",
+  "country": "United States",
+  "cap": "large"
+ },
+ "FRT": {
+  "name": "Federal Realty Investment Trust",
+  "sector": "Real Estate",
+  "industry": "REIT - Retail",
+  "country": "United States",
+  "cap": "large"
+ },
+ "HST": {
+  "name": "Host Hotels & Resorts, Inc.",
+  "sector": "Real Estate",
+  "industry": "REIT - Hotel & Motel",
+  "country": "United States",
+  "cap": "large"
+ },
+ "IRM": {
+  "name": "Iron Mountain Incorporated",
+  "sector": "Real Estate",
+  "industry": "REIT - Specialty",
+  "country": "United States",
+  "cap": "large"
+ },
+ "KIM": {
+  "name": "Kimco Realty Corporation",
+  "sector": "Real Estate",
+  "industry": "REIT - Retail",
+  "country": "United States",
+  "cap": "large"
+ },
+ "MAA": {
+  "name": "Mid-America Apartment Communities, Inc.",
+  "sector": "Real Estate",
+  "industry": "REIT - Residential",
+  "country": "United States",
+  "cap": "large"
+ },
+ "NNN": {
+  "name": "NNN REIT, Inc.",
+  "sector": "Real Estate",
+  "industry": "REIT - Retail",
+  "country": "United States",
+  "cap": "mid"
+ },
+ "UDR": {
+  "name": "UDR, Inc.",
+  "sector": "Real Estate",
+  "industry": "REIT - Residential",
+  "country": "United States",
+  "cap": "large"
+ },
+ "VICI": {
+  "name": "VICI Properties Inc.",
+  "sector": "Real Estate",
+  "industry": "REIT - Diversified",
+  "country": "United States",
+  "cap": "large"
+ },
+ "CPT": {
+  "name": "Camden Property Trust",
+  "sector": "Real Estate",
+  "industry": "REIT - Residential",
+  "country": "United States",
+  "cap": "large"
+ },
+ "WPC": {
+  "name": "W. P. Carey Inc.",
+  "sector": "Real Estate",
+  "industry": "REIT - Diversified",
+  "country": "United States",
+  "cap": "large"
+ },
+ "INVH": {
+  "name": "Invitation Homes Inc.",
+  "sector": "Real Estate",
+  "industry": "REIT - Residential",
+  "country": "United States",
+  "cap": "large"
+ },
+ "CBRE": {
+  "name": "CBRE Group, Inc.",
+  "sector": "Real Estate",
+  "industry": "Real Estate Services",
+  "country": "United States",
+  "cap": "large"
+ },
+ "NEE": {
+  "name": "NextEra Energy, Inc.",
+  "sector": "Utilities",
+  "industry": "Utilities - Regulated Electric",
+  "country": "United States",
+  "cap": "large"
+ },
+ "DUK": {
+  "name": "Duke Energy Corporation",
+  "sector": "Utilities",
+  "industry": "Utilities - Regulated Electric",
+  "country": "United States",
+  "cap": "large"
+ },
+ "SO": {
+  "name": "The Southern Company",
+  "sector": "Utilities",
+  "industry": "Utilities - Regulated Electric",
+  "country": "United States",
+  "cap": "large"
+ },
+ "D": {
+  "name": "Dominion Energy, Inc.",
+  "sector": "Utilities",
+  "industry": "Utilities - Regulated Electric",
+  "country": "United States",
+  "cap": "large"
+ },
+ "AEP": {
+  "name": "American Electric Power Company, Inc.",
+  "sector": "Utilities",
+  "industry": "Utilities - Regulated Electric",
+  "country": "United States",
+  "cap": "large"
+ },
+ "EXC": {
+  "name": "Exelon Corporation",
+  "sector": "Utilities",
+  "industry": "Utilities - Regulated Electric",
+  "country": "United States",
+  "cap": "large"
+ },
+ "XEL": {
+  "name": "Xcel Energy Inc.",
+  "sector": "Utilities",
+  "industry": "Utilities - Regulated Electric",
+  "country": "United States",
+  "cap": "large"
+ },
+ "SRE": {
+  "name": "Sempra",
+  "sector": "Utilities",
+  "industry": "Utilities - Diversified",
+  "country": "United States",
+  "cap": "large"
+ },
+ "CEG": {
+  "name": "Constellation Energy Corporation",
+  "sector": "Utilities",
+  "industry": "Utilities - Independent Power Producers",
+  "country": "United States",
+  "cap": "large"
+ },
+ "AWK": {
+  "name": "American Water Works Company, Inc.",
+  "sector": "Utilities",
+  "industry": "Utilities - Regulated Water",
+  "country": "United States",
+  "cap": "large"
+ },
+ "CMS": {
+  "name": "CMS Energy Corporation",
+  "sector": "Utilities",
+  "industry": "Utilities - Regulated Electric",
+  "country": "United States",
+  "cap": "large"
+ },
+ "CNP": {
+  "name": "CenterPoint Energy, Inc.",
+  "sector": "Utilities",
+  "industry": "Utilities - Regulated Electric",
+  "country": "United States",
+  "cap": "large"
+ },
+ "DTE": {
+  "name": "DTE Energy Company",
+  "sector": "Utilities",
+  "industry": "Utilities - Regulated Electric",
+  "country": "United States",
+  "cap": "large"
+ },
+ "EIX": {
+  "name": "Edison International",
+  "sector": "Utilities",
+  "industry": "Utilities - Regulated Electric",
+  "country": "United States",
+  "cap": "large"
+ },
+ "ETR": {
+  "name": "Entergy Corporation",
+  "sector": "Utilities",
+  "industry": "Utilities - Regulated Electric",
+  "country": "United States",
+  "cap": "large"
+ },
+ "FE": {
+  "name": "FirstEnergy Corp.",
+  "sector": "Utilities",
+  "industry": "Utilities - Regulated Electric",
+  "country": "United States",
+  "cap": "large"
+ },
+ "LNT": {
+  "name": "Alliant Energy Corporation",
+  "sector": "Utilities",
+  "industry": "Utilities - Regulated Electric",
+  "country": "United States",
+  "cap": "large"
+ },
+ "NI": {
+  "name": "NiSource Inc.",
+  "sector": "Utilities",
+  "industry": "Utilities - Regulated Gas",
+  "country": "United States",
+  "cap": "large"
+ },
+ "NRG": {
+  "name": "NRG Energy, Inc.",
+  "sector": "Utilities",
+  "industry": "Utilities - Independent Power Producers",
+  "country": "United States",
+  "cap": "large"
+ },
+ "PEG": {
+  "name": "Public Service Enterprise Group Incorporated",
+  "sector": "Utilities",
+  "industry": "Utilities - Regulated Electric",
+  "country": "United States",
+  "cap": "large"
+ },
+ "PNW": {
+  "name": "Pinnacle West Capital Corporation",
+  "sector": "Utilities",
+  "industry": "Utilities - Regulated Electric",
+  "country": "United States",
+  "cap": "large"
+ },
+ "PPL": {
+  "name": "PPL Corporation",
+  "sector": "Utilities",
+  "industry": "Utilities - Regulated Electric",
+  "country": "United States",
+  "cap": "large"
+ },
+ "WEC": {
+  "name": "WEC Energy Group, Inc.",
+  "sector": "Utilities",
+  "industry": "Utilities - Regulated Electric",
+  "country": "United States",
+  "cap": "large"
+ },
+ "AEE": {
+  "name": "Ameren Corporation",
+  "sector": "Utilities",
+  "industry": "Utilities - Regulated Electric",
+  "country": "United States",
+  "cap": "large"
+ },
+ "ADP": {
+  "name": "Automatic Data Processing, Inc.",
+  "sector": "Technology",
+  "industry": "Software - Application",
+  "country": "United States",
+  "cap": "large"
+ },
+ "BMY": {
+  "name": "Bristol-Myers Squibb Company",
+  "sector": "Healthcare",
+  "industry": "Drug Manufacturers - General",
+  "country": "United States",
+  "cap": "large"
+ },
+ "NOC": {
+  "name": "Northrop Grumman Corporation",
+  "sector": "Industrials",
+  "industry": "Aerospace & Defense",
+  "country": "United States",
+  "cap": "large"
+ },
+ "PG": {
+  "name": "The Procter & Gamble Company",
+  "sector": "Consumer Defensive",
+  "industry": "Household & Personal Products",
+  "country": "United States",
+  "cap": "mega"
+ },
+ "V": {
+  "name": "Visa Inc.",
+  "sector": "Financial Services",
+  "industry": "Credit Services",
+  "country": "United States",
+  "cap": "mega"
+ },
+ "MA": {
+  "name": "Mastercard Incorporated",
+  "sector": "Financial Services",
+  "industry": "Credit Services",
+  "country": "United States",
+  "cap": "mega"
+ },
+ "CRM": {
+  "name": "Salesforce, Inc.",
+  "sector": "Technology",
+  "industry": "Software - Application",
+  "country": "United States",
+  "cap": "large"
+ },
+ "ENPH": {
+  "name": "Enphase Energy, Inc.",
+  "sector": "Technology",
+  "industry": "Solar",
+  "country": "United States",
+  "cap": "mid"
+ },
+ "MMM": {
+  "name": "3M Company",
+  "sector": "Industrials",
+  "industry": "Conglomerates",
+  "country": "United States",
+  "cap": "large"
+ },
+ "PFE": {
+  "name": "Pfizer Inc.",
+  "sector": "Healthcare",
+  "industry": "Drug Manufacturers - General",
+  "country": "United States",
+  "cap": "large"
+ },
+ "TGT": {
+  "name": "Target Corporation",
+  "sector": "Consumer Defensive",
+  "industry": "Discount Stores",
+  "country": "United States",
+  "cap": "large"
+ },
+ "UBER": {
+  "name": "Uber Technologies, Inc.",
+  "sector": "Technology",
+  "industry": "Software - Application",
+  "country": "United States",
+  "cap": "large"
+ },
+ "PAYX": {
+  "name": "Paychex, Inc.",
+  "sector": "Technology",
+  "industry": "Software - Application",
+  "country": "United States",
+  "cap": "large"
+ },
+ "CTSH": {
+  "name": "Cognizant Technology Solutions Corporation",
+  "sector": "Technology",
+  "industry": "Information Technology Services",
+  "country": "United States",
+  "cap": "large"
+ },
+ "ROST": {
+  "name": "Ross Stores, Inc.",
+  "sector": "Consumer Cyclical",
+  "industry": "Apparel Retail",
+  "country": "United States",
+  "cap": "large"
+ },
+ "CRH": {
+  "name": "CRH plc",
+  "sector": "Basic Materials",
+  "industry": "Building Materials",
+  "country": "Ireland",
+  "cap": "large"
+ },
+ "CCL": {
+  "name": "Carnival Corporation Ltd.",
+  "sector": "Consumer Cyclical",
+  "industry": "Travel Services",
+  "country": "United States",
+  "cap": "large"
+ },
+ "ACI": {
+  "name": "Albertsons Companies, Inc.",
+  "sector": "Consumer Defensive",
+  "industry": "Grocery Stores",
+  "country": "United States",
+  "cap": "mid"
+ },
+ "AN": {
+  "name": "AutoNation, Inc.",
+  "sector": "Consumer Cyclical",
+  "industry": "Auto & Truck Dealerships",
+  "country": "United States",
+  "cap": "mid"
+ },
+ "ANF": {
+  "name": "Abercrombie & Fitch Co.",
+  "sector": "Consumer Cyclical",
+  "industry": "Apparel Retail",
+  "country": "United States",
+  "cap": "mid"
+ },
+ "AEO": {
+  "name": "American Eagle Outfitters, Inc.",
+  "sector": "Consumer Cyclical",
+  "industry": "Apparel Retail",
+  "country": "United States",
+  "cap": "mid"
+ },
+ "ASH": {
+  "name": "Ashland Inc.",
+  "sector": "Basic Materials",
+  "industry": "Specialty Chemicals",
+  "country": "United States",
+  "cap": "mid"
+ },
+ "ATR": {
+  "name": "AptarGroup, Inc.",
+  "sector": "Healthcare",
+  "industry": "Medical Instruments & Supplies",
+  "country": "United States",
+  "cap": "mid"
+ },
+ "AVNT": {
+  "name": "Avient Corporation",
+  "sector": "Basic Materials",
+  "industry": "Specialty Chemicals",
+  "country": "United States",
+  "cap": "mid"
+ },
+ "BC": {
+  "name": "Brunswick Corporation",
+  "sector": "Consumer Cyclical",
+  "industry": "Recreational Vehicles",
+  "country": "United States",
+  "cap": "mid"
+ },
+ "BFH": {
+  "name": "Bread Financial Holdings, Inc.",
+  "sector": "Financial Services",
+  "industry": "Credit Services",
+  "country": "United States",
+  "cap": "mid"
+ },
+ "BJ": {
+  "name": "BJ's Wholesale Club Holdings, Inc.",
+  "sector": "Consumer Defensive",
+  "industry": "Discount Stores",
+  "country": "United States",
+  "cap": "large"
+ },
+ "BLDR": {
+  "name": "Builders FirstSource, Inc.",
+  "sector": "Industrials",
+  "industry": "Building Products & Equipment",
+  "country": "United States",
+  "cap": "mid"
+ },
+ "BR": {
+  "name": "Broadridge Financial Solutions, Inc.",
+  "sector": "Technology",
+  "industry": "Information Technology Services",
+  "country": "United States",
+  "cap": "large"
+ },
+ "CACC": {
+  "name": "Credit Acceptance Corporation",
+  "sector": "Financial Services",
+  "industry": "Credit Services",
+  "country": "United States",
+  "cap": "mid"
+ },
+ "CC": {
+  "name": "The Chemours Company",
+  "sector": "Basic Materials",
+  "industry": "Specialty Chemicals",
+  "country": "United States",
+  "cap": "mid"
+ },
+ "CNXC": {
+  "name": "Concentrix Corporation",
+  "sector": "Technology",
+  "industry": "Information Technology Services",
+  "country": "United States",
+  "cap": "small"
+ },
+ "CR": {
+  "name": "Crane Company",
+  "sector": "Industrials",
+  "industry": "Specialty Industrial Machinery",
+  "country": "United States",
+  "cap": "large"
+ },
+ "CROX": {
+  "name": "Crocs, Inc.",
+  "sector": "Consumer Cyclical",
+  "industry": "Footwear & Accessories",
+  "country": "United States",
+  "cap": "mid"
+ },
+ "DKS": {
+  "name": "DICK'S Sporting Goods, Inc.",
+  "sector": "Consumer Cyclical",
+  "industry": "Specialty Retail",
+  "country": "United States",
+  "cap": "large"
+ },
+ "DLB": {
+  "name": "Dolby Laboratories, Inc.",
+  "sector": "Industrials",
+  "industry": "Specialty Business Services",
+  "country": "United States",
+  "cap": "mid"
+ },
+ "DORM": {
+  "name": "Dorman Products, Inc.",
+  "sector": "Consumer Cyclical",
+  "industry": "Auto Parts",
+  "country": "United States",
+  "cap": "mid"
+ },
+ "EPC": {
+  "name": "Edgewell Personal Care Company",
+  "sector": "Consumer Defensive",
+  "industry": "Household & Personal Products",
+  "country": "United States",
+  "cap": "small"
+ },
+ "EXP": {
+  "name": "Eagle Materials Inc.",
+  "sector": "Basic Materials",
+  "industry": "Building Materials",
+  "country": "United States",
+  "cap": "mid"
+ },
+ "FTDR": {
+  "name": "Frontdoor, Inc.",
+  "sector": "Consumer Cyclical",
+  "industry": "Personal Services",
+  "country": "United States",
+  "cap": "mid"
+ },
+ "GNRC": {
+  "name": "Generac Holdings Inc.",
+  "sector": "Industrials",
+  "industry": "Specialty Industrial Machinery",
+  "country": "United States",
+  "cap": "large"
+ },
+ "G": {
+  "name": "Genpact Limited",
+  "sector": "Technology",
+  "industry": "Information Technology Services",
+  "country": "Bermuda",
+  "cap": "mid"
+ },
+ "HQY": {
+  "name": "HealthEquity, Inc.",
+  "sector": "Healthcare",
+  "industry": "Health Information Services",
+  "country": "United States",
+  "cap": "mid"
+ },
+ "HRB": {
+  "name": "H&R Block, Inc.",
+  "sector": "Consumer Cyclical",
+  "industry": "Personal Services",
+  "country": "United States",
+  "cap": "mid"
+ },
+ "HUN": {
+  "name": "Huntsman Corporation",
+  "sector": "Basic Materials",
+  "industry": "Chemicals",
+  "country": "United States",
+  "cap": "small"
+ },
+ "IBP": {
+  "name": "Installed Building Products, Inc.",
+  "sector": "Consumer Cyclical",
+  "industry": "Residential Construction",
+  "country": "United States",
+  "cap": "mid"
+ },
+ "INGR": {
+  "name": "Ingredion Incorporated",
+  "sector": "Consumer Defensive",
+  "industry": "Packaged Foods",
+  "country": "United States",
+  "cap": "mid"
+ },
+ "ITRI": {
+  "name": "Itron, Inc.",
+  "sector": "Technology",
+  "industry": "Scientific & Technical Instruments",
+  "country": "United States",
+  "cap": "mid"
+ },
+ "JKHY": {
+  "name": "Jack Henry & Associates, Inc.",
+  "sector": "Technology",
+  "industry": "Information Technology Services",
+  "country": "United States",
+  "cap": "large"
+ },
+ "KMPR": {
+  "name": "Kemper Corporation",
+  "sector": "Financial Services",
+  "industry": "Insurance - Property & Casualty",
+  "country": "United States",
+  "cap": "small"
+ },
+ "KNX": {
+  "name": "Knight-Swift Transportation Holdings Inc.",
+  "sector": "Industrials",
+  "industry": "Trucking",
+  "country": "United States",
+  "cap": "large"
+ },
+ "LECO": {
+  "name": "Lincoln Electric Holdings, Inc.",
+  "sector": "Industrials",
+  "industry": "Tools & Accessories",
+  "country": "United States",
+  "cap": "large"
+ },
+ "LII": {
+  "name": "Lennox International Inc.",
+  "sector": "Industrials",
+  "industry": "Building Products & Equipment",
+  "country": "United States",
+  "cap": "large"
+ },
+ "MAN": {
+  "name": "ManpowerGroup Inc.",
+  "sector": "Industrials",
+  "industry": "Staffing & Employment Services",
+  "country": "United States",
+  "cap": "small"
+ },
+ "MCY": {
+  "name": "Mercury General Corporation",
+  "sector": "Financial Services",
+  "industry": "Insurance - Property & Casualty",
+  "country": "United States",
+  "cap": "mid"
+ },
+ "MKL": {
+  "name": "Markel Group Inc.",
+  "sector": "Financial Services",
+  "industry": "Insurance - Property & Casualty",
+  "country": "United States",
+  "cap": "large"
+ },
+ "MSA": {
+  "name": "MSA Safety Incorporated",
+  "sector": "Industrials",
+  "industry": "Security & Protection Services",
+  "country": "United States",
+  "cap": "mid"
+ },
+ "MTZ": {
+  "name": "MasTec, Inc.",
+  "sector": "Industrials",
+  "industry": "Engineering & Construction",
+  "country": "United States",
+  "cap": "large"
+ },
+ "MWA": {
+  "name": "Mueller Water Products, Inc.",
+  "sector": "Industrials",
+  "industry": "Specialty Industrial Machinery",
+  "country": "United States",
+  "cap": "mid"
+ },
+ "NAVI": {
+  "name": "Navient Corporation",
+  "sector": "Financial Services",
+  "industry": "Credit Services",
+  "country": "United States",
+  "cap": "small"
+ },
+ "NVT": {
+  "name": "nVent Electric plc",
+  "sector": "Industrials",
+  "industry": "Electrical Equipment & Parts",
+  "country": "United Kingdom",
+  "cap": "large"
+ },
+ "OC": {
+  "name": "Owens Corning",
+  "sector": "Industrials",
+  "industry": "Building Products & Equipment",
+  "country": "United States",
+  "cap": "large"
+ },
+ "ORI": {
+  "name": "Old Republic International Corporation",
+  "sector": "Financial Services",
+  "industry": "Insurance - Property & Casualty",
+  "country": "United States",
+  "cap": "large"
+ },
+ "PATK": {
+  "name": "Patrick Industries, Inc.",
+  "sector": "Consumer Cyclical",
+  "industry": "Recreational Vehicles",
+  "country": "United States",
+  "cap": "mid"
+ },
+ "PBF": {
+  "name": "PBF Energy Inc.",
+  "sector": "Energy",
+  "industry": "Oil & Gas Refining & Marketing",
+  "country": "United States",
+  "cap": "mid"
+ },
+ "RGA": {
+  "name": "Reinsurance Group of America, Incorporated",
+  "sector": "Financial Services",
+  "industry": "Insurance - Reinsurance",
+  "country": "United States",
+  "cap": "large"
+ },
+ "RHI": {
+  "name": "Robert Half Inc.",
+  "sector": "Industrials",
+  "industry": "Staffing & Employment Services",
+  "country": "United States",
+  "cap": "mid"
+ },
+ "RGEN": {
+  "name": "Repligen Corporation",
+  "sector": "Healthcare",
+  "industry": "Medical Instruments & Supplies",
+  "country": "United States",
+  "cap": "mid"
+ },
+ "RLI": {
+  "name": "RLI Corp.",
+  "sector": "Financial Services",
+  "industry": "Insurance - Property & Casualty",
+  "country": "United States",
+  "cap": "mid"
+ },
+ "RS": {
+  "name": "Reliance, Inc.",
+  "sector": "Basic Materials",
+  "industry": "Steel",
+  "country": "United States",
+  "cap": "large"
+ },
+ "RXO": {
+  "name": "RXO, Inc.",
+  "sector": "Industrials",
+  "industry": "Trucking",
+  "country": "United States",
+  "cap": "mid"
+ },
+ "SFM": {
+  "name": "Sprouts Farmers Market, Inc.",
+  "sector": "Consumer Defensive",
+  "industry": "Grocery Stores",
+  "country": "United States",
+  "cap": "mid"
+ },
+ "SIG": {
+  "name": "Signet Jewelers Limited",
+  "sector": "Consumer Cyclical",
+  "industry": "Luxury Goods",
+  "country": "Bermuda",
+  "cap": "mid"
+ },
+ "SM": {
+  "name": "SM Energy Company",
+  "sector": "Energy",
+  "industry": "Oil & Gas E&P",
+  "country": "United States",
+  "cap": "mid"
+ },
+ "SNX": {
+  "name": "TD SYNNEX Corporation",
+  "sector": "Technology",
+  "industry": "Electronics & Computer Distribution",
+  "country": "United States",
+  "cap": "large"
+ },
+ "SSD": {
+  "name": "Simpson Manufacturing Co., Inc.",
+  "sector": "Basic Materials",
+  "industry": "Lumber & Wood Production",
+  "country": "United States",
+  "cap": "mid"
+ },
+ "STLD": {
+  "name": "Steel Dynamics, Inc.",
+  "sector": "Basic Materials",
+  "industry": "Steel",
+  "country": "United States",
+  "cap": "large"
+ },
+ "SWX": {
+  "name": "Southwest Gas Holdings, Inc.",
+  "sector": "Utilities",
+  "industry": "Utilities - Regulated Gas",
+  "country": "United States",
+  "cap": "mid"
+ },
+ "THC": {
+  "name": "Tenet Healthcare Corporation",
+  "sector": "Healthcare",
+  "industry": "Medical Care Facilities",
+  "country": "United States",
+  "cap": "large"
+ },
+ "TOL": {
+  "name": "Toll Brothers, Inc.",
+  "sector": "Consumer Cyclical",
+  "industry": "Residential Construction",
+  "country": "United States",
+  "cap": "large"
+ },
+ "TRMK": {
+  "name": "Trustmark Corporation",
+  "sector": "Financial Services",
+  "industry": "Banks - Regional",
+  "country": "United States",
+  "cap": "mid"
+ },
+ "TRN": {
+  "name": "Trinity Industries, Inc.",
+  "sector": "Industrials",
+  "industry": "Railroads",
+  "country": "United States",
+  "cap": "mid"
+ },
+ "TXRH": {
+  "name": "Texas Roadhouse, Inc.",
+  "sector": "Consumer Cyclical",
+  "industry": "Restaurants",
+  "country": "United States",
+  "cap": "large"
+ },
+ "UFPI": {
+  "name": "UFP Industries, Inc.",
+  "sector": "Basic Materials",
+  "industry": "Lumber & Wood Production",
+  "country": "United States",
+  "cap": "mid"
+ },
+ "UMBF": {
+  "name": "UMB Financial Corporation",
+  "sector": "Financial Services",
+  "industry": "Banks - Regional",
+  "country": "United States",
+  "cap": "large"
+ },
+ "UNM": {
+  "name": "Unum Group",
+  "sector": "Financial Services",
+  "industry": "Insurance - Life",
+  "country": "United States",
+  "cap": "large"
+ },
+ "WSO": {
+  "name": "Watsco, Inc.",
+  "sector": "Industrials",
+  "industry": "Industrial Distribution",
+  "country": "United States",
+  "cap": "large"
+ },
+ "WTRG": {
+  "name": "Essential Utilities, Inc.",
+  "sector": "Utilities",
+  "industry": "Utilities - Regulated Water",
+  "country": "United States",
+  "cap": "large"
+ },
+ "WTS": {
+  "name": "Watts Water Technologies, Inc.",
+  "sector": "Industrials",
+  "industry": "Specialty Industrial Machinery",
+  "country": "United States",
+  "cap": "large"
+ },
+ "MELI": {
+  "name": "MercadoLibre, Inc.",
+  "sector": "Consumer Cyclical",
+  "industry": "Internet Retail",
+  "country": "Uruguay",
+  "cap": "large"
+ },
+ "PDD": {
+  "name": "PDD Holdings Inc.",
+  "sector": "Consumer Cyclical",
+  "industry": "Internet Retail",
+  "country": "Ireland",
+  "cap": "large"
+ },
+ "PLTR": {
+  "name": "Palantir Technologies Inc.",
+  "sector": "Technology",
+  "industry": "Software - Infrastructure",
+  "country": "United States",
+  "cap": "mega"
+ },
+ "APP": {
+  "name": "AppLovin Corporation",
+  "sector": "Communication Services",
+  "industry": "Advertising Agencies",
+  "country": "United States",
+  "cap": "large"
+ },
+ "ARM": {
+  "name": "Arm Holdings plc",
+  "sector": "Technology",
+  "industry": "Semiconductors",
+  "country": "United Kingdom",
+  "cap": "mega"
+ },
+ "DDOG": {
+  "name": "Datadog, Inc.",
+  "sector": "Technology",
+  "industry": "Software - Application",
+  "country": "United States",
+  "cap": "large"
+ },
+ "ZS": {
+  "name": "Zscaler, Inc.",
+  "sector": "Technology",
+  "industry": "Software - Infrastructure",
+  "country": "United States",
+  "cap": "large"
+ },
+ "TEAM": {
+  "name": "Atlassian Corporation",
+  "sector": "Technology",
+  "industry": "Software - Application",
+  "country": "Australia",
+  "cap": "large"
+ },
+ "MPWR": {
+  "name": "Monolithic Power Systems, Inc.",
+  "sector": "Technology",
+  "industry": "Semiconductors",
+  "country": "United States",
+  "cap": "large"
+ },
+ "NXPI": {
+  "name": "NXP Semiconductors N.V.",
+  "sector": "Technology",
+  "industry": "Semiconductors",
+  "country": "Netherlands",
+  "cap": "large"
+ },
+ "MCHP": {
+  "name": "Microchip Technology Incorporated",
+  "sector": "Technology",
+  "industry": "Semiconductors",
+  "country": "United States",
+  "cap": "large"
+ },
+ "CDW": {
+  "name": "CDW Corporation",
+  "sector": "Technology",
+  "industry": "Information Technology Services",
+  "country": "United States",
+  "cap": "large"
+ },
+ "GFS": {
+  "name": "GLOBALFOUNDRIES Inc.",
+  "sector": "Technology",
+  "industry": "Semiconductors",
+  "country": "United States",
+  "cap": "large"
+ },
+ "ON": {
+  "name": "ON Semiconductor Corporation",
+  "sector": "Technology",
+  "industry": "Semiconductors",
+  "country": "United States",
+  "cap": "large"
+ },
+ "MDB": {
+  "name": "MongoDB, Inc.",
+  "sector": "Technology",
+  "industry": "Software - Infrastructure",
+  "country": "United States",
+  "cap": "large"
+ },
+ "NET": {
+  "name": "Cloudflare, Inc.",
+  "sector": "Technology",
+  "industry": "Software - Infrastructure",
+  "country": "United States",
+  "cap": "large"
+ },
+ "SNOW": {
+  "name": "Snowflake Inc.",
+  "sector": "Technology",
+  "industry": "Software - Application",
+  "country": "United States",
+  "cap": "large"
+ },
+ "TTD": {
+  "name": "The Trade Desk, Inc.",
+  "sector": "Communication Services",
+  "industry": "Advertising Agencies",
+  "country": "United States",
+  "cap": "mid"
+ },
+ "OKTA": {
+  "name": "Okta, Inc.",
+  "sector": "Technology",
+  "industry": "Software - Infrastructure",
+  "country": "United States",
+  "cap": "large"
+ },
+ "DOCU": {
+  "name": "DocuSign, Inc.",
+  "sector": "Technology",
+  "industry": "Software - Application",
+  "country": "United States",
+  "cap": "mid"
+ },
+ "TWLO": {
+  "name": "Twilio Inc.",
+  "sector": "Technology",
+  "industry": "Software - Infrastructure",
+  "country": "United States",
+  "cap": "large"
+ },
+ "GTM": {
+  "name": "ZoomInfo Technologies Inc.",
+  "sector": "Technology",
+  "industry": "Software - Application",
+  "country": "United States",
+  "cap": "small"
+ },
+ "MNDY": {
+  "name": "monday.com Ltd.",
+  "sector": "Technology",
+  "industry": "Software - Application",
+  "country": "Israel",
+  "cap": "mid"
+ },
+ "GTLB": {
+  "name": "GitLab Inc.",
+  "sector": "Technology",
+  "industry": "Software - Infrastructure",
+  "country": "United States",
+  "cap": "mid"
+ },
+ "BILL": {
+  "name": "BILL Holdings, Inc.",
+  "sector": "Technology",
+  "industry": "Software - Application",
+  "country": "United States",
+  "cap": "mid"
+ },
+ "BRZE": {
+  "name": "Braze, Inc.",
+  "sector": "Technology",
+  "industry": "Software - Application",
+  "country": "United States",
+  "cap": "mid"
+ },
+ "TOST": {
+  "name": "Toast, Inc.",
+  "sector": "Technology",
+  "industry": "Software - Infrastructure",
+  "country": "United States",
+  "cap": "large"
+ },
+ "PATH": {
+  "name": "UiPath, Inc.",
+  "sector": "Technology",
+  "industry": "Software - Infrastructure",
+  "country": "United States",
+  "cap": "mid"
+ },
+ "FROG": {
+  "name": "JFrog Ltd.",
+  "sector": "Technology",
+  "industry": "Software - Application",
+  "country": "United States",
+  "cap": "large"
+ },
+ "DOMO": {
+  "name": "Domo, Inc.",
+  "sector": "Technology",
+  "industry": "Software - Application",
+  "country": "United States",
+  "cap": "small"
+ },
+ "PCTY": {
+  "name": "Paylocity Holding Corporation",
+  "sector": "Technology",
+  "industry": "Software - Application",
+  "country": "United States",
+  "cap": "mid"
+ },
+ "ESTC": {
+  "name": "Elastic N.V.",
+  "sector": "Technology",
+  "industry": "Software - Application",
+  "country": "Netherlands",
+  "cap": "mid"
+ },
+ "CWAN": {
+  "name": "Clearwater Analytics Holdings, Inc.",
+  "sector": "Technology",
+  "industry": "Software - Application",
+  "country": "United States",
+  "cap": "mid"
+ },
+ "FRSH": {
+  "name": "Freshworks Inc.",
+  "sector": "Technology",
+  "industry": "Software - Application",
+  "country": "United States",
+  "cap": "mid"
+ },
+ "HUBS": {
+  "name": "HubSpot, Inc.",
+  "sector": "Technology",
+  "industry": "Software - Application",
+  "country": "United States",
+  "cap": "mid"
+ },
+ "COIN": {
+  "name": "Coinbase Global, Inc.",
+  "sector": "Financial Services",
+  "industry": "Financial Data & Stock Exchanges",
+  "country": "United States",
+  "cap": "large"
+ },
+ "AFRM": {
+  "name": "Affirm Holdings, Inc.",
+  "sector": "Financial Services",
+  "industry": "Credit Services",
+  "country": "United States",
+  "cap": "large"
+ },
+ "UPST": {
+  "name": "Upstart Holdings, Inc.",
+  "sector": "Financial Services",
+  "industry": "Credit Services",
+  "country": "United States",
+  "cap": "mid"
+ },
+ "HOOD": {
+  "name": "Robinhood Markets, Inc.",
+  "sector": "Financial Services",
+  "industry": "Capital Markets",
+  "country": "United States",
+  "cap": "large"
+ },
+ "MQ": {
+  "name": "Marqeta, Inc.",
+  "sector": "Technology",
+  "industry": "Software - Infrastructure",
+  "country": "United States",
+  "cap": "small"
+ },
+ "LMND": {
+  "name": "Lemonade, Inc.",
+  "sector": "Financial Services",
+  "industry": "Insurance - Property & Casualty",
+  "country": "United States",
+  "cap": "mid"
+ },
+ "ROOT": {
+  "name": "Root, Inc.",
+  "sector": "Financial Services",
+  "industry": "Insurance - Property & Casualty",
+  "country": "United States",
+  "cap": "small"
+ },
+ "SOFI": {
+  "name": "SoFi Technologies, Inc.",
+  "sector": "Financial Services",
+  "industry": "Credit Services",
+  "country": "United States",
+  "cap": "large"
+ },
+ "LC": {
+  "name": "LendingClub Corporation",
+  "sector": "Financial Services",
+  "industry": "Banks - Regional",
+  "country": "United States",
+  "cap": "mid"
+ },
+ "OPEN": {
+  "name": "Opendoor Technologies Inc.",
+  "sector": "Real Estate",
+  "industry": "Real Estate Services",
+  "country": "United States",
+  "cap": "mid"
+ },
+ "RIVN": {
+  "name": "Rivian Automotive, Inc.",
+  "sector": "Consumer Cyclical",
+  "industry": "Auto Manufacturers",
+  "country": "United States",
+  "cap": "large"
+ },
+ "LCID": {
+  "name": "Lucid Group, Inc.",
+  "sector": "Consumer Cyclical",
+  "industry": "Auto Manufacturers",
+  "country": "United States",
+  "cap": "mid"
+ },
+ "CHWY": {
+  "name": "Chewy, Inc.",
+  "sector": "Consumer Cyclical",
+  "industry": "Internet Retail",
+  "country": "United States",
+  "cap": "mid"
+ },
+ "RBLX": {
+  "name": "Roblox Corporation",
+  "sector": "Communication Services",
+  "industry": "Electronic Gaming & Multimedia",
+  "country": "United States",
+  "cap": "large"
+ },
+ "DUOL": {
+  "name": "Duolingo, Inc.",
+  "sector": "Technology",
+  "industry": "Software - Application",
+  "country": "United States",
+  "cap": "mid"
+ },
+ "LYFT": {
+  "name": "Lyft, Inc.",
+  "sector": "Technology",
+  "industry": "Software - Application",
+  "country": "United States",
+  "cap": "mid"
+ },
+ "U": {
+  "name": "Unity Software Inc.",
+  "sector": "Technology",
+  "industry": "Software - Application",
+  "country": "United States",
+  "cap": "large"
+ },
+ "AGEN": {
+  "name": "Agenus Inc.",
+  "sector": "Healthcare",
+  "industry": "Biotechnology",
+  "country": "United States",
+  "cap": "small"
+ },
+ "RCKT": {
+  "name": "Rocket Pharmaceuticals, Inc.",
+  "sector": "Healthcare",
+  "industry": "Biotechnology",
+  "country": "United States",
+  "cap": "small"
+ },
+ "ACAD": {
+  "name": "ACADIA Pharmaceuticals Inc.",
+  "sector": "Healthcare",
+  "industry": "Biotechnology",
+  "country": "United States",
+  "cap": "mid"
+ },
+ "KRYS": {
+  "name": "Krystal Biotech, Inc.",
+  "sector": "Healthcare",
+  "industry": "Biotechnology",
+  "country": "United States",
+  "cap": "large"
+ },
+ "IRDM": {
+  "name": "Iridium Communications Inc.",
+  "sector": "Communication Services",
+  "industry": "Telecom Services",
+  "country": "United States",
+  "cap": "mid"
+ },
+ "IOVA": {
+  "name": "Iovance Biotherapeutics, Inc.",
+  "sector": "Healthcare",
+  "industry": "Biotechnology",
+  "country": "United States",
+  "cap": "small"
+ },
+ "RARE": {
+  "name": "Ultragenyx Pharmaceutical Inc.",
+  "sector": "Healthcare",
+  "industry": "Biotechnology",
+  "country": "United States",
+  "cap": "mid"
+ },
+ "NTLA": {
+  "name": "Intellia Therapeutics, Inc.",
+  "sector": "Healthcare",
+  "industry": "Biotechnology",
+  "country": "United States",
+  "cap": "mid"
+ },
+ "BEAM": {
+  "name": "Beam Therapeutics Inc.",
+  "sector": "Healthcare",
+  "industry": "Biotechnology",
+  "country": "United States",
+  "cap": "mid"
+ },
+ "EDIT": {
+  "name": "Editas Medicine, Inc.",
+  "sector": "Healthcare",
+  "industry": "Biotechnology",
+  "country": "United States",
+  "cap": "small"
+ },
+ "CRSP": {
+  "name": "CRISPR Therapeutics AG",
+  "sector": "Healthcare",
+  "industry": "Biotechnology",
+  "country": "Switzerland",
+  "cap": "mid"
+ },
+ "FATE": {
+  "name": "Fate Therapeutics, Inc.",
+  "sector": "Healthcare",
+  "industry": "Biotechnology",
+  "country": "United States",
+  "cap": "small"
+ },
+ "KYMR": {
+  "name": "Kymera Therapeutics, Inc.",
+  "sector": "Healthcare",
+  "industry": "Biotechnology",
+  "country": "United States",
+  "cap": "mid"
+ },
+ "WOLF": {
+  "name": "Wolfspeed, Inc.",
+  "sector": "Technology",
+  "industry": "Semiconductors",
+  "country": "United States",
+  "cap": "mid"
+ },
+ "CEVA": {
+  "name": "CEVA, Inc.",
+  "sector": "Technology",
+  "industry": "Semiconductors",
+  "country": "United States",
+  "cap": "small"
+ },
+ "AMBA": {
+  "name": "Ambarella, Inc.",
+  "sector": "Technology",
+  "industry": "Semiconductor Equipment & Materials",
+  "country": "United States",
+  "cap": "mid"
+ },
+ "FORM": {
+  "name": "FormFactor, Inc.",
+  "sector": "Technology",
+  "industry": "Semiconductor Equipment & Materials",
+  "country": "United States",
+  "cap": "mid"
+ },
+ "POWI": {
+  "name": "Power Integrations, Inc.",
+  "sector": "Technology",
+  "industry": "Semiconductors",
+  "country": "United States",
+  "cap": "mid"
+ },
+ "SLAB": {
+  "name": "Silicon Laboratories Inc.",
+  "sector": "Technology",
+  "industry": "Semiconductors",
+  "country": "United States",
+  "cap": "mid"
+ },
+ "DIOD": {
+  "name": "Diodes Incorporated",
+  "sector": "Technology",
+  "industry": "Semiconductors",
+  "country": "United States",
+  "cap": "mid"
+ },
+ "SIMO": {
+  "name": "Silicon Motion Technology Corporation",
+  "sector": "Technology",
+  "industry": "Semiconductors",
+  "country": "Hong Kong",
+  "cap": "large"
+ },
+ "ASML": {
+  "name": "ASML Holding N.V.",
+  "sector": "Technology",
+  "industry": "Semiconductor Equipment & Materials",
+  "country": "Netherlands",
+  "cap": "mega"
+ },
+ "TSM": {
+  "name": "Taiwan Semiconductor Manufacturing Company Limited",
+  "sector": "Technology",
+  "industry": "Semiconductors",
+  "country": "Taiwan",
+  "cap": "mega"
+ },
+ "NVO": {
+  "name": "Novo Nordisk A/S",
+  "sector": "Healthcare",
+  "industry": "Drug Manufacturers - General",
+  "country": "Denmark",
+  "cap": "mega"
+ },
+ "BIDU": {
+  "name": "Baidu, Inc.",
+  "sector": "Communication Services",
+  "industry": "Internet Content & Information",
+  "country": "China",
+  "cap": "large"
+ },
+ "JD": {
+  "name": "JD.com, Inc.",
+  "sector": "Consumer Cyclical",
+  "industry": "Internet Retail",
+  "country": "China",
+  "cap": "large"
+ },
+ "SE": {
+  "name": "Sea Limited",
+  "sector": "Consumer Cyclical",
+  "industry": "Internet Retail",
+  "country": "Singapore",
+  "cap": "large"
+ },
+ "CPNG": {
+  "name": "Coupang, Inc.",
+  "sector": "Consumer Cyclical",
+  "industry": "Internet Retail",
+  "country": "United States",
+  "cap": "large"
+ },
+ "GRAB": {
+  "name": "Grab Holdings Limited",
+  "sector": "Technology",
+  "industry": "Software - Application",
+  "country": "Singapore",
+  "cap": "large"
+ },
+ "RY.TO": {
+  "name": "Royal Bank of Canada",
+  "sector": "Financial Services",
+  "industry": "Banks - Diversified",
+  "country": "Canada",
+  "cap": "mega"
+ },
+ "TD.TO": {
+  "name": "The Toronto-Dominion Bank",
+  "sector": "Financial Services",
+  "industry": "Banks - Diversified",
+  "country": "Canada",
+  "cap": "mega"
+ },
+ "BNS.TO": {
+  "name": "The Bank of Nova Scotia",
+  "sector": "Financial Services",
+  "industry": "Banks - Diversified",
+  "country": "Canada",
+  "cap": "large"
+ },
+ "BMO.TO": {
+  "name": "Bank of Montreal",
+  "sector": "Financial Services",
+  "industry": "Banks - Diversified",
+  "country": "Canada",
+  "cap": "large"
+ },
+ "CM.TO": {
+  "name": "Canadian Imperial Bank of Commerce",
+  "sector": "Financial Services",
+  "industry": "Banks - Diversified",
+  "country": "Canada",
+  "cap": "large"
+ },
+ "NA.TO": {
+  "name": "National Bank of Canada",
+  "sector": "Financial Services",
+  "industry": "Banks - Diversified",
+  "country": "Canada",
+  "cap": "large"
+ },
+ "MFC.TO": {
+  "name": "Manulife Financial Corporation",
+  "sector": "Financial Services",
+  "industry": "Insurance - Life",
+  "country": "Canada",
+  "cap": "large"
+ },
+ "SLF.TO": {
+  "name": "Sun Life Financial Inc.",
+  "sector": "Financial Services",
+  "industry": "Insurance - Diversified",
+  "country": "Canada",
+  "cap": "large"
+ },
+ "GWO.TO": {
+  "name": "Great-West Lifeco Inc.",
+  "sector": "Financial Services",
+  "industry": "Insurance - Life",
+  "country": "Canada",
+  "cap": "large"
+ },
+ "IFC.TO": {
+  "name": "Intact Financial Corporation",
+  "sector": "Financial Services",
+  "industry": "Insurance - Property & Casualty",
+  "country": "Canada",
+  "cap": "large"
+ },
+ "POW.TO": {
+  "name": "Power Corporation of Canada",
+  "sector": "Financial Services",
+  "industry": "Insurance - Life",
+  "country": "Canada",
+  "cap": "large"
+ },
+ "FFH.TO": {
+  "name": "Fairfax Financial Holdings Limited",
+  "sector": "Financial Services",
+  "industry": "Insurance - Property & Casualty",
+  "country": "Canada",
+  "cap": "large"
+ },
+ "IAG.TO": {
+  "name": "iA Financial Corporation Inc.",
+  "sector": "Financial Services",
+  "industry": "Insurance - Diversified",
+  "country": "Canada",
+  "cap": "large"
+ },
+ "ENB.TO": {
+  "name": "Enbridge Inc.",
+  "sector": "Energy",
+  "industry": "Oil & Gas Midstream",
+  "country": "Canada",
+  "cap": "large"
+ },
+ "TRP.TO": {
+  "name": "TC Energy Corporation",
+  "sector": "Energy",
+  "industry": "Oil & Gas Midstream",
+  "country": "Canada",
+  "cap": "large"
+ },
+ "CNQ.TO": {
+  "name": "Canadian Natural Resources Limited",
+  "sector": "Energy",
+  "industry": "Oil & Gas E&P",
+  "country": "Canada",
+  "cap": "large"
+ },
+ "SU.TO": {
+  "name": "Suncor Energy Inc.",
+  "sector": "Energy",
+  "industry": "Oil & Gas Integrated",
+  "country": "Canada",
+  "cap": "large"
+ },
+ "CVE.TO": {
+  "name": "Cenovus Energy Inc.",
+  "sector": "Energy",
+  "industry": "Oil & Gas Integrated",
+  "country": "Canada",
+  "cap": "large"
+ },
+ "IMO.TO": {
+  "name": "Imperial Oil Limited",
+  "sector": "Energy",
+  "industry": "Oil & Gas Integrated",
+  "country": "Canada",
+  "cap": "large"
+ },
+ "TOU.TO": {
+  "name": "Tourmaline Oil Corp.",
+  "sector": "Energy",
+  "industry": "Oil & Gas E&P",
+  "country": "Canada",
+  "cap": "large"
+ },
+ "BAM.TO": {
+  "name": "Brookfield Asset Management Ltd.",
+  "sector": "Financial Services",
+  "industry": "Asset Management",
+  "country": "United States",
+  "cap": "large"
+ },
+ "BN.TO": {
+  "name": "Brookfield Corporation",
+  "sector": "Financial Services",
+  "industry": "Asset Management",
+  "country": "Canada",
+  "cap": "large"
+ },
+ "BIP-UN.TO": {
+  "name": "Brookfield Infrastructure Partners L.P.",
+  "sector": "Utilities",
+  "industry": "Utilities - Diversified",
+  "country": "Bermuda",
+  "cap": "large"
+ },
+ "BEP-UN.TO": {
+  "name": "Brookfield Renewable Partners L.P.",
+  "sector": "Utilities",
+  "industry": "Utilities - Renewable",
+  "country": "Canada",
+  "cap": "large"
+ },
+ "FTS.TO": {
+  "name": "Fortis Inc.",
+  "sector": "Utilities",
+  "industry": "Utilities - Regulated Electric",
+  "country": "Canada",
+  "cap": "large"
+ },
+ "EMA.TO": {
+  "name": "Emera Incorporated",
+  "sector": "Utilities",
+  "industry": "Utilities - Regulated Electric",
+  "country": "Canada",
+  "cap": "large"
+ },
+ "PPL.TO": {
+  "name": "Pembina Pipeline Corporation",
+  "sector": "Energy",
+  "industry": "Oil & Gas Midstream",
+  "country": "Canada",
+  "cap": "large"
+ },
+ "H.TO": {
+  "name": "Hydro One Limited",
+  "sector": "Utilities",
+  "industry": "Utilities - Regulated Electric",
+  "country": "Canada",
+  "cap": "large"
+ },
+ "CNR.TO": {
+  "name": "Canadian National Railway Company",
+  "sector": "Industrials",
+  "industry": "Railroads",
+  "country": "Canada",
+  "cap": "large"
+ },
+ "CP.TO": {
+  "name": "Canadian Pacific Kansas City Limited",
+  "sector": "Industrials",
+  "industry": "Railroads",
+  "country": "Canada",
+  "cap": "large"
+ },
+ "WCN.TO": {
+  "name": "Waste Connections, Inc.",
+  "sector": "Industrials",
+  "industry": "Waste Management",
+  "country": "Canada",
+  "cap": "large"
+ },
+ "TFII.TO": {
+  "name": "TFI International Inc.",
+  "sector": "Industrials",
+  "industry": "Trucking",
+  "country": "Canada",
+  "cap": "large"
+ },
+ "CSU.TO": {
+  "name": "Constellation Software Inc.",
+  "sector": "Technology",
+  "industry": "Software - Application",
+  "country": "Canada",
+  "cap": "large"
+ },
+ "SHOP.TO": {
+  "name": "Shopify Inc.",
+  "sector": "Technology",
+  "industry": "Software - Application",
+  "country": "Canada",
+  "cap": "mega"
+ },
+ "OTEX.TO": {
+  "name": "Open Text Corporation",
+  "sector": "Technology",
+  "industry": "Software - Application",
+  "country": "Canada",
+  "cap": "mid"
+ },
+ "GIB-A.TO": {
+  "name": "CGI Inc.",
+  "sector": "Technology",
+  "industry": "Information Technology Services",
+  "country": "Canada",
+  "cap": "large"
+ },
+ "ABX.TO": {
+  "name": "Barrick Mining Corporation",
+  "sector": "Basic Materials",
+  "industry": "Gold",
+  "country": "Canada",
+  "cap": "large"
+ },
+ "AEM.TO": {
+  "name": "Agnico Eagle Mines Limited",
+  "sector": "Basic Materials",
+  "industry": "Gold",
+  "country": "Canada",
+  "cap": "large"
+ },
+ "WPM.TO": {
+  "name": "Wheaton Precious Metals Corp.",
+  "sector": "Basic Materials",
+  "industry": "Gold",
+  "country": "Canada",
+  "cap": "large"
+ },
+ "FNV.TO": {
+  "name": "Franco-Nevada Corporation",
+  "sector": "Basic Materials",
+  "industry": "Gold",
+  "country": "Canada",
+  "cap": "large"
+ },
+ "K.TO": {
+  "name": "Kinross Gold Corporation",
+  "sector": "Basic Materials",
+  "industry": "Gold",
+  "country": "Canada",
+  "cap": "large"
+ },
+ "NTR.TO": {
+  "name": "Nutrien Ltd.",
+  "sector": "Basic Materials",
+  "industry": "Agricultural Inputs",
+  "country": "Canada",
+  "cap": "large"
+ },
+ "TECK-B.TO": {
+  "name": "Teck Resources Limited",
+  "sector": "Basic Materials",
+  "industry": "Other Industrial Metals & Mining",
+  "country": "Canada",
+  "cap": "large"
+ },
+ "FM.TO": {
+  "name": "First Quantum Minerals Ltd.",
+  "sector": "Basic Materials",
+  "industry": "Copper",
+  "country": "Canada",
+  "cap": "large"
+ },
+ "ATD.TO": {
+  "name": "Alimentation Couche-Tard Inc.",
+  "sector": "Consumer Cyclical",
+  "industry": "Specialty Retail",
+  "country": "Canada",
+  "cap": "large"
+ },
+ "DOL.TO": {
+  "name": "Dollarama Inc.",
+  "sector": "Consumer Defensive",
+  "industry": "Discount Stores",
+  "country": "Canada",
+  "cap": "large"
+ },
+ "MRU.TO": {
+  "name": "Metro Inc.",
+  "sector": "Consumer Defensive",
+  "industry": "Grocery Stores",
+  "country": "Canada",
+  "cap": "large"
+ },
+ "L.TO": {
+  "name": "Loblaw Companies Limited",
+  "sector": "Consumer Defensive",
+  "industry": "Grocery Stores",
+  "country": "Canada",
+  "cap": "large"
+ },
+ "WN.TO": {
+  "name": "George Weston Limited",
+  "sector": "Consumer Defensive",
+  "industry": "Grocery Stores",
+  "country": "Canada",
+  "cap": "large"
+ },
+ "QSR.TO": {
+  "name": "Restaurant Brands International Inc.",
+  "sector": "Consumer Cyclical",
+  "industry": "Restaurants",
+  "country": "United States",
+  "cap": "large"
+ },
+ "TRI.TO": {
+  "name": "Thomson Reuters Corporation",
+  "sector": "Industrials",
+  "industry": "Specialty Business Services",
+  "country": "Canada",
+  "cap": "large"
+ },
+ "RCI-B.TO": {
+  "name": "Rogers Communications Inc.",
+  "sector": "Communication Services",
+  "industry": "Telecom Services",
+  "country": "Canada",
+  "cap": "large"
+ },
+ "BCE.TO": {
+  "name": "BCE Inc.",
+  "sector": "Communication Services",
+  "industry": "Telecom Services",
+  "country": "Canada",
+  "cap": "large"
+ },
+ "T.TO": {
+  "name": "TELUS Corporation",
+  "sector": "Communication Services",
+  "industry": "Telecom Services",
+  "country": "Canada",
+  "cap": "large"
+ },
+ "WSP.TO": {
+  "name": "WSP Global Inc.",
+  "sector": "Industrials",
+  "industry": "Engineering & Construction",
+  "country": "Canada",
+  "cap": "large"
+ },
+ "MG.TO": {
+  "name": "Magna International Inc.",
+  "sector": "Consumer Cyclical",
+  "industry": "Auto Parts",
+  "country": "Canada",
+  "cap": "large"
+ },
+ "CLS.TO": {
+  "name": "Celestica Inc.",
+  "sector": "Technology",
+  "industry": "Electronic Components",
+  "country": "Canada",
+  "cap": "large"
+ },
+ "CCO.TO": {
+  "name": "Cameco Corporation",
+  "sector": "Energy",
+  "industry": "Uranium",
+  "country": "Canada",
+  "cap": "large"
+ },
+ "ARX.TO": {
+  "name": "ARC Resources Ltd.",
+  "sector": "Energy",
+  "industry": "Oil & Gas E&P",
+  "country": "Canada",
+  "cap": "large"
+ },
+ "BTE.TO": {
+  "name": "Baytex Energy Corp.",
+  "sector": "Energy",
+  "industry": "Oil & Gas E&P",
+  "country": "Canada",
+  "cap": "mid"
+ },
+ "WCP.TO": {
+  "name": "Whitecap Resources Inc.",
+  "sector": "Energy",
+  "industry": "Oil & Gas E&P",
+  "country": "Canada",
+  "cap": "large"
+ },
+ "VET.TO": {
+  "name": "Vermilion Energy Inc.",
+  "sector": "Energy",
+  "industry": "Oil & Gas E&P",
+  "country": "Canada",
+  "cap": "small"
+ },
+ "TVE.TO": {
+  "name": "Tamarack Valley Energy Ltd.",
+  "sector": "Energy",
+  "industry": "Oil & Gas E&P",
+  "country": "Canada",
+  "cap": "mid"
+ },
+ "PSK.TO": {
+  "name": "PrairieSky Royalty Ltd.",
+  "sector": "Energy",
+  "industry": "Oil & Gas E&P",
+  "country": "Canada",
+  "cap": "mid"
+ },
+ "PEY.TO": {
+  "name": "Peyto Exploration & Development Corp.",
+  "sector": "Energy",
+  "industry": "Oil & Gas E&P",
+  "country": "Canada",
+  "cap": "mid"
+ },
+ "AAV.TO": {
+  "name": "Advantage Energy Ltd.",
+  "sector": "Energy",
+  "industry": "Oil & Gas E&P",
+  "country": "Canada",
+  "cap": "small"
+ },
+ "SGY.TO": {
+  "name": "Surge Energy Inc.",
+  "sector": "Energy",
+  "industry": "Oil & Gas E&P",
+  "country": "Canada",
+  "cap": "small"
+ },
+ "LUC.TO": {
+  "name": "Lucara Diamond Corp.",
+  "sector": "Basic Materials",
+  "industry": "Other Precious Metals & Mining",
+  "country": "Canada",
+  "cap": "small"
+ },
+ "ELD.TO": {
+  "name": "Eldorado Gold Corporation",
+  "sector": "Basic Materials",
+  "industry": "Gold",
+  "country": "Canada",
+  "cap": "large"
+ },
+ "AGI.TO": {
+  "name": "Alamos Gold Inc.",
+  "sector": "Basic Materials",
+  "industry": "Gold",
+  "country": "Canada",
+  "cap": "large"
+ },
+ "OGC.TO": {
+  "name": "OceanaGold Corporation",
+  "sector": "Basic Materials",
+  "industry": "Gold",
+  "country": "Canada",
+  "cap": "mid"
+ },
+ "DPM.TO": {
+  "name": "DPM Metals Inc.",
+  "sector": "Basic Materials",
+  "industry": "Gold",
+  "country": "Canada",
+  "cap": "large"
+ },
+ "IMG.TO": {
+  "name": "IAMGOLD Corporation",
+  "sector": "Basic Materials",
+  "industry": "Gold",
+  "country": "Canada",
+  "cap": "large"
+ },
+ "HBM.TO": {
+  "name": "Hudbay Minerals Inc.",
+  "sector": "Basic Materials",
+  "industry": "Copper",
+  "country": "Canada",
+  "cap": "large"
+ },
+ "CS.TO": {
+  "name": "Capstone Copper Corp.",
+  "sector": "Basic Materials",
+  "industry": "Copper",
+  "country": "Canada",
+  "cap": "large"
+ },
+ "LIF.TO": {
+  "name": "Labrador Iron Ore Royalty Corporation",
+  "sector": "Basic Materials",
+  "industry": "Steel",
+  "country": "Canada",
+  "cap": "small"
+ },
+ "LSPD.TO": {
+  "name": "Lightspeed Commerce Inc.",
+  "sector": "Technology",
+  "industry": "Software - Application",
+  "country": "Canada",
+  "cap": "small"
+ },
+ "DCBO.TO": {
+  "name": "Docebo Inc.",
+  "sector": "Technology",
+  "industry": "Software - Application",
+  "country": "Canada",
+  "cap": "small"
+ },
+ "GS.TO": {
+  "name": "The Goldman Sachs Group, Inc.",
+  "sector": "",
+  "industry": "",
+  "country": "",
+  "cap": "mega"
+ },
+ "TOI.V": {
+  "name": "Topicus.com Inc.",
+  "sector": "Technology",
+  "industry": "Software - Infrastructure",
+  "country": "Netherlands",
+  "cap": "mid"
+ },
+ "DND.TO": {
+  "name": "Dye & Durham Limited",
+  "sector": "Technology",
+  "industry": "Software - Application",
+  "country": "Canada",
+  "cap": "small"
+ },
+ "BB.TO": {
+  "name": "BlackBerry Limited",
+  "sector": "Technology",
+  "industry": "Software - Infrastructure",
+  "country": "Canada",
+  "cap": "mid"
+ },
+ "CIGI.TO": {
+  "name": "Colliers International Group Inc.",
+  "sector": "Real Estate",
+  "industry": "Real Estate Services",
+  "country": "Canada",
+  "cap": "mid"
+ },
+ "STN.TO": {
+  "name": "Stantec Inc.",
+  "sector": "Industrials",
+  "industry": "Engineering & Construction",
+  "country": "Canada",
+  "cap": "large"
+ },
+ "ATS.TO": {
+  "name": "ATS Corporation",
+  "sector": "Industrials",
+  "industry": "Specialty Industrial Machinery",
+  "country": "Canada",
+  "cap": "mid"
+ },
+ "SJ.TO": {
+  "name": "Stella-Jones Inc.",
+  "sector": "Basic Materials",
+  "industry": "Lumber & Wood Production",
+  "country": "Canada",
+  "cap": "mid"
+ },
+ "NFI.TO": {
+  "name": "NFI Group Inc.",
+  "sector": "Consumer Cyclical",
+  "industry": "Auto Manufacturers",
+  "country": "Canada",
+  "cap": "mid"
+ },
+ "RUS.TO": {
+  "name": "Russel Metals Inc.",
+  "sector": "Industrials",
+  "industry": "Industrial Distribution",
+  "country": "Canada",
+  "cap": "mid"
+ },
+ "MTY.TO": {
+  "name": "MTY Food Group Inc.",
+  "sector": "Consumer Cyclical",
+  "industry": "Restaurants",
+  "country": "Canada",
+  "cap": "small"
+ },
+ "BYD.TO": {
+  "name": "Boyd Group Services Inc.",
+  "sector": "Consumer Cyclical",
+  "industry": "Auto & Truck Dealerships",
+  "country": "Canada",
+  "cap": "mid"
+ },
+ "TIH.TO": {
+  "name": "Toromont Industries Ltd.",
+  "sector": "Industrials",
+  "industry": "Industrial Distribution",
+  "country": "Canada",
+  "cap": "large"
+ },
+ "EIF.TO": {
+  "name": "Exchange Income Corporation",
+  "sector": "Industrials",
+  "industry": "Airlines",
+  "country": "Canada",
+  "cap": "mid"
+ },
+ "AC.TO": {
+  "name": "Air Canada",
+  "sector": "Industrials",
+  "industry": "Airlines",
+  "country": "Canada",
+  "cap": "mid"
+ },
+ "GFL.TO": {
+  "name": "GFL Environmental Inc.",
+  "sector": "Industrials",
+  "industry": "Waste Management",
+  "country": "United States",
+  "cap": "large"
+ },
+ "PZA.TO": {
+  "name": "Pizza Pizza Royalty Corp.",
+  "sector": "Consumer Cyclical",
+  "industry": "Restaurants",
+  "country": "Canada",
+  "cap": "small"
+ },
+ "EMP-A.TO": {
+  "name": "Empire Company Limited",
+  "sector": "Consumer Defensive",
+  "industry": "Grocery Stores",
+  "country": "Canada",
+  "cap": "large"
+ },
+ "SAP.TO": {
+  "name": "Saputo Inc.",
+  "sector": "Consumer Defensive",
+  "industry": "Packaged Foods",
+  "country": "Canada",
+  "cap": "large"
+ },
+ "CAR-UN.TO": {
+  "name": "Canadian Apartment Properties Real Estate Investment Trust",
+  "sector": "Real Estate",
+  "industry": "REIT - Residential",
+  "country": "Canada",
+  "cap": "mid"
+ },
+ "HR-UN.TO": {
+  "name": "H&R Real Estate Investment Trust",
+  "sector": "Real Estate",
+  "industry": "REIT - Diversified",
+  "country": "Canada",
+  "cap": "mid"
+ },
+ "AP-UN.TO": {
+  "name": "Allied Properties Real Estate Investment Trust",
+  "sector": "Real Estate",
+  "industry": "REIT - Office",
+  "country": "Canada",
+  "cap": "mid"
+ },
+ "SRU-UN.TO": {
+  "name": "SmartCentres Real Estate Investment Trust",
+  "sector": "Real Estate",
+  "industry": "REIT - Retail",
+  "country": "Canada",
+  "cap": "mid"
+ },
+ "DIR-UN.TO": {
+  "name": "Dream Industrial Real Estate Investment Trust",
+  "sector": "Real Estate",
+  "industry": "REIT - Industrial",
+  "country": "Canada",
+  "cap": "mid"
+ },
+ "CHP-UN.TO": {
+  "name": "Choice Properties Real Estate Investment Trust",
+  "sector": "Real Estate",
+  "industry": "REIT - Retail",
+  "country": "Canada",
+  "cap": "large"
+ },
+ "GRT-UN.TO": {
+  "name": "Granite Real Estate Investment Trust",
+  "sector": "Real Estate",
+  "industry": "REIT - Industrial",
+  "country": "Canada",
+  "cap": "mid"
+ },
+ "MRT-UN.TO": {
+  "name": "Morguard Real Estate Investment Trust",
+  "sector": "Real Estate",
+  "industry": "REIT - Diversified",
+  "country": "Canada",
+  "cap": "small"
+ },
+ "D-UN.TO": {
+  "name": "Dream Office Real Estate Investment Trust",
+  "sector": "Real Estate",
+  "industry": "REIT - Office",
+  "country": "Canada",
+  "cap": "small"
+ },
+ "EQB.TO": {
+  "name": "EQB Inc.",
+  "sector": "Financial Services",
+  "industry": "Banks - Regional",
+  "country": "Canada",
+  "cap": "mid"
+ },
+ "IGM.TO": {
+  "name": "IGM Financial Inc.",
+  "sector": "Financial Services",
+  "industry": "Asset Management",
+  "country": "Canada",
+  "cap": "large"
+ },
+ "CG.TO": {
+  "name": "Centerra Gold Inc.",
+  "sector": "Basic Materials",
+  "industry": "Gold",
+  "country": "Canada",
+  "cap": "mid"
+ },
+ "AQN.TO": {
+  "name": "Algonquin Power & Utilities Corp.",
+  "sector": "Utilities",
+  "industry": "Utilities - Diversified",
+  "country": "Canada",
+  "cap": "mid"
+ },
+ "NPI.TO": {
+  "name": "Northland Power Inc.",
+  "sector": "Utilities",
+  "industry": "Utilities - Renewable",
+  "country": "Canada",
+  "cap": "mid"
+ },
+ "ALA.TO": {
+  "name": "AltaGas Ltd.",
+  "sector": "Energy",
+  "industry": "Oil & Gas Midstream",
+  "country": "Canada",
+  "cap": "large"
+ },
+ "BLX.TO": {
+  "name": "Boralex Inc.",
+  "sector": "Utilities",
+  "industry": "Utilities - Renewable",
+  "country": "Canada",
+  "cap": "mid"
+ },
+ "WELL.TO": {
+  "name": "WELL Health Technologies Corp.",
+  "sector": "Healthcare",
+  "industry": "Medical Care Facilities",
+  "country": "Canada",
+  "cap": "small"
+ },
+ "DRX.TO": {
+  "name": "ADF Group Inc.",
+  "sector": "Industrials",
+  "industry": "Metal Fabrication",
+  "country": "Canada",
+  "cap": "small"
+ },
+ "AZN.L": {
+  "name": "AstraZeneca PLC",
+  "sector": "Healthcare",
+  "industry": "Drug Manufacturers - General",
+  "country": "United Kingdom",
+  "cap": "mega"
+ },
+ "GSK.L": {
+  "name": "GSK plc",
+  "sector": "Healthcare",
+  "industry": "Drug Manufacturers - General",
+  "country": "United Kingdom",
+  "cap": "large"
+ },
+ "SN.L": {
+  "name": "Smith & Nephew plc",
+  "sector": "Healthcare",
+  "industry": "Medical Devices",
+  "country": "United Kingdom",
+  "cap": "mid"
+ },
+ "HLN.L": {
+  "name": "Haleon plc",
+  "sector": "Healthcare",
+  "industry": "Drug Manufacturers - Specialty & Generic",
+  "country": "United Kingdom",
+  "cap": "large"
+ },
+ "ULVR.L": {
+  "name": "Unilever PLC",
+  "sector": "Consumer Defensive",
+  "industry": "Household & Personal Products",
+  "country": "United Kingdom",
+  "cap": "large"
+ },
+ "DGE.L": {
+  "name": "Diageo plc",
+  "sector": "Consumer Defensive",
+  "industry": "Beverages - Wineries & Distilleries",
+  "country": "United Kingdom",
+  "cap": "large"
+ },
+ "BATS.L": {
+  "name": "British American Tobacco p.l.c.",
+  "sector": "Consumer Defensive",
+  "industry": "Tobacco",
+  "country": "United Kingdom",
+  "cap": "large"
+ },
+ "IMB.L": {
+  "name": "Imperial Brands PLC",
+  "sector": "Consumer Defensive",
+  "industry": "Tobacco",
+  "country": "United Kingdom",
+  "cap": "large"
+ },
+ "ABF.L": {
+  "name": "Associated British Foods plc",
+  "sector": "Consumer Defensive",
+  "industry": "Packaged Foods",
+  "country": "United Kingdom",
+  "cap": "large"
+ },
+ "RKT.L": {
+  "name": "Reckitt Benckiser Group plc",
+  "sector": "Consumer Defensive",
+  "industry": "Household & Personal Products",
+  "country": "United Kingdom",
+  "cap": "large"
+ },
+ "TSCO.L": {
+  "name": "Tesco PLC",
+  "sector": "Consumer Defensive",
+  "industry": "Grocery Stores",
+  "country": "United Kingdom",
+  "cap": "large"
+ },
+ "SBRY.L": {
+  "name": "J Sainsbury plc",
+  "sector": "Consumer Defensive",
+  "industry": "Grocery Stores",
+  "country": "United Kingdom",
+  "cap": "mid"
+ },
+ "MKS.L": {
+  "name": "Marks and Spencer Group plc",
+  "sector": "Consumer Cyclical",
+  "industry": "Department Stores",
+  "country": "United Kingdom",
+  "cap": "mid"
+ },
+ "SHEL.L": {
+  "name": "Shell plc",
+  "sector": "Energy",
+  "industry": "Oil & Gas Integrated",
+  "country": "United Kingdom",
+  "cap": "large"
+ },
+ "BP.L": {
+  "name": "BP p.l.c.",
+  "sector": "Energy",
+  "industry": "Oil & Gas Integrated",
+  "country": "United Kingdom",
+  "cap": "large"
+ },
+ "RIO.L": {
+  "name": "Rio Tinto Group",
+  "sector": "Basic Materials",
+  "industry": "Other Industrial Metals & Mining",
+  "country": "United Kingdom",
+  "cap": "large"
+ },
+ "GLEN.L": {
+  "name": "Glencore plc",
+  "sector": "Basic Materials",
+  "industry": "Other Industrial Metals & Mining",
+  "country": "Switzerland",
+  "cap": "large"
+ },
+ "AAL.L": {
+  "name": "Anglo American plc",
+  "sector": "Basic Materials",
+  "industry": "Other Industrial Metals & Mining",
+  "country": "United Kingdom",
+  "cap": "large"
+ },
+ "MNDI.L": {
+  "name": "",
+  "sector": "",
+  "industry": "",
+  "country": "",
+  "cap": ""
+ },
+ "HSBA.L": {
+  "name": "",
+  "sector": "",
+  "industry": "",
+  "country": "",
+  "cap": ""
+ },
+ "LLOY.L": {
+  "name": "",
+  "sector": "",
+  "industry": "",
+  "country": "",
+  "cap": ""
+ },
+ "BARC.L": {
+  "name": "",
+  "sector": "",
+  "industry": "",
+  "country": "",
+  "cap": ""
+ },
+ "NWG.L": {
+  "name": "",
+  "sector": "",
+  "industry": "",
+  "country": "",
+  "cap": ""
+ },
+ "STAN.L": {
+  "name": "",
+  "sector": "",
+  "industry": "",
+  "country": "",
+  "cap": ""
+ },
+ "LSEG.L": {
+  "name": "",
+  "sector": "",
+  "industry": "",
+  "country": "",
+  "cap": ""
+ },
+ "MNG.L": {
+  "name": "",
+  "sector": "",
+  "industry": "",
+  "country": "",
+  "cap": ""
+ },
+ "ADM.L": {
+  "name": "",
+  "sector": "",
+  "industry": "",
+  "country": "",
+  "cap": ""
+ },
+ "PRU.L": {
+  "name": "",
+  "sector": "",
+  "industry": "",
+  "country": "",
+  "cap": ""
+ },
+ "III.L": {
+  "name": "",
+  "sector": "",
+  "industry": "",
+  "country": "",
+  "cap": ""
+ },
+ "BA.L": {
+  "name": "",
+  "sector": "",
+  "industry": "",
+  "country": "",
+  "cap": ""
+ },
+ "RR.L": {
+  "name": "",
+  "sector": "",
+  "industry": "",
+  "country": "",
+  "cap": ""
+ },
+ "SMIN.L": {
+  "name": "",
+  "sector": "",
+  "industry": "",
+  "country": "",
+  "cap": ""
+ },
+ "EXPN.L": {
+  "name": "",
+  "sector": "",
+  "industry": "",
+  "country": "",
+  "cap": ""
+ },
+ "ITRK.L": {
+  "name": "",
+  "sector": "",
+  "industry": "",
+  "country": "",
+  "cap": ""
+ },
+ "HLMA.L": {
+  "name": "",
+  "sector": "",
+  "industry": "",
+  "country": "",
+  "cap": ""
+ },
+ "VOD.L": {
+  "name": "",
+  "sector": "",
+  "industry": "",
+  "country": "",
+  "cap": ""
+ },
+ "BT-A.L": {
+  "name": "",
+  "sector": "",
+  "industry": "",
+  "country": "",
+  "cap": ""
+ },
+ "WPP.L": {
+  "name": "",
+  "sector": "",
+  "industry": "",
+  "country": "",
+  "cap": ""
+ },
+ "NG.L": {
+  "name": "",
+  "sector": "",
+  "industry": "",
+  "country": "",
+  "cap": ""
+ },
+ "SSE.L": {
+  "name": "",
+  "sector": "",
+  "industry": "",
+  "country": "",
+  "cap": ""
+ },
+ "UU.L": {
+  "name": "",
+  "sector": "",
+  "industry": "",
+  "country": "",
+  "cap": ""
+ },
+ "SVT.L": {
+  "name": "",
+  "sector": "",
+  "industry": "",
+  "country": "",
+  "cap": ""
+ },
+ "CNA.L": {
+  "name": "",
+  "sector": "",
+  "industry": "",
+  "country": "",
+  "cap": ""
+ },
+ "LAND.L": {
+  "name": "",
+  "sector": "",
+  "industry": "",
+  "country": "",
+  "cap": ""
+ },
+ "BLND.L": {
+  "name": "",
+  "sector": "",
+  "industry": "",
+  "country": "",
+  "cap": ""
+ },
+ "SGRO.L": {
+  "name": "",
+  "sector": "",
+  "industry": "",
+  "country": "",
+  "cap": ""
+ },
+ "HMSO.L": {
+  "name": "",
+  "sector": "",
+  "industry": "",
+  "country": "",
+  "cap": ""
+ },
+ "CPG.L": {
+  "name": "",
+  "sector": "",
+  "industry": "",
+  "country": "",
+  "cap": ""
+ },
+ "JD.L": {
+  "name": "",
+  "sector": "",
+  "industry": "",
+  "country": "",
+  "cap": ""
+ },
+ "BME.L": {
+  "name": "",
+  "sector": "",
+  "industry": "",
+  "country": "",
+  "cap": ""
+ },
+ "OCDO.L": {
+  "name": "",
+  "sector": "",
+  "industry": "",
+  "country": "",
+  "cap": ""
+ },
+ "EZJ.L": {
+  "name": "",
+  "sector": "",
+  "industry": "",
+  "country": "",
+  "cap": ""
+ },
+ "IAG.L": {
+  "name": "",
+  "sector": "",
+  "industry": "",
+  "country": "",
+  "cap": ""
+ },
+ "AUTO.L": {
+  "name": "",
+  "sector": "",
+  "industry": "",
+  "country": "",
+  "cap": ""
+ },
+ "FLTR.L": {
+  "name": "",
+  "sector": "",
+  "industry": "",
+  "country": "",
+  "cap": ""
+ },
+ "REL.L": {
+  "name": "",
+  "sector": "",
+  "industry": "",
+  "country": "",
+  "cap": ""
+ },
+ "SDR.L": {
+  "name": "",
+  "sector": "",
+  "industry": "",
+  "country": "",
+  "cap": ""
+ },
+ "WISE.L": {
+  "name": "",
+  "sector": "",
+  "industry": "",
+  "country": "",
+  "cap": ""
+ },
+ "DPLM.L": {
+  "name": "",
+  "sector": "",
+  "industry": "",
+  "country": "",
+  "cap": ""
+ },
+ "HIK.L": {
+  "name": "",
+  "sector": "",
+  "industry": "",
+  "country": "",
+  "cap": ""
+ },
+ "WIZZ.L": {
+  "name": "",
+  "sector": "",
+  "industry": "",
+  "country": "",
+  "cap": ""
+ },
+ "ATG.L": {
+  "name": "",
+  "sector": "",
+  "industry": "",
+  "country": "",
+  "cap": ""
+ },
+ "HTG.L": {
+  "name": "",
+  "sector": "",
+  "industry": "",
+  "country": "",
+  "cap": ""
+ },
+ "SPX.L": {
+  "name": "",
+  "sector": "",
+  "industry": "",
+  "country": "",
+  "cap": ""
+ },
+ "BKG.L": {
+  "name": "",
+  "sector": "",
+  "industry": "",
+  "country": "",
+  "cap": ""
+ },
+ "PSN.L": {
+  "name": "",
+  "sector": "",
+  "industry": "",
+  "country": "",
+  "cap": ""
+ },
+ "TW.L": {
+  "name": "",
+  "sector": "",
+  "industry": "",
+  "country": "",
+  "cap": ""
+ },
+ "RTO.L": {
+  "name": "",
+  "sector": "",
+  "industry": "",
+  "country": "",
+  "cap": ""
+ },
+ "BTRW.L": {
+  "name": "",
+  "sector": "",
+  "industry": "",
+  "country": "",
+  "cap": ""
+ },
+ "VTY.L": {
+  "name": "",
+  "sector": "",
+  "industry": "",
+  "country": "",
+  "cap": ""
+ },
+ "BBOX.L": {
+  "name": "",
+  "sector": "",
+  "industry": "",
+  "country": "",
+  "cap": ""
+ },
+ "PHP.L": {
+  "name": "",
+  "sector": "",
+  "industry": "",
+  "country": "",
+  "cap": ""
+ },
+ "IHG.L": {
+  "name": "",
+  "sector": "",
+  "industry": "",
+  "country": "",
+  "cap": ""
+ },
+ "CKN.L": {
+  "name": "",
+  "sector": "",
+  "industry": "",
+  "country": "",
+  "cap": ""
+ },
+ "WEIR.L": {
+  "name": "",
+  "sector": "",
+  "industry": "",
+  "country": "",
+  "cap": ""
+ },
+ "DFS.L": {
+  "name": "",
+  "sector": "",
+  "industry": "",
+  "country": "",
+  "cap": ""
+ },
+ "GNS.L": {
+  "name": "",
+  "sector": "",
+  "industry": "",
+  "country": "",
+  "cap": ""
+ },
+ "INCH.L": {
+  "name": "",
+  "sector": "",
+  "industry": "",
+  "country": "",
+  "cap": ""
+ },
+ "MTO.L": {
+  "name": "",
+  "sector": "",
+  "industry": "",
+  "country": "",
+  "cap": ""
+ },
+ "CHG.L": {
+  "name": "",
+  "sector": "",
+  "industry": "",
+  "country": "",
+  "cap": ""
+ },
+ "CLDN.L": {
+  "name": "",
+  "sector": "",
+  "industry": "",
+  "country": "",
+  "cap": ""
+ },
+ "NXT.L": {
+  "name": "",
+  "sector": "",
+  "industry": "",
+  "country": "",
+  "cap": ""
+ },
+ "PETS.L": {
+  "name": "",
+  "sector": "",
+  "industry": "",
+  "country": "",
+  "cap": ""
+ },
+ "AAF.L": {
+  "name": "",
+  "sector": "",
+  "industry": "",
+  "country": "",
+  "cap": ""
+ },
+ "SBRE.L": {
+  "name": "",
+  "sector": "",
+  "industry": "",
+  "country": "",
+  "cap": ""
+ },
+ "SAP.DE": {
+  "name": "",
+  "sector": "",
+  "industry": "",
+  "country": "",
+  "cap": ""
+ },
+ "ALV.DE": {
+  "name": "",
+  "sector": "",
+  "industry": "",
+  "country": "",
+  "cap": ""
+ },
+ "SIE.DE": {
+  "name": "",
+  "sector": "",
+  "industry": "",
+  "country": "",
+  "cap": ""
+ },
+ "MUV2.DE": {
+  "name": "",
+  "sector": "",
+  "industry": "",
+  "country": "",
+  "cap": ""
+ },
+ "DTE.DE": {
+  "name": "",
+  "sector": "",
+  "industry": "",
+  "country": "",
+  "cap": ""
+ },
+ "RHM.DE": {
+  "name": "",
+  "sector": "",
+  "industry": "",
+  "country": "",
+  "cap": ""
+ },
+ "BAYN.DE": {
+  "name": "",
+  "sector": "",
+  "industry": "",
+  "country": "",
+  "cap": ""
+ },
+ "MBG.DE": {
+  "name": "",
+  "sector": "",
+  "industry": "",
+  "country": "",
+  "cap": ""
+ },
+ "BMW.DE": {
+  "name": "",
+  "sector": "",
+  "industry": "",
+  "country": "",
+  "cap": ""
+ },
+ "IFX.DE": {
+  "name": "",
+  "sector": "",
+  "industry": "",
+  "country": "",
+  "cap": ""
+ },
+ "DB1.DE": {
+  "name": "",
+  "sector": "",
+  "industry": "",
+  "country": "",
+  "cap": ""
+ },
+ "BEI.DE": {
+  "name": "",
+  "sector": "",
+  "industry": "",
+  "country": "",
+  "cap": ""
+ },
+ "AIR.PA": {
+  "name": "",
+  "sector": "",
+  "industry": "",
+  "country": "",
+  "cap": ""
+ },
+ "OR.PA": {
+  "name": "",
+  "sector": "",
+  "industry": "",
+  "country": "",
+  "cap": ""
+ },
+ "MC.PA": {
+  "name": "",
+  "sector": "",
+  "industry": "",
+  "country": "",
+  "cap": ""
+ },
+ "SAN.PA": {
+  "name": "",
+  "sector": "",
+  "industry": "",
+  "country": "",
+  "cap": ""
+ },
+ "BNP.PA": {
+  "name": "",
+  "sector": "",
+  "industry": "",
+  "country": "",
+  "cap": ""
+ },
+ "ENGI.PA": {
+  "name": "",
+  "sector": "",
+  "industry": "",
+  "country": "",
+  "cap": ""
+ },
+ "TTE.PA": {
+  "name": "",
+  "sector": "",
+  "industry": "",
+  "country": "",
+  "cap": ""
+ },
+ "EL.PA": {
+  "name": "",
+  "sector": "",
+  "industry": "",
+  "country": "",
+  "cap": ""
+ },
+ "RMS.PA": {
+  "name": "",
+  "sector": "",
+  "industry": "",
+  "country": "",
+  "cap": ""
+ },
+ "SU.PA": {
+  "name": "",
+  "sector": "",
+  "industry": "",
+  "country": "",
+  "cap": ""
+ },
+ "AI.PA": {
+  "name": "",
+  "sector": "",
+  "industry": "",
+  "country": "",
+  "cap": ""
+ },
+ "DG.PA": {
+  "name": "",
+  "sector": "",
+  "industry": "",
+  "country": "",
+  "cap": ""
+ },
+ "SAF.PA": {
+  "name": "",
+  "sector": "",
+  "industry": "",
+  "country": "",
+  "cap": ""
+ },
+ "CS.PA": {
+  "name": "",
+  "sector": "",
+  "industry": "",
+  "country": "",
+  "cap": ""
+ },
+ "ACA.PA": {
+  "name": "",
+  "sector": "",
+  "industry": "",
+  "country": "",
+  "cap": ""
+ },
+ "ASML.AS": {
+  "name": "",
+  "sector": "",
+  "industry": "",
+  "country": "",
+  "cap": ""
+ },
+ "INGA.AS": {
+  "name": "",
+  "sector": "",
+  "industry": "",
+  "country": "",
+  "cap": ""
+ },
+ "AD.AS": {
+  "name": "",
+  "sector": "",
+  "industry": "",
+  "country": "",
+  "cap": ""
+ },
+ "ENEL.MI": {
+  "name": "",
+  "sector": "",
+  "industry": "",
+  "country": "",
+  "cap": ""
+ },
+ "ISP.MI": {
+  "name": "",
+  "sector": "",
+  "industry": "",
+  "country": "",
+  "cap": ""
+ },
+ "ENI.MI": {
+  "name": "",
+  "sector": "",
+  "industry": "",
+  "country": "",
+  "cap": ""
+ },
+ "UCG.MI": {
+  "name": "",
+  "sector": "",
+  "industry": "",
+  "country": "",
+  "cap": ""
+ },
+ "G.MI": {
+  "name": "",
+  "sector": "",
+  "industry": "",
+  "country": "",
+  "cap": ""
+ },
+ "SAN.MC": {
+  "name": "",
+  "sector": "",
+  "industry": "",
+  "country": "",
+  "cap": ""
+ },
+ "IBE.MC": {
+  "name": "",
+  "sector": "",
+  "industry": "",
+  "country": "",
+  "cap": ""
+ },
+ "BBVA.MC": {
+  "name": "",
+  "sector": "",
+  "industry": "",
+  "country": "",
+  "cap": ""
+ },
+ "ITX.MC": {
+  "name": "",
+  "sector": "",
+  "industry": "",
+  "country": "",
+  "cap": ""
+ },
+ "ABI.BR": {
+  "name": "",
+  "sector": "",
+  "industry": "",
+  "country": "",
+  "cap": ""
+ },
+ "NESN.SW": {
+  "name": "",
+  "sector": "",
+  "industry": "",
+  "country": "",
+  "cap": ""
+ },
+ "NOVN.SW": {
+  "name": "",
+  "sector": "",
+  "industry": "",
+  "country": "",
+  "cap": ""
+ },
+ "RO.SW": {
+  "name": "",
+  "sector": "",
+  "industry": "",
+  "country": "",
+  "cap": ""
+ },
+ "UBSG.SW": {
+  "name": "",
+  "sector": "",
+  "industry": "",
+  "country": "",
+  "cap": ""
+ },
+ "VOW3.DE": {
+  "name": "",
+  "sector": "",
+  "industry": "",
+  "country": "",
+  "cap": ""
+ },
+ "HEN3.DE": {
+  "name": "",
+  "sector": "",
+  "industry": "",
+  "country": "",
+  "cap": ""
+ },
+ "CON.DE": {
+  "name": "",
+  "sector": "",
+  "industry": "",
+  "country": "",
+  "cap": ""
+ },
+ "MTX.DE": {
+  "name": "",
+  "sector": "",
+  "industry": "",
+  "country": "",
+  "cap": ""
+ },
+ "FRE.DE": {
+  "name": "",
+  "sector": "",
+  "industry": "",
+  "country": "",
+  "cap": ""
+ },
+ "ZAL.DE": {
+  "name": "",
+  "sector": "",
+  "industry": "",
+  "country": "",
+  "cap": ""
+ },
+ "DHER.DE": {
+  "name": "",
+  "sector": "",
+  "industry": "",
+  "country": "",
+  "cap": ""
+ },
+ "AFX.DE": {
+  "name": "",
+  "sector": "",
+  "industry": "",
+  "country": "",
+  "cap": ""
+ },
+ "BOSS.DE": {
+  "name": "",
+  "sector": "",
+  "industry": "",
+  "country": "",
+  "cap": ""
+ },
+ "MRK.DE": {
+  "name": "",
+  "sector": "",
+  "industry": "",
+  "country": "",
+  "cap": ""
+ },
+ "FME.DE": {
+  "name": "",
+  "sector": "",
+  "industry": "",
+  "country": "",
+  "cap": ""
+ },
+ "EVT.DE": {
+  "name": "",
+  "sector": "",
+  "industry": "",
+  "country": "",
+  "cap": ""
+ },
+ "HEI.DE": {
+  "name": "",
+  "sector": "",
+  "industry": "",
+  "country": "",
+  "cap": ""
+ },
+ "SHL.DE": {
+  "name": "",
+  "sector": "",
+  "industry": "",
+  "country": "",
+  "cap": ""
+ },
+ "VNA.DE": {
+  "name": "",
+  "sector": "",
+  "industry": "",
+  "country": "",
+  "cap": ""
+ },
+ "TEG.DE": {
+  "name": "",
+  "sector": "",
+  "industry": "",
+  "country": "",
+  "cap": ""
+ },
+ "TUI1.DE": {
+  "name": "",
+  "sector": "",
+  "industry": "",
+  "country": "",
+  "cap": ""
+ },
+ "KER.PA": {
+  "name": "",
+  "sector": "",
+  "industry": "",
+  "country": "",
+  "cap": ""
+ },
+ "DSY.PA": {
+  "name": "",
+  "sector": "",
+  "industry": "",
+  "country": "",
+  "cap": ""
+ },
+ "HO.PA": {
+  "name": "",
+  "sector": "",
+  "industry": "",
+  "country": "",
+  "cap": ""
+ },
+ "SGO.PA": {
+  "name": "",
+  "sector": "",
+  "industry": "",
+  "country": "",
+  "cap": ""
+ },
+ "ML.PA": {
+  "name": "",
+  "sector": "",
+  "industry": "",
+  "country": "",
+  "cap": ""
+ },
+ "RI.PA": {
+  "name": "",
+  "sector": "",
+  "industry": "",
+  "country": "",
+  "cap": ""
+ },
+ "CAP.PA": {
+  "name": "",
+  "sector": "",
+  "industry": "",
+  "country": "",
+  "cap": ""
+ },
+ "PUB.PA": {
+  "name": "",
+  "sector": "",
+  "industry": "",
+  "country": "",
+  "cap": ""
+ },
+ "CA.PA": {
+  "name": "",
+  "sector": "",
+  "industry": "",
+  "country": "",
+  "cap": ""
+ },
+ "VIE.PA": {
+  "name": "",
+  "sector": "",
+  "industry": "",
+  "country": "",
+  "cap": ""
+ },
+ "WLN.PA": {
+  "name": "",
+  "sector": "",
+  "industry": "",
+  "country": "",
+  "cap": ""
+ },
+ "GLE.PA": {
+  "name": "",
+  "sector": "",
+  "industry": "",
+  "country": "",
+  "cap": ""
+ },
+ "SW.PA": {
+  "name": "",
+  "sector": "",
+  "industry": "",
+  "country": "",
+  "cap": ""
+ },
+ "LR.PA": {
+  "name": "",
+  "sector": "",
+  "industry": "",
+  "country": "",
+  "cap": ""
+ },
+ "BN.PA": {
+  "name": "",
+  "sector": "",
+  "industry": "",
+  "country": "",
+  "cap": ""
+ },
+ "MT.AS": {
+  "name": "",
+  "sector": "",
+  "industry": "",
+  "country": "",
+  "cap": ""
+ },
+ "PHIA.AS": {
+  "name": "",
+  "sector": "",
+  "industry": "",
+  "country": "",
+  "cap": ""
+ },
+ "ABN.AS": {
+  "name": "",
+  "sector": "",
+  "industry": "",
+  "country": "",
+  "cap": ""
+ },
+ "NN.AS": {
+  "name": "",
+  "sector": "",
+  "industry": "",
+  "country": "",
+  "cap": ""
+ },
+ "AKZA.AS": {
+  "name": "",
+  "sector": "",
+  "industry": "",
+  "country": "",
+  "cap": ""
+ },
+ "WKL.AS": {
+  "name": "",
+  "sector": "",
+  "industry": "",
+  "country": "",
+  "cap": ""
+ },
+ "HEIA.AS": {
+  "name": "",
+  "sector": "",
+  "industry": "",
+  "country": "",
+  "cap": ""
+ },
+ "URW.PA": {
+  "name": "",
+  "sector": "",
+  "industry": "",
+  "country": "",
+  "cap": ""
+ },
+ "RAND.AS": {
+  "name": "",
+  "sector": "",
+  "industry": "",
+  "country": "",
+  "cap": ""
+ },
+ "IMCD.AS": {
+  "name": "",
+  "sector": "",
+  "industry": "",
+  "country": "",
+  "cap": ""
+ },
+ "BESI.AS": {
+  "name": "",
+  "sector": "",
+  "industry": "",
+  "country": "",
+  "cap": ""
+ },
+ "UCB.BR": {
+  "name": "",
+  "sector": "",
+  "industry": "",
+  "country": "",
+  "cap": ""
+ },
+ "COLR.BR": {
+  "name": "",
+  "sector": "",
+  "industry": "",
+  "country": "",
+  "cap": ""
+ },
+ "KBC.BR": {
+  "name": "",
+  "sector": "",
+  "industry": "",
+  "country": "",
+  "cap": ""
+ },
+ "AGS.BR": {
+  "name": "",
+  "sector": "",
+  "industry": "",
+  "country": "",
+  "cap": ""
+ },
+ "SOLB.BR": {
+  "name": "",
+  "sector": "",
+  "industry": "",
+  "country": "",
+  "cap": ""
+ },
+ "WDP.BR": {
+  "name": "",
+  "sector": "",
+  "industry": "",
+  "country": "",
+  "cap": ""
+ },
+ "ZURN.SW": {
+  "name": "",
+  "sector": "",
+  "industry": "",
+  "country": "",
+  "cap": ""
+ },
+ "ABBN.SW": {
+  "name": "",
+  "sector": "",
+  "industry": "",
+  "country": "",
+  "cap": ""
+ },
+ "CFR.SW": {
+  "name": "",
+  "sector": "",
+  "industry": "",
+  "country": "",
+  "cap": ""
+ },
+ "ALC.SW": {
+  "name": "",
+  "sector": "",
+  "industry": "",
+  "country": "",
+  "cap": ""
+ },
+ "GEBN.SW": {
+  "name": "",
+  "sector": "",
+  "industry": "",
+  "country": "",
+  "cap": ""
+ },
+ "LONN.SW": {
+  "name": "",
+  "sector": "",
+  "industry": "",
+  "country": "",
+  "cap": ""
+ },
+ "SREN.SW": {
+  "name": "",
+  "sector": "",
+  "industry": "",
+  "country": "",
+  "cap": ""
+ },
+ "SLHN.SW": {
+  "name": "",
+  "sector": "",
+  "industry": "",
+  "country": "",
+  "cap": ""
+ },
+ "ADEN.SW": {
+  "name": "",
+  "sector": "",
+  "industry": "",
+  "country": "",
+  "cap": ""
+ },
+ "SGKN.SW": {
+  "name": "",
+  "sector": "",
+  "industry": "",
+  "country": "",
+  "cap": ""
+ },
+ "RACE.MI": {
+  "name": "",
+  "sector": "",
+  "industry": "",
+  "country": "",
+  "cap": ""
+ },
+ "STLAM.MI": {
+  "name": "",
+  "sector": "",
+  "industry": "",
+  "country": "",
+  "cap": ""
+ },
+ "LDO.MI": {
+  "name": "",
+  "sector": "",
+  "industry": "",
+  "country": "",
+  "cap": ""
+ },
+ "TIT.MI": {
+  "name": "",
+  "sector": "",
+  "industry": "",
+  "country": "",
+  "cap": ""
+ },
+ "PST.MI": {
+  "name": "",
+  "sector": "",
+  "industry": "",
+  "country": "",
+  "cap": ""
+ },
+ "BMED.MI": {
+  "name": "",
+  "sector": "",
+  "industry": "",
+  "country": "",
+  "cap": ""
+ },
+ "PRY.MI": {
+  "name": "",
+  "sector": "",
+  "industry": "",
+  "country": "",
+  "cap": ""
+ },
+ "CPR.MI": {
+  "name": "",
+  "sector": "",
+  "industry": "",
+  "country": "",
+  "cap": ""
+ },
+ "MONC.MI": {
+  "name": "",
+  "sector": "",
+  "industry": "",
+  "country": "",
+  "cap": ""
+ },
+ "REP.MC": {
+  "name": "",
+  "sector": "",
+  "industry": "",
+  "country": "",
+  "cap": ""
+ },
+ "ELE.MC": {
+  "name": "",
+  "sector": "",
+  "industry": "",
+  "country": "",
+  "cap": ""
+ },
+ "TEF.MC": {
+  "name": "",
+  "sector": "",
+  "industry": "",
+  "country": "",
+  "cap": ""
+ },
+ "FER.MC": {
+  "name": "",
+  "sector": "",
+  "industry": "",
+  "country": "",
+  "cap": ""
+ },
+ "AMS.MC": {
+  "name": "",
+  "sector": "",
+  "industry": "",
+  "country": "",
+  "cap": ""
+ },
+ "MAP.MC": {
+  "name": "",
+  "sector": "",
+  "industry": "",
+  "country": "",
+  "cap": ""
+ },
+ "NOKIA.HE": {
+  "name": "",
+  "sector": "",
+  "industry": "",
+  "country": "",
+  "cap": ""
+ },
+ "NESTE.HE": {
+  "name": "",
+  "sector": "",
+  "industry": "",
+  "country": "",
+  "cap": ""
+ },
+ "SAMPO.HE": {
+  "name": "",
+  "sector": "",
+  "industry": "",
+  "country": "",
+  "cap": ""
+ },
+ "FORTUM.HE": {
+  "name": "",
+  "sector": "",
+  "industry": "",
+  "country": "",
+  "cap": ""
+ },
+ "ERIC-B.ST": {
+  "name": "",
+  "sector": "",
+  "industry": "",
+  "country": "",
+  "cap": ""
+ },
+ "VOLV-B.ST": {
+  "name": "",
+  "sector": "",
+  "industry": "",
+  "country": "",
+  "cap": ""
+ },
+ "ATCO-A.ST": {
+  "name": "",
+  "sector": "",
+  "industry": "",
+  "country": "",
+  "cap": ""
+ },
+ "SAND.ST": {
+  "name": "",
+  "sector": "",
+  "industry": "",
+  "country": "",
+  "cap": ""
+ },
+ "ESSITY-B.ST": {
+  "name": "",
+  "sector": "",
+  "industry": "",
+  "country": "",
+  "cap": ""
+ },
+ "NHY.OL": {
+  "name": "",
+  "sector": "",
+  "industry": "",
+  "country": "",
+  "cap": ""
+ },
+ "DNB.OL": {
+  "name": "",
+  "sector": "",
+  "industry": "",
+  "country": "",
+  "cap": ""
+ },
+ "TEL.OL": {
+  "name": "",
+  "sector": "",
+  "industry": "",
+  "country": "",
+  "cap": ""
+ },
+ "EQNR.OL": {
+  "name": "",
+  "sector": "",
+  "industry": "",
+  "country": "",
+  "cap": ""
+ },
+ "ORK.OL": {
+  "name": "",
+  "sector": "",
+  "industry": "",
+  "country": "",
+  "cap": ""
+ },
+ "NOVO-B.CO": {
+  "name": "",
+  "sector": "",
+  "industry": "",
+  "country": "",
+  "cap": ""
+ },
+ "DSV.CO": {
+  "name": "",
+  "sector": "",
+  "industry": "",
+  "country": "",
+  "cap": ""
+ },
+ "CARL-B.CO": {
+  "name": "",
+  "sector": "",
+  "industry": "",
+  "country": "",
+  "cap": ""
+ },
+ "MAERSK-B.CO": {
+  "name": "",
+  "sector": "",
+  "industry": "",
+  "country": "",
+  "cap": ""
+ },
+ "TM": {
+  "name": "",
+  "sector": "",
+  "industry": "",
+  "country": "",
+  "cap": ""
+ },
+ "SONY": {
+  "name": "",
+  "sector": "",
+  "industry": "",
+  "country": "",
+  "cap": ""
+ },
+ "MUFG": {
+  "name": "",
+  "sector": "",
+  "industry": "",
+  "country": "",
+  "cap": ""
+ },
+ "HMC": {
+  "name": "",
+  "sector": "",
+  "industry": "",
+  "country": "",
+  "cap": ""
+ },
+ "SMFG": {
+  "name": "",
+  "sector": "",
+  "industry": "",
+  "country": "",
+  "cap": ""
+ },
+ "MFG": {
+  "name": "",
+  "sector": "",
+  "industry": "",
+  "country": "",
+  "cap": ""
+ },
+ "NTTYY": {
+  "name": "",
+  "sector": "",
+  "industry": "",
+  "country": "",
+  "cap": ""
+ },
+ "NTDOY": {
+  "name": "",
+  "sector": "",
+  "industry": "",
+  "country": "",
+  "cap": ""
+ },
+ "FANUY": {
+  "name": "",
+  "sector": "",
+  "industry": "",
+  "country": "",
+  "cap": ""
+ },
+ "KYOCY": {
+  "name": "",
+  "sector": "",
+  "industry": "",
+  "country": "",
+  "cap": ""
+ },
+ "HTHIY": {
+  "name": "",
+  "sector": "",
+  "industry": "",
+  "country": "",
+  "cap": ""
+ },
+ "KB": {
+  "name": "",
+  "sector": "",
+  "industry": "",
+  "country": "",
+  "cap": ""
+ },
+ "SHG": {
+  "name": "",
+  "sector": "",
+  "industry": "",
+  "country": "",
+  "cap": ""
+ },
+ "KEP": {
+  "name": "",
+  "sector": "",
+  "industry": "",
+  "country": "",
+  "cap": ""
+ },
+ "PKX": {
+  "name": "",
+  "sector": "",
+  "industry": "",
+  "country": "",
+  "cap": ""
+ },
+ "UMC": {
+  "name": "",
+  "sector": "",
+  "industry": "",
+  "country": "",
+  "cap": ""
+ },
+ "ASX": {
+  "name": "",
+  "sector": "",
+  "industry": "",
+  "country": "",
+  "cap": ""
+ },
+ "HIMX": {
+  "name": "",
+  "sector": "",
+  "industry": "",
+  "country": "",
+  "cap": ""
+ },
+ "BABA": {
+  "name": "",
+  "sector": "",
+  "industry": "",
+  "country": "",
+  "cap": ""
+ },
+ "NIO": {
+  "name": "",
+  "sector": "",
+  "industry": "",
+  "country": "",
+  "cap": ""
+ },
+ "LI": {
+  "name": "",
+  "sector": "",
+  "industry": "",
+  "country": "",
+  "cap": ""
+ },
+ "XPEV": {
+  "name": "",
+  "sector": "",
+  "industry": "",
+  "country": "",
+  "cap": ""
+ },
+ "TME": {
+  "name": "",
+  "sector": "",
+  "industry": "",
+  "country": "",
+  "cap": ""
+ },
+ "NTES": {
+  "name": "",
+  "sector": "",
+  "industry": "",
+  "country": "",
+  "cap": ""
+ },
+ "INFY": {
+  "name": "",
+  "sector": "",
+  "industry": "",
+  "country": "",
+  "cap": ""
+ },
+ "WIT": {
+  "name": "",
+  "sector": "",
+  "industry": "",
+  "country": "",
+  "cap": ""
+ },
+ "HDB": {
+  "name": "",
+  "sector": "",
+  "industry": "",
+  "country": "",
+  "cap": ""
+ },
+ "IBN": {
+  "name": "",
+  "sector": "",
+  "industry": "",
+  "country": "",
+  "cap": ""
+ },
+ "SIFY": {
+  "name": "",
+  "sector": "",
+  "industry": "",
+  "country": "",
+  "cap": ""
+ },
+ "VALE": {
+  "name": "",
+  "sector": "",
+  "industry": "",
+  "country": "",
+  "cap": ""
+ },
+ "PBR": {
+  "name": "",
+  "sector": "",
+  "industry": "",
+  "country": "",
+  "cap": ""
+ },
+ "PBR-A": {
+  "name": "",
+  "sector": "",
+  "industry": "",
+  "country": "",
+  "cap": ""
+ },
+ "ITUB": {
+  "name": "",
+  "sector": "",
+  "industry": "",
+  "country": "",
+  "cap": ""
+ },
+ "BBD": {
+  "name": "",
+  "sector": "",
+  "industry": "",
+  "country": "",
+  "cap": ""
+ },
+ "ABEV": {
+  "name": "",
+  "sector": "",
+  "industry": "",
+  "country": "",
+  "cap": ""
+ },
+ "BHP": {
+  "name": "",
+  "sector": "",
+  "industry": "",
+  "country": "",
+  "cap": ""
+ },
+ "RIO": {
+  "name": "",
+  "sector": "",
+  "industry": "",
+  "country": "",
+  "cap": ""
+ },
+ "BTI": {
+  "name": "",
+  "sector": "",
+  "industry": "",
+  "country": "",
+  "cap": ""
+ },
+ "DEO": {
+  "name": "",
+  "sector": "",
+  "industry": "",
+  "country": "",
+  "cap": ""
+ },
+ "UL": {
+  "name": "",
+  "sector": "",
+  "industry": "",
+  "country": "",
+  "cap": ""
+ },
+ "HSBC": {
+  "name": "",
+  "sector": "",
+  "industry": "",
+  "country": "",
+  "cap": ""
+ },
+ "BCS": {
+  "name": "",
+  "sector": "",
+  "industry": "",
+  "country": "",
+  "cap": ""
+ },
+ "LYG": {
+  "name": "",
+  "sector": "",
+  "industry": "",
+  "country": "",
+  "cap": ""
+ },
+ "NGG": {
+  "name": "",
+  "sector": "",
+  "industry": "",
+  "country": "",
+  "cap": ""
+ },
+ "AZN": {
+  "name": "",
+  "sector": "",
+  "industry": "",
+  "country": "",
+  "cap": ""
+ },
+ "RHHBY": {
+  "name": "",
+  "sector": "",
+  "industry": "",
+  "country": "",
+  "cap": ""
+ },
+ "SAP": {
+  "name": "",
+  "sector": "",
+  "industry": "",
+  "country": "",
+  "cap": ""
+ }
+}

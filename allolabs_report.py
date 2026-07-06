@@ -17,6 +17,12 @@ from matplotlib.patches import FancyBboxPatch, Rectangle
 from allolabs_report_memo import create_investment_memo
 
 
+# ═══════════════════════════════════════════════════════════════════════════════
+# SECTION: Color Palette & Module Constants
+# Dark-terminal color scheme used across all PDF pages.
+# ALLOCATION_APPENDIX_* constants govern the detailed allocation table layout.
+# ═══════════════════════════════════════════════════════════════════════════════
+
 NAVY = "#05070A"
 BLUE = "#4DA3FF"
 TEAL = "#20C77A"
@@ -36,6 +42,13 @@ ALLOCATION_APPENDIX_ROWS_PER_PAGE = 28
 COMPANY_LOGO_DIR = Path(__file__).resolve().parent / "resources" / "company-logos"
 COMPANY_LOGO_PATTERN = re.compile(r"^[A-Z0-9][A-Z0-9.\-]{0,19}$")
 COMPANY_LOGO_CACHE = {}
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# SECTION: Sector Classification Data
+# SECTOR_MAP: hand-curated per-ticker sector overrides (highest priority).
+# YAHOO_SECTOR_MAP: normalises Yahoo Finance sector strings to GICS names.
+# INDUSTRY_KEYWORDS: keyword-based fallback for tickers not in either map.
+# ═══════════════════════════════════════════════════════════════════════════════
 
 SECTOR_MAP = {
     "AEM.TO": "Materials",
@@ -164,6 +177,13 @@ INDUSTRY_KEYWORDS = {
 LAST_SECTORS: dict[str, str] = {}
 
 
+# ═══════════════════════════════════════════════════════════════════════════════
+# SECTION: Sector Resolution
+# resolve_sectors() is the main public entry: it chains SECTOR_MAP →
+# research metadata → LAST_SECTORS cache → Yahoo Finance lookup.
+# Results are persisted atomically to sector_cache.json.
+# ═══════════════════════════════════════════════════════════════════════════════
+
 def _infer_sector(industry):
     normalized = str(industry or "").strip().lower()
     for sector, keywords in INDUSTRY_KEYWORDS.items():
@@ -238,6 +258,12 @@ def resolve_sectors(tickers, max_weights, min_weights, analysis, cache_path):
     SECTOR_MAP.update(current)
     return current
 
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# SECTION: Chart & Layout Helpers
+# Low-level drawing primitives (rounded boxes, logos, headers, metric cards,
+# bar/sector charts) shared across all PDF page-builder functions below.
+# ═══════════════════════════════════════════════════════════════════════════════
 
 def _rounded_box(fig, x, y, width, height, facecolor=WHITE, edgecolor=GRID, radius=0.012):
     box = FancyBboxPatch(
@@ -542,6 +568,13 @@ def _draw_sector_comparison(ax, max_sector, min_sector):
     for label in legend.get_texts():
         label.set_color(INK)
 
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# SECTION: PDF Page Builders
+# One function per report page.  Each receives a PdfPages handle and writes
+# exactly one matplotlib figure to it.  Page order is determined by
+# create_portfolio_pdf() at the bottom of this module.
+# ═══════════════════════════════════════════════════════════════════════════════
 
 def _return_bridge_page(pdf, max_frame, min_frame, max_metrics, min_metrics, page_number):
     fig = plt.figure(figsize=(8.5, 11))
@@ -983,6 +1016,14 @@ def _allocation_appendix(pdf, max_frame, min_frame, page_number):
 
     return page_count
 
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# SECTION: Main Entry Point
+# create_portfolio_pdf() is the sole public function.  It resolves sectors,
+# builds the two portfolio DataFrames, exports the CSV allocation schedule, and
+# delegates the actual PDF rendering to create_investment_memo() in
+# allolabs_report_memo.py.
+# ═══════════════════════════════════════════════════════════════════════════════
 
 def create_portfolio_pdf(
     output_path,

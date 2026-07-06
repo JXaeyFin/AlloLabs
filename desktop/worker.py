@@ -5,6 +5,13 @@ from __future__ import annotations
 import sys
 
 
+# ═══════════════════════════════════════════════════════════════════════════════
+# SECTION: Self-Test
+# Verifies that all analysis dependencies are importable and prints a JSON
+# status payload.  Called by the desktop app at startup to confirm the worker
+# bundle is intact before accepting user runs.
+# ═══════════════════════════════════════════════════════════════════════════════
+
 def self_test() -> int:
     import json
 
@@ -31,11 +38,14 @@ def self_test() -> int:
     return 0
 
 
-def main() -> int:
-    arguments = sys.argv[1:]
-    if not arguments:
-        raise SystemExit("Usage: AlloLabsWorker --run ... | --company-details ...")
+# ═══════════════════════════════════════════════════════════════════════════════
+# SECTION: Entry Point
+# Dispatches to the appropriate worker mode based on the first CLI argument.
+# Three modes: --run (pipeline), --self-test (dependency check),
+# --company-details (single-ticker context fetch).
+# ═══════════════════════════════════════════════════════════════════════════════
 
+def _dispatch(arguments: list[str]) -> int:
     if arguments[0] == "--run":
         if len(arguments) != 3:
             raise SystemExit(
@@ -58,6 +68,28 @@ def main() -> int:
         return company_details.main()
 
     raise SystemExit(f"Unknown AlloLabs worker mode: {arguments[0]}")
+
+
+def main() -> int:
+    arguments = sys.argv[1:]
+    if not arguments:
+        raise SystemExit("Usage: AlloLabsWorker --run ... | --company-details ...")
+
+    # SystemExit (usage messages) and KeyboardInterrupt propagate untouched.
+    # Anything else — a missing bundled dependency, an import-time failure —
+    # becomes a single readable error line plus a non-zero exit code so the
+    # desktop shell never surfaces a raw traceback from the worker process.
+    try:
+        return _dispatch(arguments)
+    except (SystemExit, KeyboardInterrupt):
+        raise
+    except Exception as exc:  # noqa: BLE001 - top-level worker safety net
+        print(
+            f"AlloLabs worker failed ({arguments[0]}): {type(exc).__name__}: {exc}",
+            file=sys.stderr,
+            flush=True,
+        )
+        return 1
 
 
 if __name__ == "__main__":

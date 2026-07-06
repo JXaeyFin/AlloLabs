@@ -14,9 +14,14 @@ from datetime import date, datetime
 from pathlib import Path
 
 try:
-    from dashboard.universe import CANADA_RESEARCH_TICKERS, CURATED_RESEARCH_TICKERS
+    from dashboard.market_tickers import CANADA_RESEARCH_TICKERS, CURATED_RESEARCH_TICKERS
 except ModuleNotFoundError:  # Direct execution: python dashboard/runner.py
-    from universe import CANADA_RESEARCH_TICKERS, CURATED_RESEARCH_TICKERS
+    from market_tickers import CANADA_RESEARCH_TICKERS, CURATED_RESEARCH_TICKERS  # type: ignore[no-redef]
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# SECTION: Module Constants
+# Exchange display metadata and cache TTL.
+# ═══════════════════════════════════════════════════════════════════════════════
 
 LISTING_CACHE_MAX_AGE_DAYS = 30
 EXCHANGE_DETAILS = {
@@ -40,6 +45,12 @@ EXCHANGE_DETAILS = {
     "SWX": ("SIX Swiss Exchange", "Switzerland", "🇨🇭"),
 }
 
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# SECTION: Listing Helpers
+# Fetch, normalise, and cache per-ticker exchange/country metadata used in
+# the configuration UI.  Cached to listing_cache.json (TTL: 30 days).
+# ═══════════════════════════════════════════════════════════════════════════════
 
 def fallback_listing(ticker: str) -> dict:
     suffixes = (
@@ -138,12 +149,26 @@ def resolve_listing_metadata(tickers, cache_path: Path) -> dict[str, dict]:
                 ticker, listing = future.result()
                 resolved[ticker] = listing
 
-    cache_path.write_text(
-        json.dumps({ticker: resolved[ticker] for ticker in sorted(resolved)}, indent=2),
-        encoding="utf-8",
+    # Write atomically (temp file + replace) so an interrupted write cannot
+    # leave a truncated JSON cache that the next run would fail to parse.
+    serialized = json.dumps(
+        {ticker: resolved[ticker] for ticker in sorted(resolved)}, indent=2
     )
+    try:
+        temporary = cache_path.with_suffix(cache_path.suffix + ".tmp")
+        temporary.write_text(serialized, encoding="utf-8")
+        temporary.replace(cache_path)
+    except OSError as exc:
+        print(f"[runner] WARNING: Could not update listing cache: {exc}", flush=True)
     return resolved
 
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# SECTION: Environment Builder
+# Translates the validated JSON config into environment variables consumed by
+# the allolabs.py subprocess.  Injects API keys from the host environment but
+# never passes them back in the JSON response.
+# ═══════════════════════════════════════════════════════════════════════════════
 
 def configuration_environment(config: dict) -> dict[str, str]:
     training_years = float(config["trainingYears"])
@@ -372,6 +397,12 @@ def archive_completed_run(
     return result["archive"]
 
 
+# ═══════════════════════════════════════════════════════════════════════════════
+# SECTION: Run Output Persistence
+# Serialises the completed namespace to JSON and CSV, archives the run, and
+# writes a stable latest_run.json pointer consumed by the dashboard.
+# ═══════════════════════════════════════════════════════════════════════════════
+
 def write_latest_run(namespace: dict, config: dict, script_path: Path) -> Path:
     data_dir = Path(namespace.get("DATA_DIR", script_path.parent)).resolve()
     data_dir.mkdir(parents=True, exist_ok=True)
@@ -491,20 +522,53 @@ def write_latest_run(namespace: dict, config: dict, script_path: Path) -> Path:
     return output_path
 
 
+# ═══════════════════════════════════════════════════════════════════════════════
+# SECTION: CLI Entry Point
+# Parses the JSON config from argv, resolves the analysis environment,
+# executes allolabs.py via runpy, and writes all output artefacts.
+# Exits non-zero if the pipeline raises or returns a non-zero code.
+# ═══════════════════════════════════════════════════════════════════════════════
+
 def main() -> int:
     if len(sys.argv) != 3:
         raise SystemExit("Usage: runner.py PATH_TO_ALLOLABS CONFIG_JSON")
 
     script_path = Path(sys.argv[1]).resolve()
-    config = json.loads(sys.argv[2])
+    try:
+        config = json.loads(sys.argv[2])
+    except json.JSONDecodeError as exc:
+        print(f"[runner] ERROR: Run configuration is not valid JSON: {exc}", flush=True)
+        return 1
     if not script_path.is_file():
         raise FileNotFoundError(f"AlloLabs script not found: {script_path}")
     os.environ.update(configuration_environment(config))
 
     sys.path.insert(0, str(script_path.parent))
     print("[runner] Configuration validated. Starting AlloLabs.", flush=True)
-    namespace = runpy.run_path(str(script_path), run_name="__main__")
-    write_latest_run(namespace, config, script_path)
+
+    # A crash inside allolabs.py (or while persisting its output) must surface as
+    # a clean, user-readable failure line and a non-zero exit code rather than a
+    # raw traceback dumped to the dashboard log.  The full traceback is still
+    # printed afterwards so it remains available for diagnostics, but the leading
+    # banner is what the operator reads first.  Because latest_run.json is only
+    # written atomically on success, a failed run cannot leave a half-written
+    # result that a later view could mistake for a completed run.
+    try:
+        namespace = runpy.run_path(str(script_path), run_name="__main__")
+        write_latest_run(namespace, config, script_path)
+    except Exception as exc:  # noqa: BLE001 - convert to a readable run failure
+        import traceback
+
+        print(
+            f"[runner] ERROR: AlloLabs run failed: {type(exc).__name__}: {exc}",
+            flush=True,
+        )
+        print(
+            "[runner] The run did not complete; no new results were saved.",
+            flush=True,
+        )
+        traceback.print_exc()
+        return 1
     return 0
 
 

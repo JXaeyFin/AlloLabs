@@ -7,8 +7,20 @@ import sys
 from pathlib import Path
 
 
+# ═══════════════════════════════════════════════════════════════════════════════
+# SECTION: Module Constants
+# Single source of truth for the application name used in data directory paths.
+# ═══════════════════════════════════════════════════════════════════════════════
+
 APP_NAME = "AlloLabs"
 
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# SECTION: Path Resolvers
+# Functions called by every module that needs to locate bundled assets or
+# write generated output.  Both work correctly in source and frozen (PyInstaller)
+# environments, and respect the ALLOLABS_DATA_DIR override env var.
+# ═══════════════════════════════════════════════════════════════════════════════
 
 def application_root() -> Path:
     """Return the directory containing bundled read-only application assets."""

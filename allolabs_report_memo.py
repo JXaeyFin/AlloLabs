@@ -14,6 +14,12 @@ from matplotlib.backends.backend_pdf import PdfPages
 from matplotlib.patches import FancyBboxPatch, Rectangle
 
 
+# ═══════════════════════════════════════════════════════════════════════════════
+# SECTION: Color Palette & Module Constants
+# Paper/editorial color scheme (off-white background, navy ink) contrasting with
+# the dark terminal palette used in allolabs_report.py.
+# ═══════════════════════════════════════════════════════════════════════════════
+
 PAGE = "#F7F5F0"
 PAPER = "#FFFFFF"
 NAVY = "#12263A"
@@ -34,6 +40,13 @@ APPENDIX_MIN_WEIGHT = 0.00005
 APPENDIX_ROWS = 38
 _LOGO_CACHE = {}
 
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# SECTION: Industry Profile Library
+# Each entry is a tuple of (keyword_match_tuple, display_name, earnings_driver,
+# rate_sensitivity, portfolio_role, key_metrics_to_watch).
+# Matched by lowercased industry string from yfinance; first match wins.
+# ═══════════════════════════════════════════════════════════════════════════════
 
 INDUSTRY_PROFILES = [
     (
@@ -221,6 +234,12 @@ HEDGE_RELATIONSHIPS = [
     ("Industrials", "Health Care", "Capital cycle versus defensive growth", "Industrials depend on orders and utilization; health care relies more on clinical demand and product cycles, reducing dependence on one macro pathway."),
 ]
 
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# SECTION: Utility & Layout Helpers
+# Formatting, text wrapping, table, logo drawing, and primitive drawing
+# functions shared by all memo page builders below.
+# ═══════════════════════════════════════════════════════════════════════════════
 
 def _safe_float(value, default=0.0):
     try:
@@ -448,6 +467,12 @@ def _table(ax, rows, columns, widths=None, header_color=NAVY, font_size=7.6, row
             cell.get_text().set_color(INK)
     return table
 
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# SECTION: Memo Page Builders
+# One function per report page/section.  Assembled in order by
+# create_investment_memo() at the bottom of this file.
+# ═══════════════════════════════════════════════════════════════════════════════
 
 def _cover(builder, training_start, training_end, max_stats, min_stats):
     builder.page_number += 1
@@ -867,6 +892,12 @@ def _allocation_appendix(builder, max_frame, min_frame):
             )
             builder.save(fig)
 
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# SECTION: Main Entry Point
+# create_investment_memo() is the only public function.  It orchestrates all
+# memo page builders in sequence and writes the final PDF.
+# ═══════════════════════════════════════════════════════════════════════════════
 
 def create_investment_memo(
     output_path,

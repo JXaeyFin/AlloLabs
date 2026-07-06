@@ -62,10 +62,10 @@ cp "$ROOT/packaging/PORTABLE_README.md" "$TARGET/README.md"
 
 if [[ "$PLATFORM" == "macOS" ]]; then
   ditto -c -k --sequesterRsrc --keepParent \
-    "$TARGET" "$ROOT/dist/AlloLabs-v1.3.1-${PLATFORM}-${ARCH}.zip"
+    "$TARGET" "$ROOT/dist/AlloLabs-v1.4.0-${PLATFORM}-${ARCH}.zip"
 else
   tar -C "$ROOT/dist" -czf \
-    "$ROOT/dist/AlloLabs-v1.3.1-${PLATFORM}-${ARCH}.tar.gz" \
+    "$ROOT/dist/AlloLabs-v1.4.0-${PLATFORM}-${ARCH}.tar.gz" \
     "AlloLabs-${PLATFORM}-${ARCH}"
 fi
 
