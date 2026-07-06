@@ -91,8 +91,8 @@ thesis-alignment behavior, and makes the desktop workflow more resilient.
 
 ## Validation
 
-- `python -m unittest discover -s tests -v`: 45 passed, 6 dependency-based
-  report tests skipped when scientific reporting packages are unavailable.
+- `python -m unittest discover -s tests -v`: 45 tests run; 6 dependency-based
+  report tests skipped because scientific reporting packages were unavailable.
 - Python compilation checks pass for the pipeline, guide, relay, runner, and
   test suite.
 - `node --check dashboard/app.js` passes.
