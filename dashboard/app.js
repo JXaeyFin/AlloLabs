@@ -3474,8 +3474,8 @@ function alloDockRestore() {
   dock.hidden = true;
 }
 
-function alloDockSync(viewName) {
-  if (guideModeEnabled && viewName !== "guide") {
+function alloDockSync() {
+  if (guideModeEnabled) {
     alloDockMount();
   } else {
     alloDockRestore();

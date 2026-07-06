@@ -2618,7 +2618,7 @@ body.modal-open { overflow: hidden; }
   flex-direction: column;
   position: fixed;
   right: 22px;
-  width: 400px;
+  width: min(600px, calc(100vw - 32px));
   z-index: 950;
 }
 
