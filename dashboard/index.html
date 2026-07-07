@@ -511,6 +511,30 @@
                 </div>
                 <div class="remote-fields">
                   <label class="field">
+                    <span>Optimization target <small>Portfolios computed by this run</small></span>
+                    <select id="remote-optimization-target">
+                      <option value="max_sharpe,min_volatility" selected>Max Sharpe + Min Volatility</option>
+                      <option value="max_sharpe">Max Sharpe only</option>
+                      <option value="min_volatility">Min Volatility only</option>
+                      <option value="max_return">Max Return</option>
+                      <option value="risk_parity">Risk Parity</option>
+                      <option value="max_diversification">Max Diversification</option>
+                    </select>
+                  </label>
+                  <label class="field">
+                    <span>Solver mode <small>Auto picks per target and size</small></span>
+                    <select id="remote-solver-mode">
+                      <option value="auto" selected>Auto (recommended)</option>
+                      <option value="cvxpy-osqp">CVXPY · OSQP</option>
+                      <option value="cvxpy-ecos">CVXPY · ECOS</option>
+                      <option value="cvxpy-scs">CVXPY · SCS</option>
+                      <option value="scipy-slsqp">SciPy · SLSQP</option>
+                      <option value="scipy-trust-constr">SciPy · trust-constr</option>
+                    </select>
+                  </label>
+                </div>
+                <div class="remote-fields">
+                  <label class="field">
                     <span>Regularization</span>
                     <select id="remote-regularization">
                       <option value="none" selected>None</option>

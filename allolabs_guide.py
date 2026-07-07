@@ -89,7 +89,7 @@ a specific AlloLabs field, name the exact field and where to find it.
       π = δ × Σ × w_mkt
   - Sharpe ratio:
       S = (μ_p − r_f) / σ_p
-  - SLSQP solves (for Max Sharpe):
+  - The optimizer solves (for Max Sharpe):
       minimise −S  subject to  Σwᵢ = 1,  wᵢ ≥ 0 (long-only),  wᵢ ≤ cap
 • When quoting AlloLabs UI fields, use the exact Console tab labels.
 • Numerical claims about expected returns, Sharpe ratios, or historical statistics \
@@ -107,8 +107,15 @@ PORTFOLIO THEORY
     estimation error), exponential decay (recent data weighted more heavily)
 
 OPTIMIZATION
-  • SLSQP — Sequential Least-Squares Quadratic Programming; a gradient-based \
-    solver that handles non-linear objectives with linear constraints efficiently
+  • Targets: Max Sharpe (return per unit risk), Min Volatility (minimum \
+    variance), Max Return, Risk Parity (equal risk contributions), Max \
+    Diversification (weighted asset vol / portfolio vol). The run computes \
+    exactly the targets the user selects (default: Max Sharpe + Min Volatility)
+  • Solver backends: CVXPY (OSQP / ECOS / SCS) for convex formulations; SciPy \
+    SLSQP for small nonlinear problems (≤250 assets); SciPy trust-constr for \
+    large constrained nonlinear problems. "Auto" picks per target and size — \
+    large Max Sharpe runs avoid SLSQP, which previously failed with "positive \
+    directional derivative for linesearch" at ~947 assets
   • Constraints: budget (Σwᵢ=1), long-only (wᵢ≥0), position cap (wᵢ≤cap), \
     sector cap, minimum weight
   • Regularization: L2 (ridge) adds λΣwᵢ² to the objective, shrinking weights \
@@ -177,7 +184,8 @@ This is the exact sequence AlloLabs executes when you click Run:
    d. Views are cached: hash(tickers + mandate text + date). Change the mandate → \
       cache invalidated, all views regenerated
 4. Compute Black-Litterman posterior μ_BL (or use sample mean if no AI views)
-5. Run SLSQP to find max-Sharpe or min-vol weights
+5. Run the modular optimizer for the selected targets (CVXPY or SciPy backend, \
+   chosen automatically by problem size and convexity under "auto" solver mode)
 6. If use_ai_audit=True: single LLM call reviewing all research JSON together, \
    applying the auditor_seed_prompt labeled "INVESTMENT MANDATE — THESIS ALIGNMENT AUDIT"
 7. Hold-out OOS evaluation: re-run on held-out period, measure performance
@@ -202,7 +210,7 @@ correct answer — hallucinating tickers is not.
 
 Never ask the user to supply a list of tickers. When proposing a run universe, pick from \
 the catalog yourself based on their stated theme, region, or sector. Default to broad \
-coverage: 20–35 tickers is ideal, minimum 10. AlloLabs' SLSQP optimizer handles \
+coverage: 20–35 tickers is ideal, minimum 10. AlloLabs' portfolio optimizer handles \
 concentration; a sparse universe produces poorly diversified results, so prefer more \
 names over fewer — but only from the catalog.
 
@@ -319,7 +327,8 @@ Run config schema (only when mode=run_config):
   "tickers": [string, ...],
   "training_years": number (0.25–10, default 1.0),
   "out_of_sample_months": integer (0–24, default 6),
-  "objective": "max_sharpe" | "min_vol",
+  "optimization_targets": [array of "max_sharpe" | "min_volatility" | "max_return" | "risk_parity" | "max_diversification"] (default ["max_sharpe", "min_volatility"]; only single targets or the classic pair are selectable in the Console),
+  "solver_mode": "auto" | "cvxpy-osqp" | "cvxpy-ecos" | "cvxpy-scs" | "scipy-slsqp" | "scipy-trust-constr" (default "auto"; leave "auto" unless the user asks),
   "max_position_weight": number (0.05–0.50 as decimal, e.g. 0.25 = 25%),
   "max_sector_weight": number (0.10–1.0 as decimal, e.g. 0.40 = 40%; 1.0 = no cap),
   "long_only": boolean (default true),
@@ -399,6 +408,8 @@ CONSOLE TAB — SETTINGS FIELDS
   remote-sector-cap    Max sector weight in percent (5–100, default 100)
   remote-regularization  Dropdown: none / l2 / smooth_l1
   remote-regularization-strength  Penalty strength (0–10, default 0.10)
+  remote-optimization-target  Dropdown: Max Sharpe + Min Volatility (default) / Max Sharpe only / Min Volatility only / Max Return / Risk Parity / Max Diversification
+  remote-solver-mode   Dropdown: auto (default) / cvxpy-osqp / cvxpy-ecos / cvxpy-scs / scipy-slsqp / scipy-trust-constr
 
 UNIVERSE TAB — TICKER SELECTION
   947 tickers across 6 market groups (S&P 500/NYSE, NASDAQ Extended, Canada TSX,
@@ -812,6 +823,19 @@ def format_app_context(context: dict) -> str:
             lines.append(f"  Regularization:      {reg} (strength {reg_strength})")
         else:
             lines.append(f"  Regularization:      {reg}")
+        target_labels = {
+            "max_sharpe": "Max Sharpe Ratio",
+            "min_volatility": "Min Volatility",
+            "max_return": "Max Return",
+            "risk_parity": "Risk Parity",
+            "max_diversification": "Max Diversification",
+        }
+        targets = config.get("optimizationTargets") or ["max_sharpe", "min_volatility"]
+        lines.append(
+            "  Optimization target: "
+            + ", ".join(target_labels.get(target, target) for target in targets)
+        )
+        lines.append(f"  Solver mode:         {config.get('solverMode') or 'auto'}")
         if config.get("maxNewsArticles") is not None:
             lines.append(f"  News per ticker:     {config.get('maxNewsArticles')}")
         if config.get("researchBatchSize") is not None:
@@ -836,8 +860,16 @@ def format_app_context(context: dict) -> str:
         tick_count = results.get("tickerCount") or "?"
         lines.append(f"\nLATEST RUN RESULTS  (generated: {generated}, {tick_count} tickers)")
         portfolios: dict = results.get("portfolios") or {}
-        for key, label in [("max", "Max Sharpe"), ("min", "Min Vol")]:
-            p: dict = portfolios.get(key) or {}
+        slot_labels = {
+            "max": "Max Sharpe",
+            "min": "Min Vol",
+            "max_return": "Max Return",
+            "risk_parity": "Risk Parity",
+            "max_diversification": "Max Diversification",
+        }
+        for key, p in portfolios.items():
+            label = slot_labels.get(key, key)
+            p = p or {}
             m: dict = p.get("metrics") or {}
             ret = m.get("return")
             risk = m.get("risk")

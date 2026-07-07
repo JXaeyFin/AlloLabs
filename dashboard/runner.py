@@ -213,6 +213,10 @@ def configuration_environment(config: dict) -> dict[str, str]:
         "ALLOLABS_AUDITOR_SEED_PROMPT": str(config.get("auditorSeedPrompt", "")),
         "ALLOLABS_MAX_NEWS_ARTICLES": str(int(config.get("maxNewsArticles", 5))),
         "ALLOLABS_RESEARCH_BATCH_SIZE": str(int(config.get("researchBatchSize", 12))),
+        "ALLOLABS_OPTIMIZATION_TARGETS": ",".join(
+            config.get("optimizationTargets") or ["max_sharpe", "min_volatility"]
+        ),
+        "ALLOLABS_SOLVER_MODE": str(config.get("solverMode", "auto")),
     }
 
 
@@ -254,6 +258,69 @@ def portfolio_payload(tickers, weights, sectors, analysis):
     return {"holdings": holdings, "sectors": sectors_payload}
 
 
+LEGACY_PORTFOLIO_SLOTS = {"max_sharpe": "max", "min_volatility": "min"}
+
+
+def portfolio_slot_key(target: str) -> str:
+    """JSON slot for a computed target; "max"/"min" preserve the legacy shape."""
+    return LEGACY_PORTFOLIO_SLOTS.get(target, target)
+
+
+def normalized_portfolio_results(namespace: dict) -> list[dict]:
+    """Return the computed portfolios from the pipeline namespace.
+
+    Modern pipelines expose a ``portfolio_results`` mapping keyed by
+    optimization target; older namespaces only carry the classic Max Sharpe
+    and Min Volatility variables, which are normalized to the same shape.
+    """
+    raw = namespace.get("portfolio_results")
+    if isinstance(raw, dict) and raw:
+        return [dict(entry) for entry in raw.values()]
+
+    legacy: list[dict] = []
+    if namespace.get("w_sharpe") is not None:
+        entry = {
+            "target": "max_sharpe",
+            "label": "Max Sharpe Ratio",
+            "formalLabel": "Maximum Sharpe",
+            "columnKey": "Max_Sharpe",
+            "weights": namespace["w_sharpe"],
+            "solver": "scipy-slsqp",
+            "return": namespace["opt_ret_S"],
+            "risk": namespace["opt_risk_S"],
+            "sharpe": namespace["opt_sr_S"],
+        }
+        if namespace.get("oos_ret_sharpe") is not None:
+            entry["oos"] = {
+                "return": namespace["oos_ret_sharpe"],
+                "risk": namespace["oos_vol_sharpe"],
+                "sharpe": namespace.get("oos_sr_sharpe", 0.0),
+            }
+        legacy.append(entry)
+    if namespace.get("w_vol") is not None:
+        entry = {
+            "target": "min_volatility",
+            "label": "Min Volatility",
+            "formalLabel": "Minimum Volatility",
+            "columnKey": "Min_Vol",
+            "weights": namespace["w_vol"],
+            "solver": "scipy-slsqp",
+            "return": namespace["opt_ret_V"],
+            "risk": namespace["opt_risk_V"],
+            "sharpe": namespace["opt_sr_V"],
+        }
+        if namespace.get("oos_ret_vol") is not None:
+            entry["oos"] = {
+                "return": namespace["oos_ret_vol"],
+                "risk": namespace["oos_vol_vol"],
+                "sharpe": namespace.get("oos_sr_vol", 0.0),
+            }
+        legacy.append(entry)
+    if not legacy:
+        raise KeyError("The pipeline namespace exposes no computed portfolios.")
+    return legacy
+
+
 def safe_archive_name(value: object, fallback: str) -> str:
     cleaned = re.sub(r"[^a-z0-9]+", "-", str(value or "").strip().lower()).strip("-")
     return cleaned[:40] or fallback
@@ -275,8 +342,7 @@ def archive_completed_run(
     namespace: dict,
     data_dir: Path,
     tickers: list[str],
-    max_weights,
-    min_weights,
+    portfolios: list[dict],
     sectors: dict,
     analysis: dict,
     listing_metadata: dict,
@@ -299,16 +365,21 @@ def archive_completed_run(
     archive_dir.mkdir()
     history_id = f"{date_name}/{run_name}"
 
+    # One weight column per computed target; the classic pair keeps its
+    # historical column names (max_sharpe_weight, min_volatility_weight).
+    weight_columns = [f"{portfolio['target']}_weight" for portfolio in portfolios]
     allocation_rows = []
-    for ticker, max_weight, min_weight in zip(tickers, max_weights, min_weights):
+    for index, ticker in enumerate(tickers):
         item = analysis.get(ticker, {}) if isinstance(analysis.get(ticker), dict) else {}
         listing = listing_metadata.get(ticker, fallback_listing(ticker))
-        allocation_rows.append({
+        row = {
             "ticker": ticker,
             "sector": sectors.get(ticker, "Unclassified"),
             "industry": item.get("industry") or "Not classified",
-            "max_sharpe_weight": float(max_weight),
-            "min_volatility_weight": float(min_weight),
+        }
+        for column, portfolio in zip(weight_columns, portfolios):
+            row[column] = float(portfolio["weights"][index])
+        row.update({
             "posterior_return": item.get("posterior_return"),
             "confidence": item.get("confidence"),
             "ai_view": item.get("view") or "",
@@ -317,10 +388,11 @@ def archive_completed_run(
             "country": listing.get("country"),
             "currency": listing.get("currency"),
         })
+        allocation_rows.append(row)
     write_csv(
         archive_dir / "all-tickers.csv",
         [
-            "ticker", "sector", "industry", "max_sharpe_weight", "min_volatility_weight",
+            "ticker", "sector", "industry", *weight_columns,
             "posterior_return", "confidence", "ai_view", "exchange", "exchange_code",
             "country", "currency",
         ],
@@ -353,9 +425,12 @@ def archive_completed_run(
     (archive_dir / "ai-opinions.json").write_text(
         json.dumps(analysis, indent=2, default=json_value, ensure_ascii=False), encoding="utf-8"
     )
-    copy_candidates = {
-        "pdf": (Path(namespace["PORTFOLIO_REPORT_PATH"]), "portfolio-report.pdf"),
-    }
+    copy_candidates = {}
+    if namespace.get("portfolio_report_generated", True):
+        copy_candidates["pdf"] = (
+            Path(namespace["PORTFOLIO_REPORT_PATH"]),
+            "portfolio-report.pdf",
+        )
     if result.get("performance"):
         copy_candidates["chart"] = (
             data_dir / "portfolio_vs_markets_oos.png",
@@ -421,8 +496,7 @@ def write_latest_run(namespace: dict, config: dict, script_path: Path) -> Path:
         for ticker, item in analysis.items()
         if ticker in ticker_set
     }
-    max_weights = namespace["w_sharpe"]
-    min_weights = namespace["w_vol"]
+    portfolios = normalized_portfolio_results(namespace)
     listing_cache_path = data_dir / "listing_metadata_cache.json"
     listing_metadata = resolve_listing_metadata(analysis.keys(), listing_cache_path)
 
@@ -448,37 +522,49 @@ def write_latest_run(namespace: dict, config: dict, script_path: Path) -> Path:
             "oosEnd": json_value(namespace.get("oos_end")),
         },
         "metricsMode": (
-            "oos" if namespace.get("oos_ret_sharpe") is not None
+            "oos" if any(entry.get("oos") for entry in portfolios)
             else "ai" if config.get("gptViews")
             else "historical"
         ),
         "metrics": {
-            "max": {
-                "return": float(namespace["opt_ret_S"]),
-                "risk": float(namespace["opt_risk_S"]),
-                "sharpe": float(namespace["opt_sr_S"]),
-            },
-            "min": {
-                "return": float(namespace["opt_ret_V"]),
-                "risk": float(namespace["opt_risk_V"]),
-                "sharpe": float(namespace["opt_sr_V"]),
-            },
+            portfolio_slot_key(entry["target"]): {
+                "return": float(entry["return"]),
+                "risk": float(entry["risk"]),
+                "sharpe": float(entry["sharpe"]),
+            }
+            for entry in portfolios
         },
         "oosMetrics": {
-            "max": {
-                "return": float(namespace["oos_ret_sharpe"]),
-                "risk": float(namespace["oos_vol_sharpe"]),
-                "sharpe": float(namespace.get("oos_sr_sharpe", 0.0)),
-            },
-            "min": {
-                "return": float(namespace["oos_ret_vol"]),
-                "risk": float(namespace["oos_vol_vol"]),
-                "sharpe": float(namespace.get("oos_sr_vol", 0.0)),
-            },
-        } if namespace.get("oos_ret_sharpe") is not None else None,
+            portfolio_slot_key(entry["target"]): {
+                "return": float(entry["oos"]["return"]),
+                "risk": float(entry["oos"]["risk"]),
+                "sharpe": float(entry["oos"].get("sharpe", 0.0)),
+            }
+            for entry in portfolios
+            if entry.get("oos")
+        } if any(entry.get("oos") for entry in portfolios) else None,
         "portfolios": {
-            "max": portfolio_payload(tickers, max_weights, sectors, analysis),
-            "min": portfolio_payload(tickers, min_weights, sectors, analysis),
+            portfolio_slot_key(entry["target"]): portfolio_payload(
+                tickers, entry["weights"], sectors, analysis
+            )
+            for entry in portfolios
+        },
+        "optimization": {
+            "targets": [entry["target"] for entry in portfolios],
+            "solverMode": config.get("solverMode", "auto"),
+            "portfolios": [
+                {
+                    "target": entry["target"],
+                    "key": portfolio_slot_key(entry["target"]),
+                    "columnKey": entry.get("columnKey"),
+                    "label": entry.get("label") or entry["target"],
+                    "formalLabel": entry.get("formalLabel") or entry["target"],
+                    "solver": entry.get("solver"),
+                    "formulation": entry.get("formulation"),
+                    "message": entry.get("message") or "",
+                }
+                for entry in portfolios
+            ],
         },
         "research": [
             {
@@ -496,7 +582,11 @@ def write_latest_run(namespace: dict, config: dict, script_path: Path) -> Path:
         "researchAudit": namespace.get("gpt_audit_status", {}),
         "performance": performance,
         "artifacts": {
-            "pdf": str(namespace["PORTFOLIO_REPORT_PATH"]),
+            "pdf": (
+                str(namespace["PORTFOLIO_REPORT_PATH"])
+                if namespace.get("portfolio_report_generated", True)
+                else None
+            ),
             "allocations": str(data_dir / "portfolio_allocations.csv"),
             "sectorCache": str(data_dir / "sector_cache.json"),
             "listingCache": str(listing_cache_path),
@@ -508,8 +598,7 @@ def write_latest_run(namespace: dict, config: dict, script_path: Path) -> Path:
         namespace,
         data_dir,
         tickers,
-        max_weights,
-        min_weights,
+        portfolios,
         sectors,
         analysis,
         listing_metadata,

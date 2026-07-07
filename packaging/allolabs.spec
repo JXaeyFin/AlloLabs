@@ -28,6 +28,7 @@ app_hidden_imports = collect_submodules("webview", filter=include_webview_module
 worker_hidden_imports = collect_submodules("yfinance") + [
     "allolabs",
     "allolabs_company",
+    "allolabs_optimizer",
     "allolabs_paths",
     "allolabs_report",
     "allolabs_report_memo",
@@ -37,6 +38,12 @@ worker_hidden_imports = collect_submodules("yfinance") + [
     "scipy.optimize",
     "scipy.stats",
 ]
+# CVXPY accelerates convex optimization targets when present; the optimizer
+# layer degrades gracefully to SciPy when it is not bundled.
+try:
+    worker_hidden_imports += collect_submodules("cvxpy")
+except Exception:
+    pass
 
 app_analysis = Analysis(
     [str(root / "desktop" / "app.py")],

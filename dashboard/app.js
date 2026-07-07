@@ -585,6 +585,7 @@ function renderDonut(donutId, legendId, segments) {
 
 function renderPortfolio(key) {
   const data = portfolioData[key];
+  if (!data) return;
   const isMin = key === "min";
   setFinanceValue("portfolio-return", data.metricValues.return, data.metrics.return);
   setFinanceValue("portfolio-risk", data.metricValues.risk, data.metrics.risk, true);
@@ -744,8 +745,36 @@ function livePortfolio(portfolio, metrics) {
 // The performance payload keys its series by name; the benchmark is whichever
 // series is not one of the two model portfolios. Shared by the chart renderer
 // and the interactive tooltip so the lookup stays consistent.
+const PORTFOLIO_SERIES_KEYS = ["Max_Sharpe", "Min_Vol", "Max_Return", "Risk_Parity", "Max_Div"];
+const PORTFOLIO_SERIES_LABELS = {
+  Max_Sharpe: "Max Sharpe",
+  Min_Vol: "Min Vol",
+  Max_Return: "Max Return",
+  Risk_Parity: "Risk Parity",
+  Max_Div: "Max Div"
+};
+
 function benchmarkSeriesName(series) {
-  return Object.keys(series || {}).find((name) => !["Max_Sharpe", "Min_Vol"].includes(name));
+  return Object.keys(series || {}).find((name) => !PORTFOLIO_SERIES_KEYS.includes(name));
+}
+
+// Ordered portfolio slots for a result payload. Modern runs describe their
+// computed targets in results.optimization; older archives fall back to the
+// classic Max Sharpe / Min Volatility pair.
+function portfolioSlots(results) {
+  const described = results?.optimization?.portfolios;
+  if (Array.isArray(described) && described.length) {
+    return described.map((item) => ({
+      key: item.key || item.target,
+      target: item.target,
+      label: item.label || "Portfolio",
+      columnKey: item.columnKey || null
+    }));
+  }
+  return [
+    { key: "max", target: "max_sharpe", label: "Max Sharpe", columnKey: "Max_Sharpe" },
+    { key: "min", target: "min_volatility", label: "Min Vol", columnKey: "Min_Vol" }
+  ];
 }
 
 function chartPath(values, minimum, maximum) {
@@ -771,57 +800,69 @@ function renderOverviewMetrics(results) {
   const badge = document.getElementById("metrics-mode-badge");
   badge.dataset.mode = mode;
 
-  let maxRet, maxRisk, maxSharpe, minRet, minRisk, minSharpe;
+  const slots = portfolioSlots(results);
+  const primary = slots[0];
+  const secondary = slots[1] || null;
+  const useOos = mode === "oos" && results.oosMetrics;
+  const metricsFor = (slot) => {
+    if (!slot) return null;
+    const source = useOos ? results.oosMetrics : results.metrics;
+    return source?.[slot.key] || results.metrics?.[slot.key] || null;
+  };
+  const primaryMetrics = metricsFor(primary) || {};
+  const secondaryMetrics = metricsFor(secondary);
 
-  if (mode === "oos" && results.oosMetrics) {
-    ({ return: maxRet, risk: maxRisk, sharpe: maxSharpe } = results.oosMetrics.max);
-    ({ return: minRet, risk: minRisk, sharpe: minSharpe } = results.oosMetrics.min);
-    document.getElementById("overview-max-return-label").textContent = "Max Sharpe OOS return";
-    document.getElementById("overview-max-risk-label").textContent   = "Max Sharpe OOS volatility";
-    document.getElementById("overview-min-return-label").textContent = "Min Vol OOS return";
-    document.getElementById("overview-min-risk-label").textContent   = "Min Vol OOS volatility";
-    document.getElementById("overview-max-return-sub").innerHTML = `Realized Sharpe <span id="overview-max-sharpe">${Number(maxSharpe).toFixed(2)}</span>`;
-    document.getElementById("overview-max-risk-sub").textContent  = "Realized annualized volatility";
-    document.getElementById("overview-min-return-sub").innerHTML = `Realized Sharpe <span id="overview-min-sharpe">${Number(minSharpe).toFixed(2)}</span>`;
-    document.getElementById("overview-min-risk-sub").textContent  = "Realized annualized volatility";
-    badge.textContent = `Realized out-of-sample performance · ${oosMonths}-month test window`;
-  } else if (mode === "ai") {
-    ({ return: maxRet, risk: maxRisk, sharpe: maxSharpe } = results.metrics.max);
-    ({ return: minRet, risk: minRisk, sharpe: minSharpe } = results.metrics.min);
-    document.getElementById("overview-max-return-label").textContent = "Max Sharpe AI expected return";
-    document.getElementById("overview-max-risk-label").textContent   = "Max Sharpe risk";
-    document.getElementById("overview-min-return-label").textContent = "Min Vol AI expected return";
-    document.getElementById("overview-min-risk-label").textContent   = "Min Vol risk";
-    document.getElementById("overview-max-return-sub").innerHTML = `Sharpe <span id="overview-max-sharpe">${Number(maxSharpe).toFixed(2)}</span>`;
-    document.getElementById("overview-max-risk-sub").textContent  = "Historical volatility estimate";
-    document.getElementById("overview-min-return-sub").innerHTML = `Sharpe <span id="overview-min-sharpe">${Number(minSharpe).toFixed(2)}</span>`;
-    document.getElementById("overview-min-risk-sub").textContent  = "Historical volatility estimate";
-    badge.textContent = "AI-forecast returns · Historical volatility estimate";
+  const returnSuffix = useOos ? " OOS return" : mode === "ai" ? " AI expected return" : " return";
+  const riskSuffix = useOos ? " OOS volatility" : " risk";
+  const sharpePrefix = useOos ? "Realized Sharpe" : "Sharpe";
+  const riskSub = useOos
+    ? "Realized annualized volatility"
+    : mode === "ai" ? "Historical volatility estimate" : "Annualized volatility";
+  badge.textContent = useOos
+    ? `Realized out-of-sample performance · ${oosMonths}-month test window`
+    : mode === "ai"
+      ? "AI-forecast returns · Historical volatility estimate"
+      : "In-sample training period estimates";
+
+  document.getElementById("overview-max-return-label").textContent = primary.label + returnSuffix;
+  document.getElementById("overview-max-risk-label").textContent = primary.label + riskSuffix;
+  document.getElementById("overview-max-return-sub").innerHTML =
+    `${sharpePrefix} <span id="overview-max-sharpe">${Number(primaryMetrics.sharpe ?? 0).toFixed(2)}</span>`;
+  document.getElementById("overview-max-risk-sub").textContent = riskSub;
+
+  if (secondary && secondaryMetrics) {
+    document.getElementById("overview-min-return-label").textContent = secondary.label + returnSuffix;
+    document.getElementById("overview-min-risk-label").textContent = secondary.label + riskSuffix;
+    document.getElementById("overview-min-return-sub").innerHTML =
+      `${sharpePrefix} <span id="overview-min-sharpe">${Number(secondaryMetrics.sharpe ?? 0).toFixed(2)}</span>`;
+    document.getElementById("overview-min-risk-sub").textContent = riskSub;
   } else {
-    ({ return: maxRet, risk: maxRisk, sharpe: maxSharpe } = results.metrics.max);
-    ({ return: minRet, risk: minRisk, sharpe: minSharpe } = results.metrics.min);
-    document.getElementById("overview-max-return-label").textContent = "Max Sharpe return";
-    document.getElementById("overview-max-risk-label").textContent   = "Max Sharpe risk";
-    document.getElementById("overview-min-return-label").textContent = "Min Vol return";
-    document.getElementById("overview-min-risk-label").textContent   = "Min Vol risk";
-    document.getElementById("overview-max-return-sub").innerHTML = `Sharpe <span id="overview-max-sharpe">${Number(maxSharpe).toFixed(2)}</span>`;
-    document.getElementById("overview-max-risk-sub").textContent  = "Annualized volatility";
-    document.getElementById("overview-min-return-sub").innerHTML = `Sharpe <span id="overview-min-sharpe">${Number(minSharpe).toFixed(2)}</span>`;
-    document.getElementById("overview-min-risk-sub").textContent  = "Annualized volatility";
-    badge.textContent = "In-sample training period estimates";
+    document.getElementById("overview-min-return-label").textContent = "Second portfolio";
+    document.getElementById("overview-min-risk-label").textContent = "Second portfolio risk";
+    document.getElementById("overview-min-return-sub").textContent = "Not computed in this run";
+    document.getElementById("overview-min-risk-sub").textContent = "Not computed in this run";
   }
 
-  setFinanceValue("overview-max-return", maxRet, formatPercent(maxRet));
-  setFinanceValue("overview-max-risk",   maxRisk, formatPercent(maxRisk), true);
-  setFinanceValue("overview-min-return", minRet, formatPercent(minRet));
-  setFinanceValue("overview-min-risk",   minRisk, formatPercent(minRisk), true);
+  setFinanceValue("overview-max-return", primaryMetrics.return, formatPercent(primaryMetrics.return));
+  setFinanceValue("overview-max-risk",   primaryMetrics.risk, formatPercent(primaryMetrics.risk), true);
+  setFinanceValue("overview-min-return", secondaryMetrics?.return, secondaryMetrics ? formatPercent(secondaryMetrics.return) : "--");
+  setFinanceValue("overview-min-risk",   secondaryMetrics?.risk, secondaryMetrics ? formatPercent(secondaryMetrics.risk) : "--", true);
 }
 
 function renderPerformance(performance) {
   if (!performance?.dates?.length || !performance.series) return;
   performanceCache = performance;
-  const maxSeries = performance.series.Max_Sharpe || [];
-  const minSeries = performance.series.Min_Vol || [];
+  const portfolioKeys = PORTFOLIO_SERIES_KEYS.filter((key) => performance.series[key]);
+  const maxSeries = portfolioKeys[0] ? performance.series[portfolioKeys[0]] : [];
+  const minSeries = portfolioKeys[1] ? performance.series[portfolioKeys[1]] : [];
+  const legendSpans = document.querySelectorAll(".terminal-card .legend span");
+  if (legendSpans.length >= 2) {
+    const primaryLabel = PORTFOLIO_SERIES_LABELS[portfolioKeys[0]] || "Portfolio";
+    const secondaryLabel = portfolioKeys[1] ? PORTFOLIO_SERIES_LABELS[portfolioKeys[1]] : null;
+    legendSpans[0].lastChild.textContent = primaryLabel;
+    legendSpans[1].lastChild.textContent = secondaryLabel || "";
+    legendSpans[1].style.display = secondaryLabel ? "" : "none";
+  }
   const benchmarkName = benchmarkSeriesName(performance.series);
   const benchmarkSeries = benchmarkName ? performance.series[benchmarkName] : [];
   const allValues = [...maxSeries, ...minSeries, ...benchmarkSeries].map(Number).filter(Number.isFinite);
@@ -880,12 +921,35 @@ function applyLiveResults(results) {
 
   renderOverviewMetrics(results);
 
-  portfolioData = {
-    max: livePortfolio(results.portfolios.max, results.metrics.max),
-    min: livePortfolio(results.portfolios.min, results.metrics.min)
-  };
-  const selectedPortfolio = document.querySelector("[data-portfolio].active")?.dataset.portfolio || "max";
-  renderPortfolio(selectedPortfolio);
+  const slots = portfolioSlots(results);
+  portfolioData = {};
+  slots.forEach((slot) => {
+    const holdings = results.portfolios?.[slot.key];
+    if (holdings) {
+      portfolioData[slot.key] = livePortfolio(holdings, results.metrics?.[slot.key] || {});
+    }
+  });
+  const portfolioTabs = Array.from(document.querySelectorAll("button[data-portfolio]"));
+  const visibleSlots = slots.filter((slot) => portfolioData[slot.key]);
+  portfolioTabs.forEach((button, index) => {
+    const slot = visibleSlots[index];
+    if (slot) {
+      button.dataset.portfolio = slot.key;
+      button.textContent = slot.label;
+      button.style.display = "";
+    } else {
+      button.style.display = "none";
+    }
+  });
+  const activeKey = document.querySelector("button[data-portfolio].active")?.dataset.portfolio;
+  const renderKey = portfolioData[activeKey] ? activeKey : visibleSlots[0]?.key;
+  portfolioTabs.forEach((button) => {
+    button.classList.toggle(
+      "active",
+      button.style.display !== "none" && button.dataset.portfolio === renderKey
+    );
+  });
+  if (renderKey) renderPortfolio(renderKey);
 
   researchData = (results.research || [])
     .filter((item) => item.view)
@@ -932,6 +996,12 @@ function applyLiveResults(results) {
     : (results.config.maxSectorPercent ?? 100);
   document.getElementById("remote-regularization").value = results.config.regularization || "none";
   document.getElementById("remote-regularization-strength").value = results.config.regularizationStrength ?? 0.10;
+  const configTargets = (results.config.optimizationTargets || ["max_sharpe", "min_volatility"]).join(",");
+  const targetSelect = document.getElementById("remote-optimization-target");
+  if ([...targetSelect.options].some((option) => option.value === configTargets)) {
+    targetSelect.value = configTargets;
+  }
+  document.getElementById("remote-solver-mode").value = results.config.solverMode || "auto";
   document.getElementById("remote-refresh").checked = Boolean(results.config.refreshCache);
   document.getElementById("remote-analyst-seed").value = results.config.analystSeedPrompt || "";
   document.getElementById("remote-auditor-seed").value = results.config.auditorSeedPrompt || "";
@@ -1833,29 +1903,30 @@ function renderHistoryList() {
   `).join("");
 }
 
-function historyPortfolioRows(results) {
+function historyPortfolioRows(results, slots) {
   const rows = new Map();
-  ["max", "min"].forEach((portfolioKey) => {
-    (results.portfolios?.[portfolioKey]?.holdings || []).forEach((holding) => {
+  slots.forEach((slot) => {
+    (results.portfolios?.[slot.key]?.holdings || []).forEach((holding) => {
       const row = rows.get(holding.ticker) || {
         ticker: holding.ticker,
         sector: holding.sector || "Unclassified",
-        max: 0,
-        min: 0
+        weights: {}
       };
-      row[portfolioKey] = Number(holding.weight || 0);
+      row.weights[slot.key] = Number(holding.weight || 0);
       rows.set(holding.ticker, row);
     });
   });
-  return [...rows.values()].sort((left, right) =>
-    Math.max(Math.abs(right.max), Math.abs(right.min)) - Math.max(Math.abs(left.max), Math.abs(left.min))
+  const rowExtreme = (row) => Math.max(
+    0, ...slots.map((slot) => Math.abs(row.weights[slot.key] || 0))
   );
+  return [...rows.values()].sort((left, right) => rowExtreme(right) - rowExtreme(left));
 }
 
 function renderHistoryDetail(results, manifest) {
   const detail = document.getElementById("history-detail");
   const config = results.config || {};
-  const portfolioRows = historyPortfolioRows(results);
+  const historySlots = portfolioSlots(results).filter((slot) => results.portfolios?.[slot.key]);
+  const portfolioRows = historyPortfolioRows(results, historySlots);
   const opinions = (results.research || []).filter((item) => item.view);
   const configItems = Object.entries(config).map(([key, value]) => `
     <div class="history-config-item">
@@ -1867,8 +1938,10 @@ function renderHistoryDetail(results, manifest) {
     <tr>
       <td>${escapeHtml(row.ticker)}</td>
       <td>${escapeHtml(row.sector)}</td>
-      <td class="${financeClass(row.max)}">${(row.max * 100).toFixed(3)}%</td>
-      <td class="${financeClass(row.min)}">${(row.min * 100).toFixed(3)}%</td>
+      ${historySlots.map((slot) => {
+        const weight = row.weights[slot.key] || 0;
+        return `<td class="${financeClass(weight)}">${(weight * 100).toFixed(3)}%</td>`;
+      }).join("")}
     </tr>
   `).join("");
   const opinionTable = opinions.map((item) => `
@@ -1895,18 +1968,20 @@ function renderHistoryDetail(results, manifest) {
       </div>
     </div>
     <div class="history-stat-grid">
-      <div class="history-stat"><span>Max Sharpe return</span><strong class="${financeClass(results.metrics.max.return)}">${formatPercent(results.metrics.max.return)}</strong></div>
-      <div class="history-stat"><span>Max Sharpe risk</span><strong>${formatPercent(results.metrics.max.risk)}</strong></div>
-      <div class="history-stat"><span>Min Vol return</span><strong class="${financeClass(results.metrics.min.return)}">${formatPercent(results.metrics.min.return)}</strong></div>
-      <div class="history-stat"><span>Min Vol risk</span><strong>${formatPercent(results.metrics.min.risk)}</strong></div>
+      ${historySlots.map((slot) => {
+        const metrics = results.metrics?.[slot.key] || {};
+        return `
+      <div class="history-stat"><span>${escapeHtml(slot.label)} return</span><strong class="${financeClass(metrics.return)}">${formatPercent(metrics.return)}</strong></div>
+      <div class="history-stat"><span>${escapeHtml(slot.label)} risk</span><strong>${formatPercent(metrics.risk)}</strong></div>`;
+      }).join("")}
     </div>
     <h4 class="history-section-title">Run configuration</h4>
     <div class="history-config-grid">${configItems}</div>
     <h4 class="history-section-title">All portfolio holdings</h4>
     <div class="history-table-shell">
       <table class="history-table">
-        <thead><tr><th>Ticker</th><th>Sector</th><th>Max Sharpe</th><th>Min Volatility</th></tr></thead>
-        <tbody>${portfolioTable || '<tr><td colspan="4">No holdings stored.</td></tr>'}</tbody>
+        <thead><tr><th>Ticker</th><th>Sector</th>${historySlots.map((slot) => `<th>${escapeHtml(slot.label)}</th>`).join("")}</tr></thead>
+        <tbody>${portfolioTable || `<tr><td colspan="${2 + historySlots.length}">No holdings stored.</td></tr>`}</tbody>
       </table>
     </div>
     <h4 class="history-section-title">AI opinions (${opinions.length})</h4>
@@ -2191,7 +2266,9 @@ runnerStart.addEventListener("click", async () => {
     maxNewsArticles: Math.max(1, Math.min(20, parseInt(document.getElementById("remote-max-news").value) || 5)),
     researchBatchSize: Math.max(1, Math.min(30, parseInt(document.getElementById("remote-batch-size").value) || 12)),
     analystSeedPrompt: document.getElementById("remote-analyst-seed").value.trim(),
-    auditorSeedPrompt: document.getElementById("remote-auditor-seed").value.trim()
+    auditorSeedPrompt: document.getElementById("remote-auditor-seed").value.trim(),
+    optimizationTargets: document.getElementById("remote-optimization-target").value.split(","),
+    solverMode: document.getElementById("remote-solver-mode").value
   };
   try {
     if (config.trainingYears < 0.25 || config.trainingYears > 10) throw new Error("Training lookback must be between 0.25 and 10 years.");
@@ -2710,7 +2787,15 @@ function guideAppendConfigCard(config) {
   if (!chat) return;
 
   let gridHtml = '<div class="guide-config-grid">';
-  if (config.objective) gridHtml += `<div><span>Objective</span><strong>${config.objective === "max_sharpe" ? "Max Sharpe" : "Min Volatility"}</strong></div>`;
+  if (config.optimization_targets?.length || config.objective) {
+    const targetLabels = {
+      max_sharpe: "Max Sharpe", min_volatility: "Min Volatility", min_vol: "Min Volatility",
+      max_return: "Max Return", risk_parity: "Risk Parity", max_diversification: "Max Diversification"
+    };
+    const targets = config.optimization_targets?.length ? config.optimization_targets : [config.objective];
+    gridHtml += `<div><span>Objective</span><strong>${escapeHtml(targets.map((t) => targetLabels[t] || t).join(" + "))}</strong></div>`;
+  }
+  if (config.solver_mode && config.solver_mode !== "auto") gridHtml += `<div><span>Solver</span><strong>${escapeHtml(config.solver_mode)}</strong></div>`;
   if (config.tickers?.length) {
     const preview = config.tickers.slice(0, 8).join(", ") + (config.tickers.length > 8 ? `… +${config.tickers.length - 8}` : "");
     gridHtml += `<div><span>Tickers (${config.tickers.length})</span><strong>${escapeHtml(preview)}</strong></div>`;
@@ -2796,6 +2881,8 @@ function saveConsoleConfig() {
       sectorCap:              g("remote-sector-cap")?.value,
       regularization:         g("remote-regularization")?.value,
       regularizationStrength: g("remote-regularization-strength")?.value,
+      optimizationTarget:     g("remote-optimization-target")?.value,
+      solverMode:             g("remote-solver-mode")?.value,
     };
     localStorage.setItem(CONSOLE_CONFIG_STORAGE_KEY, JSON.stringify(cfg));
   } catch {}
@@ -2836,6 +2923,8 @@ function restoreConsoleConfig() {
     set("remote-sector-cap",             "sectorCap");
     set("remote-regularization",         "regularization");
     set("remote-regularization-strength","regularizationStrength");
+    set("remote-optimization-target",    "optimizationTarget");
+    set("remote-solver-mode",            "solverMode");
     if (cfg.researchProvider) {
       const el = document.getElementById("remote-research-provider");
       if (el) el.value = cfg.researchProvider;
@@ -3057,6 +3146,21 @@ function guideImportConfig(config, feedbackBtn) {
     if (el) { el.value = config.regularization; el.dispatchEvent(new Event("change")); }
   }
 
+  // Optimization target + solver mode (guide may send optimization_targets,
+  // a legacy single objective, or nothing at all)
+  const guideTargets = Array.isArray(config.optimization_targets)
+    ? config.optimization_targets.join(",")
+    : config.objective === "min_vol" ? "min_volatility"
+    : config.objective === "max_sharpe" ? "max_sharpe"
+    : null;
+  if (guideTargets) {
+    const el = document.getElementById("remote-optimization-target");
+    if (el && [...el.options].some((option) => option.value === guideTargets)) {
+      el.value = guideTargets;
+    }
+  }
+  if (config.solver_mode) setVal("remote-solver-mode", config.solver_mode);
+
   // Seed prompts
   setVal("remote-analyst-seed",  config.analyst_seed_prompt);
   setVal("remote-auditor-seed",  config.auditor_seed_prompt);
@@ -3123,30 +3227,31 @@ function gatherConsoleConfig() {
     researchBatchSize:     Number(document.getElementById("remote-batch-size")?.value) || 12,
     analystSeedPrompt:     document.getElementById("remote-analyst-seed")?.value?.trim() || "",
     auditorSeedPrompt:     document.getElementById("remote-auditor-seed")?.value?.trim() || "",
+    optimizationTargets:   (document.getElementById("remote-optimization-target")?.value || "max_sharpe,min_volatility").split(","),
+    solverMode:            document.getElementById("remote-solver-mode")?.value || "auto",
   };
 }
 
 function gatherLatestResults() {
   if (currentResultMode === "empty") return null;
-  const hasMax = portfolioData.max.holdings.length > 0;
-  if (!hasMax) return null;
+  const availableKeys = Object.keys(portfolioData || {}).filter(
+    (key) => portfolioData[key]?.holdings?.length > 0
+  );
+  if (!availableKeys.length) return null;
   const genAt = currentResultGeneratedAt
     ? new Date(currentResultGeneratedAt).toLocaleString()
     : null;
   return {
     hasData: true,
     generatedAt: genAt,
-    tickerCount: portfolioData.max.holdings.length,
-    portfolios: {
-      max: {
-        metrics: portfolioData.max.metricValues,
-        topHoldings: portfolioData.max.holdings.slice(0, 16),
+    tickerCount: portfolioData[availableKeys[0]].holdings.length,
+    portfolios: Object.fromEntries(availableKeys.map((key) => [
+      key,
+      {
+        metrics: portfolioData[key].metricValues,
+        topHoldings: portfolioData[key].holdings.slice(0, 16),
       },
-      min: {
-        metrics: portfolioData.min.metricValues,
-        topHoldings: portfolioData.min.holdings.slice(0, 16),
-      },
-    },
+    ])),
     research: (researchData || []).slice(0, 40).map((r) => ({
       ticker:         r.ticker,
       view:           r.thesis || "",

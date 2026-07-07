@@ -11,11 +11,11 @@ import unittest
 import urllib.error
 import urllib.request
 from pathlib import Path
-from types import SimpleNamespace
 from unittest.mock import patch
 
 import numpy as np
 
+import allolabs_optimizer
 import allolabs_paths
 import allolabs_guide
 from dashboard import runner, server
@@ -200,6 +200,114 @@ class ConfigurationTests(unittest.TestCase):
                 )
             )
 
+    def test_server_validates_optimization_targets_and_solver_mode(self):
+        # Absent fields keep the classic defaults for backward compatibility.
+        config = server.validate_config(dashboard_config())
+        self.assertEqual(config["optimizationTargets"], ["max_sharpe", "min_volatility"])
+        self.assertEqual(config["solverMode"], "auto")
+
+        config = server.validate_config(
+            dashboard_config(
+                optimizationTargets=["risk_parity"],
+                solverMode="scipy-trust-constr",
+            )
+        )
+        self.assertEqual(config["optimizationTargets"], ["risk_parity"])
+        self.assertEqual(config["solverMode"], "scipy-trust-constr")
+
+        with self.assertRaisesRegex(ValueError, "not allowlisted"):
+            server.validate_config(dashboard_config(optimizationTargets=["momentum"]))
+        with self.assertRaisesRegex(ValueError, "at least one"):
+            server.validate_config(dashboard_config(optimizationTargets=[]))
+        with self.assertRaisesRegex(ValueError, "list of target names"):
+            server.validate_config(dashboard_config(optimizationTargets="max_sharpe"))
+        with self.assertRaisesRegex(ValueError, "Solver mode"):
+            server.validate_config(dashboard_config(solverMode="gradient-descent"))
+
+    def test_runner_maps_optimization_targets_and_solver_mode(self):
+        environment = runner.configuration_environment(
+            dashboard_config(optimizationTargets=["max_sharpe"], solverMode="cvxpy-osqp")
+        )
+        self.assertEqual(environment["ALLOLABS_OPTIMIZATION_TARGETS"], "max_sharpe")
+        self.assertEqual(environment["ALLOLABS_SOLVER_MODE"], "cvxpy-osqp")
+
+        environment = runner.configuration_environment(dashboard_config())
+        self.assertEqual(
+            environment["ALLOLABS_OPTIMIZATION_TARGETS"],
+            "max_sharpe,min_volatility",
+        )
+        self.assertEqual(environment["ALLOLABS_SOLVER_MODE"], "auto")
+
+    def test_runner_normalizes_modern_and_legacy_portfolio_results(self):
+        modern = runner.normalized_portfolio_results({
+            "portfolio_results": {
+                "risk_parity": {
+                    "target": "risk_parity",
+                    "label": "Risk Parity",
+                    "formalLabel": "Risk Parity",
+                    "columnKey": "Risk_Parity",
+                    "weights": np.array([0.5, 0.5]),
+                    "solver": "scipy-slsqp",
+                    "return": 0.08,
+                    "risk": 0.12,
+                    "sharpe": 0.44,
+                },
+            },
+        })
+        self.assertEqual(len(modern), 1)
+        self.assertEqual(modern[0]["target"], "risk_parity")
+        self.assertEqual(runner.portfolio_slot_key("risk_parity"), "risk_parity")
+        self.assertEqual(runner.portfolio_slot_key("max_sharpe"), "max")
+        self.assertEqual(runner.portfolio_slot_key("min_volatility"), "min")
+
+        legacy = runner.normalized_portfolio_results({
+            "w_sharpe": np.array([0.6, 0.4]),
+            "opt_ret_S": 0.10,
+            "opt_risk_S": 0.15,
+            "opt_sr_S": 0.5,
+            "w_vol": np.array([0.5, 0.5]),
+            "opt_ret_V": 0.07,
+            "opt_risk_V": 0.09,
+            "opt_sr_V": 0.5,
+        })
+        self.assertEqual([entry["target"] for entry in legacy], ["max_sharpe", "min_volatility"])
+
+    def test_optimization_context_reaches_analyst_auditor_and_guide(self):
+        source = (REPOSITORY_ROOT / "allolabs.py").read_text(encoding="utf-8")
+        self.assertIn("ALLOLABS_OPTIMIZATION_TARGETS", source)
+        self.assertIn("ALLOLABS_SOLVER_MODE", source)
+        # Both LLM prompt builders carry the construction-objective block.
+        self.assertEqual(source.count("PORTFOLIO CONSTRUCTION OBJECTIVE"), 2)
+        self.assertIn("optimizer_context_lines", source)
+
+        lines = allolabs_optimizer.ai_context_lines(["max_sharpe"], "auto")
+        self.assertEqual(lines[0], "Optimization target: Max Sharpe Ratio")
+        self.assertEqual(lines[1], "Solver mode: auto")
+        self.assertIn("return-per-unit-risk", lines[2])
+
+        snapshot = allolabs_guide.format_app_context({
+            "selectedTickers": ["AAPL", "MSFT"],
+            "consoleConfig": {
+                "trainingYears": 1,
+                "optimizationTargets": ["risk_parity"],
+                "solverMode": "scipy-trust-constr",
+            },
+        })
+        self.assertIn("Optimization target: Risk Parity", snapshot)
+        self.assertIn("scipy-trust-constr", snapshot)
+
+    def test_frontend_exposes_optimization_target_and_solver_controls(self):
+        html = (REPOSITORY_ROOT / "dashboard" / "index.html").read_text(encoding="utf-8")
+        app_js = (REPOSITORY_ROOT / "dashboard" / "app.js").read_text(encoding="utf-8")
+        self.assertIn('id="remote-optimization-target"', html)
+        self.assertIn('id="remote-solver-mode"', html)
+        for target in server.ALLOWED_OPTIMIZATION_TARGETS:
+            self.assertIn(target, html)
+        for mode in sorted(server.ALLOWED_SOLVER_MODES):
+            self.assertIn(mode, html)
+        self.assertIn("optimizationTargets", app_js)
+        self.assertIn("solverMode", app_js)
+
     def test_provider_response_extractors(self):
         source = (REPOSITORY_ROOT / "allolabs.py").read_text(encoding="utf-8")
         tree = ast.parse(source)
@@ -320,39 +428,28 @@ class ConfigurationTests(unittest.TestCase):
         self.assertIn("Do not flatten mandate-consistent differentiation", source)
 
     def test_regularization_penalties_are_zero_at_target(self):
-        source = (REPOSITORY_ROOT / "allolabs.py").read_text(encoding="utf-8")
-        tree = ast.parse(source)
-        function = next(
-            node for node in tree.body
-            if isinstance(node, ast.FunctionDef) and node.name == "regularization_penalty"
+        spec = allolabs_optimizer.ProblemSpec(
+            target="min_volatility",
+            mu=np.array([0.1, 0.1]),
+            Sigma=np.eye(2) * 0.04,
+            regularization_method="l2",
+            regularization_strength=1.0,
         )
-        namespace = {"np": np}
-        exec(compile(ast.Module(body=[function], type_ignores=[]), "allolabs.py", "exec"), namespace)
-        target = np.array([0.5, 0.5])
+        target = spec.equal_weight
         concentrated = np.array([0.9, 0.1])
-        penalty = namespace["regularization_penalty"]
-        self.assertEqual(penalty(target, target, "l2", 1.0), 0.0)
-        self.assertGreater(penalty(concentrated, target, "l2", 1.0), 0.0)
-        self.assertGreater(penalty(concentrated, target, "smooth_l1", 1.0), 0.0)
+        self.assertEqual(allolabs_optimizer._penalty(spec, target), 0.0)
+        self.assertGreater(allolabs_optimizer._penalty(spec, concentrated), 0.0)
+        spec.regularization_method = "smooth_l1"
+        self.assertGreater(allolabs_optimizer._penalty(spec, concentrated), 0.0)
 
     def test_optimizer_covariance_and_gradients_are_numerically_stable(self):
         source = (REPOSITORY_ROOT / "allolabs.py").read_text(encoding="utf-8")
         tree = ast.parse(source)
-        function_names = {
-            "stabilize_covariance",
-            "portfolio_performance",
-            "regularization_penalty",
-            "regularization_gradient",
-            "negative_sharpe",
-            "negative_sharpe_gradient",
-            "portfolio_variance",
-            "portfolio_variance_gradient",
-        }
         functions = [
             node for node in tree.body
-            if isinstance(node, ast.FunctionDef) and node.name in function_names
+            if isinstance(node, ast.FunctionDef) and node.name == "stabilize_covariance"
         ]
-        namespace = {"np": np, "Tuple": tuple}
+        namespace = {"np": np}
         exec(compile(ast.Module(body=functions, type_ignores=[]), "allolabs.py", "exec"), namespace)
 
         singular = np.array([
@@ -365,69 +462,62 @@ class ConfigurationTests(unittest.TestCase):
         np.testing.assert_allclose(covariance, covariance.T)
 
         weights = np.array([0.40, 0.35, 0.25])
-        target = np.ones(3) / 3
         expected_returns = np.array([0.12, 0.08, 0.05])
         epsilon = 1e-6
 
-        objective_cases = [
-            (
-                namespace["negative_sharpe"],
-                namespace["negative_sharpe_gradient"],
-                (expected_returns, covariance, 0.0268, target, "l2", 0.2),
-            ),
-            (
-                namespace["portfolio_variance"],
-                namespace["portfolio_variance_gradient"],
-                (covariance, target, "smooth_l1", 0.2),
-            ),
+        gradient_cases = [
+            ("max_sharpe", "l2", 0.2),
+            ("min_volatility", "smooth_l1", 0.2),
+            ("max_return", "l2", 0.2),
+            ("max_diversification", "none", 0.0),
+            ("risk_parity", "none", 0.0),
         ]
-        for objective, gradient, arguments in objective_cases:
+        for target, method, strength in gradient_cases:
+            spec = allolabs_optimizer.ProblemSpec(
+                target=target,
+                mu=expected_returns,
+                Sigma=covariance,
+                risk_free_rate=0.0268,
+                regularization_method=method,
+                regularization_strength=strength,
+            )
+            objective, gradient = allolabs_optimizer._nonlinear_objective(spec)
             numerical = np.zeros_like(weights)
             for index in range(len(weights)):
                 step = np.zeros_like(weights)
                 step[index] = epsilon
                 numerical[index] = (
-                    objective(weights + step, *arguments)
-                    - objective(weights - step, *arguments)
+                    objective(weights + step) - objective(weights - step)
                 ) / (2 * epsilon)
             np.testing.assert_allclose(
-                gradient(weights, *arguments),
+                gradient(weights),
                 numerical,
                 rtol=1e-5,
                 atol=1e-6,
+                err_msg=f"analytic gradient mismatch for {target}",
             )
 
-        self.assertIn("run_slsqp_with_restarts", source)
-        self.assertIn('"maxiter": 3000', source)
+        optimizer_source = (REPOSITORY_ROOT / "allolabs_optimizer.py").read_text(encoding="utf-8")
+        self.assertIn('"maxiter": 3000', optimizer_source)
 
     def test_optimizer_validation_allows_shorts_only_when_configured(self):
-        source = (REPOSITORY_ROOT / "allolabs.py").read_text(encoding="utf-8")
-        tree = ast.parse(source)
-        function = next(
-            node for node in tree.body
-            if isinstance(node, ast.FunctionDef)
-            and node.name == "validated_optimizer_weights"
+        spec = allolabs_optimizer.ProblemSpec(
+            target="min_volatility",
+            mu=np.array([0.1, 0.1, 0.1]),
+            Sigma=np.eye(3) * 0.04,
+            long_only=False,
+            max_position_weight=0.75,
         )
-        namespace = {
-            "np": np,
-            "long_only": False,
-            "max_position_weight": 0.75,
-            "max_sector_weight": 1.0,
-            "optimizer_sector_indices": {},
-        }
-        exec(compile(ast.Module(body=[function], type_ignores=[]), "allolabs.py", "exec"), namespace)
-        result = SimpleNamespace(
-            success=True,
-            message="ok",
-            x=np.array([-0.2, 0.6, 0.6]),
+        raw = np.array([-0.2, 0.6, 0.6])
+        validated = allolabs_optimizer.validated_weights(
+            spec, raw, "Test", tolerance=1e-6
         )
-        validated = namespace["validated_optimizer_weights"](result, "Test")
         self.assertAlmostEqual(float(validated.sum()), 1.0)
         self.assertLess(float(validated.min()), 0.0)
 
-        namespace["long_only"] = True
+        spec.long_only = True
         with self.assertRaisesRegex(RuntimeError, "negative weight"):
-            namespace["validated_optimizer_weights"](result, "Test")
+            allolabs_optimizer.validated_weights(spec, raw, "Test", tolerance=1e-6)
 
     def test_audit_summary_detects_cross_set_edits(self):
         source = (REPOSITORY_ROOT / "allolabs.py").read_text(encoding="utf-8")
@@ -466,7 +556,12 @@ class ConfigurationTests(unittest.TestCase):
                 "build_global_audit_prompt",
             }
         ]
-        namespace = {"json": json}
+        namespace = {
+            "json": json,
+            "optimizer_context_lines": allolabs_optimizer.ai_context_lines(
+                ["max_sharpe", "min_volatility"], "auto"
+            ),
+        }
         exec(
             compile(ast.Module(body=functions, type_ignores=[]), "allolabs.py", "exec"),
             namespace,
@@ -481,6 +576,8 @@ class ConfigurationTests(unittest.TestCase):
             }
         ])
         self.assertIn("45-75 words", prompt)
+        self.assertIn("PORTFOLIO CONSTRUCTION OBJECTIVE", prompt)
+        self.assertIn("Optimization target: Max Sharpe Ratio, Min Volatility", prompt)
         self.assertIn("probability-weighted 12-month total-return", prompt)
         self.assertIn("systematic optimism or pessimism", prompt)
         self.assertIn("primary downside risk", prompt)

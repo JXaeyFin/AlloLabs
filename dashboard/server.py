@@ -78,6 +78,22 @@ def _load_catalog_metadata() -> dict:
 CATALOG_METADATA = _load_catalog_metadata()
 ALLOWED_UNIVERSES = {"index-leaders", "curated", "canada", "full", "custom"}
 ALLOWED_REGULARIZATIONS = {"none", "l2", "smooth_l1"}
+ALLOWED_OPTIMIZATION_TARGETS = (
+    "max_sharpe",
+    "min_volatility",
+    "max_return",
+    "risk_parity",
+    "max_diversification",
+)
+DEFAULT_OPTIMIZATION_TARGETS = ["max_sharpe", "min_volatility"]
+ALLOWED_SOLVER_MODES = {
+    "auto",
+    "cvxpy-osqp",
+    "cvxpy-ecos",
+    "cvxpy-scs",
+    "scipy-slsqp",
+    "scipy-trust-constr",
+}
 AI_PROVIDER_MODELS = {
     "openai": {"gpt-5.5", "gpt-5.4", "gpt-5.4-mini", "gpt-5.4-nano"},
     "anthropic": {
@@ -390,6 +406,10 @@ def validate_config(payload: dict) -> dict:
         auditor_seed_prompt = str(payload.get("auditorSeedPrompt", "")).strip()
         raw_max_news = payload.get("maxNewsArticles", 5)
         raw_batch_size = payload.get("researchBatchSize", 12)
+        raw_optimization_targets = payload.get(
+            "optimizationTargets", list(DEFAULT_OPTIMIZATION_TARGETS)
+        )
+        solver_mode = str(payload.get("solverMode", "auto"))
     except (KeyError, TypeError, ValueError) as exc:
         raise ValueError("Run configuration is incomplete or invalid.") from exc
 
@@ -476,6 +496,26 @@ def validate_config(payload: dict) -> dict:
     universe = preset_id_for_selection(selected_tickers, UNIVERSE_CATALOG)
     if regularization not in ALLOWED_REGULARIZATIONS:
         raise ValueError("Regularization method is not allowlisted.")
+    if not isinstance(raw_optimization_targets, list) or not all(
+        isinstance(target, str) for target in raw_optimization_targets
+    ):
+        raise ValueError("Optimization targets must be a list of target names.")
+    optimization_targets = list(dict.fromkeys(
+        target.strip().lower() for target in raw_optimization_targets
+    ))
+    if not optimization_targets:
+        raise ValueError("Select at least one optimization target.")
+    unsupported_targets = [
+        target for target in optimization_targets
+        if target not in ALLOWED_OPTIMIZATION_TARGETS
+    ]
+    if unsupported_targets:
+        raise ValueError(
+            "Optimization targets are not allowlisted: "
+            + ", ".join(unsupported_targets)
+        )
+    if solver_mode not in ALLOWED_SOLVER_MODES:
+        raise ValueError("Solver mode is not allowlisted.")
     if research_provider not in ALLOWED_AI_MODELS["research"]:
         raise ValueError("Selected research provider is not allowlisted.")
     if audit_provider not in ALLOWED_AI_MODELS["audit"]:
@@ -524,6 +564,8 @@ def validate_config(payload: dict) -> dict:
         "auditorSeedPrompt": auditor_seed_prompt,
         "maxNewsArticles": max_news_articles,
         "researchBatchSize": research_batch_size,
+        "optimizationTargets": optimization_targets,
+        "solverMode": solver_mode,
     }
 
 

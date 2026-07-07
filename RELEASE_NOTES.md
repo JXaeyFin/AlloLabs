@@ -1,3 +1,39 @@
+# AlloLabs v1.4.1 (unreleased)
+
+## Modular portfolio optimizer
+
+- Rebuilt portfolio construction as a modular optimizer layer
+  (`allolabs_optimizer.py`) with five selectable targets: Max Sharpe Ratio,
+  Min Volatility, Max Return, Risk Parity, and Max Diversification. A run
+  computes exactly the targets the user selects; the classic
+  Max Sharpe + Min Volatility pair remains the default.
+- Added solver backends: CVXPY (OSQP, ECOS, SCS) for convex formulations and
+  SciPy (SLSQP, trust-constr) for nonlinear ones, with an `auto` mode that
+  picks per target, convexity, and universe size. Unregularized Max Sharpe and
+  Max Diversification now use an exact convex fractional-programming
+  reformulation.
+- Fixed the known large-universe failure where SLSQP aborted with
+  `Positive directional derivative for linesearch` on ~947-asset Max Sharpe
+  runs. Auto mode routes large Max Sharpe to the convex reformulation (or
+  trust-constr when regularization keeps it nonlinear); SLSQP remains the
+  default only below 250 assets and can still be requested explicitly.
+- Added Console controls for optimization target and solver mode, with full
+  server allowlist validation, runner environment mapping
+  (`ALLOLABS_OPTIMIZATION_TARGETS`, `ALLOLABS_SOLVER_MODE`), and archived
+  run-config round-tripping. Existing configurations without the new fields
+  behave exactly as before.
+- Injected the selected optimization target, solver mode, and implied risk
+  posture into analyst research prompts, global audit prompts, and the Allo
+  guide's app-state snapshot, so AI reviews are calibrated to the portfolio
+  construction objective.
+- Generalized the console report, out-of-sample analysis, Jobson-Korkie
+  significance testing, performance chart, run archive, and dashboard results
+  to any computed target set. The PDF memorandum still requires the classic
+  pair (documented limitation); other target sets skip it with a console note.
+- CVXPY ships in `requirements.txt` but remains optional at runtime: without
+  it, every target still solves through SciPy with unchanged mathematical
+  meaning, and explicit `cvxpy-*` solver requests fail with a clear message.
+
 # AlloLabs v1.4.0
 
 Released July 5, 2026.

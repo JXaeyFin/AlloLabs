@@ -12,13 +12,23 @@ Each run produces two fully invested portfolios from the same return vector, cov
 |---|---|---|
 | Maximum Sharpe | Maximize `(expected return - risk-free rate) / volatility` | Highest estimated excess return per unit of risk |
 | Minimum volatility | Minimize annualized portfolio volatility | Lowest estimated variance under the active constraints |
+| Maximum return | Maximize expected return under the active constraints | Corner allocation into the strongest forecasts |
+| Risk parity | Equalize per-asset risk contributions | Balance covariance-based risk across holdings |
+| Maximum diversification | Maximize weighted asset volatility over portfolio volatility | Strongest diversification ratio |
+
+A run computes exactly the targets selected in the Console (default: Maximum Sharpe + Minimum volatility, matching earlier releases).
 
 The expected-return vector has two modes:
 
 - **Statistical mode**: annualized sample means from the training window
 - **AI-assisted mode**: a market-equilibrium prior updated with structured AI views through Black–Litterman
 
-Both modes use the same stabilized annualized covariance matrix and Sequential Least Squares Programming (SLSQP) optimizer.
+Both modes use the same stabilized annualized covariance matrix. Portfolio construction runs through a modular optimizer layer (`allolabs_optimizer.py`) with two solver families:
+
+- **CVXPY** (optional dependency) for convex formulations — OSQP for quadratic programs, ECOS/SCS for conic forms, with SCS as the large-scale fallback. Unregularized Maximum Sharpe and Maximum Diversification use an exact convex fractional-programming reformulation.
+- **SciPy** for nonlinear formulations — SLSQP with multi-start restarts for small universes (≤250 assets) and `trust-constr` for large constrained nonlinear problems.
+
+The default `auto` solver mode picks per target and problem size; large Maximum Sharpe runs never default to SLSQP (see `Known Issues/slsqp-positive-directional-derivative-large-max-sharpe.md`). Fallbacks are only taken when they preserve the target's mathematical meaning, and explicit solver choices that cannot express a target fail with a clear error.
 
 ## Financial model
 
