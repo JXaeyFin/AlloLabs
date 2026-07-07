@@ -117,9 +117,9 @@ thesis-alignment behavior, and makes the desktop workflow more resilient.
   v1.4.0.
 - Added a `Known Issues` note for large-universe Max Sharpe SLSQP line-search
   failures.
-- Expanded the release suite to 48 tests, including authenticated Guide endpoint
+- Expanded the release suite to 70 tests, including authenticated Guide endpoint
   tests, catalog coverage, DeepSeek request construction, provider masking, and
-  configuration wiring.
+  modular optimizer routing, solver fallback, and configuration wiring.
 
 ## Upgrade notes
 
@@ -134,8 +134,8 @@ thesis-alignment behavior, and makes the desktop workflow more resilient.
 
 ## Validation
 
-- `python -m unittest discover -s tests -v`: 48 tests run; 6 dependency-based
-  report tests skipped because scientific reporting packages were unavailable.
+- `python -m unittest discover -s tests -v`: 70 tests run; all passed in the
+  reviewed source checkout.
 - Python compilation checks pass for the pipeline, guide, relay, runner, and
   test suite.
 - `node --check dashboard/app.js` passes.

@@ -4,22 +4,27 @@ MPT Data-Driven Asset Allocation Model
 ================================================================================
 Author:      Jeffrey Xia
 Description: Implements Modern Portfolio Theory (MPT) on a global large-cap
-             equity universe using SLSQP optimization to construct:
+             equity universe using a modular optimizer layer to construct
+             exactly the requested portfolio targets:
                1. Maximum Sharpe Ratio (Tangency Portfolio)
-               2. Minimum Volatility (Global Minimum Variance Portfolio)
+               2. Minimum Volatility / Minimum Variance
+               3. Maximum Return
+               4. Risk Parity
+               5. Maximum Diversification
 
-             Both portfolios can be evaluated out of sample against broad
+             Computed portfolios can be evaluated out of sample against broad
              global equity market benchmarks.
 
              A Jobson-Korkie significance test is applied to assess whether
              out-of-sample Sharpe ratio outperformance is statistically
              meaningful.
 
-Methodology: SLSQP via scipy.optimize.minimize
+Methodology: CVXPY (OSQP/ECOS/SCS) for convex formulations; SciPy
+             SLSQP/trust-constr for nonlinear formulations.
 Data:        yfinance live prices (training + out-of-sample), pulled up to today
 Risk-Free:   2.68% (hardcoded placeholder; update to reflect current short-term rate)
 
-Dependencies: numpy, pandas, scipy, matplotlib, yfinance
+Dependencies: numpy, pandas, scipy, cvxpy, matplotlib, yfinance
 ================================================================================
 """
 
