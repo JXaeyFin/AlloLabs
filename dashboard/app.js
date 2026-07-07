@@ -2608,23 +2608,129 @@ const GUIDE_QUICK_ACTIONS = {
     "Give me a concise run-readiness checklist for my next AlloLabs optimization."
 };
 
-function guideFormatText(text) {
+function guideExtractFormatTokens(text) {
+  const tokens = [];
+  const stash = (kind, value) => {
+    const id = `@@ALLO_FORMAT_TOKEN_${tokens.length}@@`;
+    tokens.push({ id, kind, value });
+    return id;
+  };
+
+  let source = String(text ?? "").replace(/\r\n?/g, "\n");
+  source = source.replace(/```([\s\S]*?)```/g, (_, code) => stash("codeBlock", code.replace(/^\n|\n$/g, "")));
+  source = source.replace(/\$\$([\s\S]*?)\$\$/g, (_, math) => stash("mathBlock", math.trim()));
+  source = source.replace(/\\\[([\s\S]*?)\\\]/g, (_, math) => stash("mathBlock", math.trim()));
+  source = source.replace(/\\\(([\s\S]*?)\\\)/g, (_, math) => stash("mathInline", math.trim()));
+  return { source, tokens };
+}
+
+function guideRenderFormatToken(token) {
+  const safeValue = escapeHtml(token.value);
+  if (token.kind === "codeBlock") {
+    return `<pre class="guide-code-block"><code>${safeValue}</code></pre>`;
+  }
+  if (token.kind === "mathBlock") {
+    return `<div class="guide-math-block" aria-label="Math expression"><code>${safeValue}</code></div>`;
+  }
+  return `<span class="guide-math-inline">${safeValue}</span>`;
+}
+
+function guideRestoreFormatTokens(html, tokens) {
+  let output = html;
+  tokens.forEach((token) => {
+    const rendered = guideRenderFormatToken(token);
+    output = output.split(escapeHtml(token.id)).join(rendered).split(token.id).join(rendered);
+  });
+  return output;
+}
+
+function guideFormatInline(text) {
   let html = escapeHtml(text);
-  html = html.replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>");
   html = html.replace(/`([^`\n]+)`/g, "<code>$1</code>");
-  // Numbered lists
-  html = html.replace(/((?:^|\n)\d+\.\s.+)+/g, (block) => {
-    const items = block.trim().split(/\n(?=\d+\.\s)/);
-    return "<ol>" + items.map(i => `<li>${i.replace(/^\d+\.\s/, "")}</li>`).join("") + "</ol>";
-  });
-  // Bullet lists
-  html = html.replace(/((?:^|\n)[•\-]\s.+)+/g, (block) => {
-    const items = block.trim().split(/\n(?=[•\-]\s)/);
-    return "<ul>" + items.map(i => `<li>${i.replace(/^[•\-]\s/, "")}</li>`).join("") + "</ul>";
-  });
-  // Remaining newlines
-  html = html.replace(/\n/g, "<br>");
+  html = html.replace(/\*\*([^*\n]+)\*\*/g, "<strong>$1</strong>");
   return html;
+}
+
+function guideFormatText(text) {
+  const { source, tokens } = guideExtractFormatTokens(text);
+  const lines = source.split("\n");
+  const html = [];
+  let paragraph = [];
+  let listType = null;
+
+  const flushParagraph = () => {
+    if (!paragraph.length) return;
+    html.push(`<p>${guideFormatInline(paragraph.join(" "))}</p>`);
+    paragraph = [];
+  };
+
+  const closeList = () => {
+    if (!listType) return;
+    html.push(`</${listType}>`);
+    listType = null;
+  };
+
+  const openList = (type) => {
+    if (listType === type) return;
+    closeList();
+    html.push(`<${type}>`);
+    listType = type;
+  };
+
+  lines.forEach((rawLine) => {
+    const line = rawLine.trim();
+    if (!line) {
+      flushParagraph();
+      closeList();
+      return;
+    }
+
+    const tokenOnly = /^@@ALLO_FORMAT_TOKEN_(\d+)@@$/.exec(line);
+    if (tokenOnly && tokens[Number(tokenOnly[1])]?.kind !== "mathInline") {
+      flushParagraph();
+      closeList();
+      html.push(guideFormatInline(line));
+      return;
+    }
+
+    const heading = /^(#{1,4})\s+(.+)$/.exec(line);
+    if (heading) {
+      flushParagraph();
+      closeList();
+      const level = heading[1].length <= 2 ? 3 : 4;
+      html.push(`<h${level} class="guide-heading">${guideFormatInline(heading[2])}</h${level}>`);
+      return;
+    }
+
+    const ordered = /^\d+\.\s+(.+)$/.exec(line);
+    if (ordered) {
+      flushParagraph();
+      openList("ol");
+      html.push(`<li>${guideFormatInline(ordered[1])}</li>`);
+      return;
+    }
+
+    const bullet = /^[•*\-]\s+(.+)$/.exec(line);
+    if (bullet) {
+      flushParagraph();
+      openList("ul");
+      html.push(`<li>${guideFormatInline(bullet[1])}</li>`);
+      return;
+    }
+
+    closeList();
+    if (/^[^.!?]{2,90}:\s*$/.test(line)) {
+      flushParagraph();
+      html.push(`<h4 class="guide-subheading">${guideFormatInline(line.replace(/:\s*$/, ""))}</h4>`);
+      return;
+    }
+
+    paragraph.push(line);
+  });
+
+  flushParagraph();
+  closeList();
+  return guideRestoreFormatTokens(html.join(""), tokens);
 }
 
 function guideAppendMessage(role, content) {

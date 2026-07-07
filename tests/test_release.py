@@ -811,6 +811,34 @@ class ConfigurationTests(unittest.TestCase):
         self.assertIn(".allo-glow-fading", stylesheet)
         self.assertIn("@keyframes allo-glow-pulse", stylesheet)
 
+    def test_guide_chat_renders_markdown_and_math_readably(self):
+        script = (REPOSITORY_ROOT / "dashboard" / "app.js").read_text(encoding="utf-8")
+        stylesheet = (REPOSITORY_ROOT / "dashboard" / "terminal-theme.css").read_text(encoding="utf-8")
+
+        self.assertIn("function guideExtractFormatTokens", script)
+        self.assertIn("function guideFormatInline", script)
+        self.assertIn("function guideRestoreFormatTokens", script)
+        self.assertIn("function guideFormatText", script)
+        self.assertIn('stash("mathBlock"', script)
+        self.assertIn('stash("mathInline"', script)
+        self.assertIn('stash("codeBlock"', script)
+        self.assertIn('class="guide-heading"', script)
+        self.assertIn('class="guide-subheading"', script)
+        self.assertIn('class="guide-math-block"', script)
+        self.assertIn('class="guide-math-inline"', script)
+        self.assertIn('class="guide-code-block"', script)
+        self.assertIn("body.innerHTML = guideFormatText(content)", script)
+        self.assertIn("body.innerHTML = formattedHtml", script)
+
+        self.assertIn(".guide-message-body p", stylesheet)
+        self.assertIn(".guide-message-body .guide-heading", stylesheet)
+        self.assertIn(".guide-message-body .guide-subheading", stylesheet)
+        self.assertIn(".guide-message-body .guide-math-block", stylesheet)
+        self.assertIn(".guide-message-body .guide-math-inline", stylesheet)
+        self.assertIn(".guide-message-body .guide-code-block", stylesheet)
+        self.assertIn("overflow-x: auto;", stylesheet)
+        self.assertIn("white-space: pre;", stylesheet)
+
     def test_project_logo_is_used_by_dashboard_assets(self):
         markup = (REPOSITORY_ROOT / "dashboard" / "index.html").read_text(encoding="utf-8")
         stylesheet = (REPOSITORY_ROOT / "dashboard" / "terminal-theme.css").read_text(encoding="utf-8")

@@ -2289,6 +2289,14 @@ body.modal-open { overflow: hidden; }
   padding: 10px 14px;
 }
 
+.guide-message-body p {
+  margin: 0 0 10px;
+}
+
+.guide-message-body p:last-child {
+  margin-bottom: 0;
+}
+
 .guide-message-allo .guide-message-body {
   background: rgba(255,255,255,0.04);
   border: 1px solid rgba(255,255,255,0.07);
@@ -2311,6 +2319,57 @@ body.modal-open { overflow: hidden; }
   padding: 1px 5px;
 }
 
+.guide-message-body .guide-heading {
+  color: var(--text-bright, #fff);
+  font-size: 14px;
+  letter-spacing: 0.01em;
+  line-height: 1.35;
+  margin: 6px 0 8px;
+}
+
+.guide-message-body .guide-subheading {
+  color: var(--text-bright, #fff);
+  font-size: 12.5px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  line-height: 1.35;
+  margin: 10px 0 5px;
+}
+
+.guide-message-body .guide-math-block,
+.guide-message-body .guide-code-block {
+  background: rgba(255,255,255,0.055);
+  border: 1px solid rgba(255,255,255,0.09);
+  border-radius: 8px;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.035);
+  color: rgba(255,255,255,0.88);
+  margin: 9px 0 11px;
+  overflow-x: auto;
+  padding: 10px 12px;
+}
+
+.guide-message-body .guide-math-block code,
+.guide-message-body .guide-code-block code {
+  background: transparent;
+  border-radius: 0;
+  display: block;
+  font-size: 12px;
+  line-height: 1.55;
+  padding: 0;
+  white-space: pre;
+}
+
+.guide-message-body .guide-math-inline {
+  background: rgba(255,255,255,0.07);
+  border: 1px solid rgba(255,255,255,0.07);
+  border-radius: 5px;
+  color: rgba(255,255,255,0.92);
+  font-family: var(--font-mono, "Fira Code", monospace);
+  font-size: 11.5px;
+  padding: 1px 5px;
+  white-space: nowrap;
+}
+
 .guide-message-body ol,
 .guide-message-body ul {
   margin: 6px 0 6px 18px;
@@ -2319,6 +2378,10 @@ body.modal-open { overflow: hidden; }
 
 .guide-message-body li {
   margin-bottom: 3px;
+}
+
+.guide-message-body li:last-child {
+  margin-bottom: 0;
 }
 
 .guide-message-body strong {
